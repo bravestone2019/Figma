@@ -8,9 +8,10 @@
   border-radius: 18px;
   box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.3); /*  X-axis | Y-axis | blur | color  */
   display: flex;
-  /* gap: 6px; Space between icons */
-  padding: 10px 15px; /*  X-axis | Y-axis  */
+  padding: 8px 10px; /*  X-axis | Y-axis  */
   z-index: 1000;  /* Ensure the tools are above other content */
+  min-height: 30px; /* Ensure consistent height even on hover */
+  gap: 2px; /* Add space between icon groups */
 }
 
 .tooltip {
@@ -22,12 +23,13 @@
   border-radius: 10px;
   font-size: 12px;
   position: absolute;
-  left: 50%;
-  bottom: 125%; /* Show above the icon */
+  left: 45%;
+  bottom: 140%; /* Show above the icon */
   transform: translateX(-50%);
   white-space: nowrap;
   pointer-events: none;
-  transition: opacity 0.2s;
+  /* transition: opacity 0.2s; */
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   z-index: 1001;
 }
 
@@ -40,44 +42,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: 2px; /* Space between icons */
 }
 
 .icon-wrapper-other {
   position: relative;
   padding: 5px; /* Space for hover background */
-  border-radius: 8px; /* Rounded corners for the icon wrapper */
+  border-radius: 7px; /* Rounded corners for the icon wrapper */
   background-color: transparent;
   transition: background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 25px; /* Ensure consistent height */
+  width: 10px;  /* Ensure consistent width */
 }
 
 .icon-wrapper:hover {
   /* background-color: #f0f0f0; */
-  background-color: rgba(0, 0, 0, 0.05); /* soft gray circle */
-  transform: translateY(2px) scale(1.05); /* down + slight zoom */
+  background-color: rgba(0, 0, 0, 0.08); /* soft gray circle */
+  /* transform: translateY(2px) scale(1.05); */ /* down + slight zoom */
 }
 
 .icon-wrapper-other:hover {
   /* background-color: #f0f0f0; */
-  background-color: rgba(0, 0, 0, 0.05); /* soft gray circle */
-  transform: translateY(2px) scale(1.05); /* down + slight zoom */
+  background-color: rgba(0, 0, 0, 0.08); /* soft gray circle */
+  /* Remove height change to prevent container resize */
+  /* height: 25px; */
 }
 
 .icon-wrapper:hover .tooltip {
   visibility: visible;
   opacity: 1;
   transition-delay: 0.6s; /* Show tootip after 0.6s delay */
-}
+} 
 
 .icon-wrapper-other:hover .tooltip {
   visibility: visible;
   opacity: 1;
   transition-delay: 0.6s; /* Show tootip after 0.6s delay */
-}
+}  
 
-.tooltip::after {
+/* .tooltip::after {
   content: '';
   position: absolute;
   top: 100%;
@@ -86,7 +92,7 @@
   border-width: 6px;
   border-style: solid;
   border-color: #222 transparent transparent transparent;
-}
+} */
 
 .icon-wrapper.active {
   background-color: #189eff; /* blue background */
@@ -96,29 +102,38 @@
   box-shadow: 0 0 0 1px #189eff; /* thin blue border */
   /* transition: all 0.2s; */
 }
-
-
-/* .icon-wrapper.active .icon {
-  filter: brightness(0) invert(1) };  /* white icon effect */
-
+.icon-wrapper.active .icon {
+  filter: brightness(0) invert(1) /* white icon effect */
+}  
 
 .icon {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   display: block; 
 }
 
 .icon-down {
-  width: 13px;
-  height: 13px;
-  margin-left: -2px;   /* Pull closer to Move icon */
-  /* Optional: give small gap to the next button */
-  display: block; 
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .icon-group-tight {
   display: flex;
-  gap: 1px; 
+  gap: 1px; /* Add space between icons in a group */
   align-items: center;
   margin-right: 8px;
+}
+
+.tooltip.hide-tooltip {
+  display: none !important;
+}
+
+/* Disable all tooltips on hover when a dropdown is open */
+.dropdown-open .icon-wrapper:hover .tooltip,
+.dropdown-open .icon-wrapper-other:hover .tooltip {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition-delay: 0s !important;
 }

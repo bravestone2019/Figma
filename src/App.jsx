@@ -1,12 +1,11 @@
 // import './App.css';
-import Tools from './components/Tools.jsx';
+import Tool from './components/Tool.jsx';
 
 function App() {
 
   return (
     <>
-      {/* <h1>hello world </h1> */}
-      <Tools />
+      <Tool />
     </>
   )
 }

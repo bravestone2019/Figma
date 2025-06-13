@@ -1,0 +1,102 @@
+import '../../components/Tool.css';
+import './MoveTool.css';
+import { useState, useRef, useEffect } from "react";
+import Move from '../../assets/move.png';
+import Hand from '../../assets/hand.png';
+import Scale from '../../assets/scale.png';
+import DownArrow from '../../assets/down.png';
+
+const moveTools = [
+  { key: "Move", label: "Move", shortcut: "V", icon: Move },
+  { key: "Hand", label: "Hand", shortcut: "H", icon: Hand },
+  { key: "Scale", label: "Scale", shortcut: "K", icon: Scale }
+];
+
+const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip  }) => {
+  const [selected, setSelected] = useState(moveTools[0]); // Default to Move
+  const dropdownRef = useRef();
+  const tooltipTimeout = useRef();
+  const isThisDropdownOpen = openDropdown === "move";
+
+  useEffect(() => {
+    if (openDropdown) {
+      document.body.classList.add('dropdown-open');
+    } else {
+      document.body.classList.remove('dropdown-open');
+    }
+    return () => {
+      document.body.classList.remove('dropdown-open');
+    };
+  }, [openDropdown]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setOpenDropdown]);
+
+  useEffect(() => {
+    if (isThisDropdownOpen) {
+      setShowTooltip(false);
+      if (tooltipTimeout.current) clearTimeout(tooltipTimeout.current);
+    } else {
+      tooltipTimeout.current = setTimeout(() => setShowTooltip(true), 600);
+    }
+    return () => clearTimeout(tooltipTimeout.current);
+  }, [setShowTooltip, isThisDropdownOpen]);
+
+  const handleToolClick = (tool) => {
+    setActiveTool(tool);
+    setOpenDropdown(false);
+    // If a move is selected from dropdown, update selected
+    const found = moveTools.find(select => select.key === tool);
+    if (found) setSelected(found);
+  };
+
+  return (
+    <>
+      <div
+        className={`icon-wrapper${activeTool === selected.key ? " active" : ""}`}
+        onClick={() => handleToolClick(selected.key)}
+      >
+        <img src={selected.icon} alt={selected.label} className="icon" />
+        <span className="tooltip">{selected.label}&nbsp;&nbsp;&nbsp;&nbsp;{selected.shortcut}</span>
+      </div>
+      <div
+        className={`icon-wrapper-other${openDropdown ? " active" : ""}`}
+        onClick={event => {
+          event.stopPropagation();
+          const newState = openDropdown === "move" ? null : "move";
+          setOpenDropdown(newState);
+        }}
+      >
+        <img src={DownArrow} alt="move-tools" className="icon-down" />
+        <span className={`tooltip${!showTooltip ? " hide-tooltip" : ""}`}>Move Tools</span>
+        {openDropdown === "move" && (
+          <div className="move-dropdown-panel" ref={dropdownRef}>
+            {moveTools.map(tool => (
+              <div
+                key={tool.key}
+                className={`move-dropdown-item${activeTool === tool.key ? " selected" : ""}`}
+                onClick={() => handleToolClick(tool.key)}
+              >
+                <span className="move-dropdown-icon">
+                  <img src={tool.icon} alt={tool.label} style={{ width: 15, height: 15 }} />
+                </span>
+                <span>{tool.label}</span>
+                <span className="move-dropdown-shortcut">{tool.shortcut}</span>
+                {/* {activeTool === tool.key && <span className="move-dropdown-check">&#10003;</span>} */}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default MoveTool;
