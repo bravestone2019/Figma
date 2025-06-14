@@ -1,5 +1,6 @@
 import '../../../components/Tool.css';
 import './RegionTool.css';
+import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
 import Grid from '../../../assets/region/grid.png';
 import Section from '../../../assets/region/section.png';
@@ -48,6 +49,21 @@ const RegionTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, 
     }
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
+
+  // Grid: F
+  Shortcut({ key: "f" }, () => {
+    handleToolClick("Grid");
+  });
+
+  // Section: Ctrl + S
+  Shortcut({ ctrl: true, key: "s" }, () => {
+    handleToolClick("Section");
+  });
+
+  // Slice: S
+  Shortcut({ key: "s" }, () => {
+    handleToolClick("Slice");
+  });
 
   const handleToolClick = (tool) => {
     setActiveTool(tool);

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "../../components/Tool.css";
+import Shortcut from "../Shortcut";
 import Text from "../../assets/Text.png";
 
 const TextTool = ({ activeTool, setActiveTool, openDropdown }) => {
@@ -20,6 +21,10 @@ const TextTool = ({ activeTool, setActiveTool, openDropdown }) => {
   // useEffect(() => {
   //   document.body.style.cursor = setActiveTool ? "crosshair" : "default";
   // }, [setActiveTool]);
+
+  Shortcut({ key: "t" }, () => {
+  setActiveTool("Text");
+});
 
   return (
     <>

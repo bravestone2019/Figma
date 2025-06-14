@@ -1,5 +1,6 @@
 import '../../../components/Tool.css';
 import './MoveTool.css';
+import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
 import Move from '../../../assets/move_Tools/move.png';
 import Hand from '../../../assets/move_Tools/hand.png';
@@ -18,6 +19,10 @@ const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, sh
   const tooltipTimeout = useRef();
   const isThisDropdownOpen = openDropdown === "move";
 
+  useEffect(() => {
+    setActiveTool("Move");
+  }, [setActiveTool]);
+  
   useEffect(() => {
     if (openDropdown) {
       document.body.classList.add('dropdown-open');
@@ -48,6 +53,21 @@ const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, sh
     }
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
+
+  // Move: V
+  Shortcut({ key: "v" }, () => {
+    handleToolClick("Move");
+  });
+
+  // Hand: H
+  Shortcut({ key: "h" }, () => {
+    handleToolClick("Hand");
+  });
+
+  // Scale: K
+  Shortcut({ key: "k" }, () => {
+    handleToolClick("Scale");
+  });
 
   const handleToolClick = (tool) => {
     setActiveTool(tool);

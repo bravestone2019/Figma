@@ -1,5 +1,6 @@
 import '../../../components/Tool.css';
 import './CreationTool.css';
+import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
 import Pen from '../../../assets/creation_Tools/pen.png';
 import Pencil from '../../../assets/creation_Tools/pencil.png';
@@ -46,6 +47,16 @@ const CreationTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown
     }
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
+
+  // Pen : P
+  Shortcut({ key: "p" }, () => {
+    handleToolClick("Pen");
+  });
+
+  // Pencil: Ctrl + P
+  Shortcut({ ctrl: true, key: "p" }, () => {
+    handleToolClick("Pencil");
+  });
 
   const handleToolClick = (tool) => {
     setActiveTool(tool);

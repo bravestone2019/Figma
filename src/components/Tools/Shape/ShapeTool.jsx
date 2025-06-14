@@ -1,19 +1,22 @@
 import '../../../components/Tool.css';
 import './ShapeTool.css';
+import Image from './Image/images';
+import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
 import Rectangle from '../../../assets/Shapes/rectangle.png';
 import DownArrow from '../../../assets/down.png';
 import Line from '../../../assets/Shapes/line.png';
 import Circle from '../../../assets/Shapes/circle.png';
 import Triangle from '../../../assets/Shapes/triangle.png';
-import Image from '../../../assets/Shapes/image.png';
+import ImageIcon from '../../../assets/Shapes/image.png';
+
 
 const shapeTools = [
   { key: "Rectangle", label: "Rectangle", shortcut: "R", icon: Rectangle },
   { key: "Line", label: "Line", shortcut: "L", icon: Line },
   { key: "Circle", label: "Circle", shortcut: "C", icon: Circle },
   { key: "Triangle", label: "Triangle", shortcut: "shift+T", icon: Triangle },
-  { key: "Image", label: "Image", shortcut: "ctrl+shift+I", icon: Image },
+  { key: "Image", label: "Image", shortcut: "ctrl+shift+I", icon: ImageIcon },
 ];
 
 const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip  }) => {
@@ -52,6 +55,32 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   }
   return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
+
+  //  Keyboard shortcuts for shape tools
+  // Rectangle: R
+  Shortcut({ key: "r" }, () => {
+    handleToolClick("Rectangle");
+  });
+
+  // Line: L
+  Shortcut({ key: "l" }, () => {
+    handleToolClick("Line");
+  });
+
+  // Circle: C
+  Shortcut({ key: "c" }, () => {
+    handleToolClick("Circle");
+  });
+
+  // Triangle: Shift+T
+  Shortcut({ shift: true, key: "t" }, () => {
+    handleToolClick("Triangle");
+  });
+
+  // Image: Ctrl+Shift+I
+  Shortcut({ ctrl: true, shift: true, key: "i" }, () => {
+    handleToolClick("Image");
+  });
 
   const handleToolClick = (tool) => {
     setActiveTool(tool);
@@ -99,6 +128,8 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
           </div>
         )}
       </div>
+      {/* {activeTool === "Image" && <Image activeTool={activeTool} />}                 */}
+      <Image activeTool={activeTool} />
     </>
   );
 };
