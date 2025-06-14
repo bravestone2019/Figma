@@ -1,30 +1,43 @@
-import '../../components/Tool.css'
-import Text from '../../assets/Text.png';
-import { useEffect } from 'react';
+import { useEffect } from "react";
+import "../../components/Tool.css";
+import Text from "../../assets/Text.png";
 
-const TextTool = ({ activeTool, setActiveTool, showTextDropdown }) => {
-  // If you ever add a dropdown to TextTool, use this pattern:
+const TextTool = ({ activeTool, setActiveTool, openDropdown }) => {
+  // const [text, setText] = useState([]); // Array to store text objects
+  // const [isTextMode, setIsTextMode] = useState(false); // activate text mode 
+
   useEffect(() => {
-    if (showTextDropdown) {
-      document.body.classList.add('dropdown-open');
+    if (openDropdown) {
+      document.body.classList.add("dropdown-open");
     } else {
-      document.body.classList.remove('dropdown-open');
+      document.body.classList.remove("dropdown-open");
     }
     return () => {
-      document.body.classList.remove('dropdown-open');
+      document.body.classList.remove("dropdown-open");
     };
-  }, [showTextDropdown]);
+  }, [openDropdown]);
+
+  // useEffect(() => {
+  //   document.body.style.cursor = setActiveTool ? "crosshair" : "default";
+  // }, [setActiveTool]);
 
   return (
+    <>
     <div
       className={`icon-wrapper${activeTool === "Text" ? " active" : ""}`}
-      onClick={() => setActiveTool("Text")}
+      onClick={() =>
+        setActiveTool("Text")
+      }
     >
-        <img src={Text} alt="Text" className="icon" />
-        <span className="tooltip">Text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T</span>
+      <img src={Text} alt="Text" className="icon" />
+      <span className="tooltip">Text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T</span>
     </div>
+
+     
+
+    </>
+
   );
 };
 
 export default TextTool;
-

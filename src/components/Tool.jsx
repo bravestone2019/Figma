@@ -1,9 +1,9 @@
 import "./Tool.css";
 import { useState } from "react";
-import MoveTool from "./Tools/MoveTool";
-import RegionTool from "./Tools/RegionTool";
-import ShapeTool from "./Tools/ShapeTool";
-import CreationTool from "./Tools/CreationTool";
+import MoveTool from "./Tools/Move/MoveTool";
+import RegionTool from "./Tools/Region/RegionTool";
+import ShapeTool from "./Tools/Shape/ShapeTool";
+import CreationTool from "./Tools/Creation/CreationTool";
 import TextTool from "./Tools/TextTool";
 
 const Tool = () => {
@@ -46,7 +46,11 @@ const Tool = () => {
         setShowTooltip={ setShowTooltip }
         />
 
-      < TextTool activeTool={ activeTool } setActiveTool={ setActiveTool } />
+      < TextTool 
+        activeTool={ activeTool } 
+        setActiveTool={ setActiveTool } 
+        openDropdown={ openDropdown }
+        />
     </div>
   );
 };

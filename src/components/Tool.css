@@ -12,6 +12,7 @@
   z-index: 1000;  /* Ensure the tools are above other content */
   min-height: 30px; /* Ensure consistent height even on hover */
   gap: 2px; /* Add space between icon groups */
+  /* cursor: default;  */
 }
 
 .tooltip {
@@ -19,9 +20,9 @@
   opacity: 0;
   background: #222; 
   color: #fff;
-  padding: 6px 12px;
+  padding: 8px 16px; 
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 13px;
   position: absolute;
   left: 45%;
   bottom: 140%; /* Show above the icon */
