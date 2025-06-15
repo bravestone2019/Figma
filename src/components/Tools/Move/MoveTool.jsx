@@ -54,6 +54,19 @@ const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, sh
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
 
+//   useEffect(() => {
+//   const body = document.body;
+//   if (activeTool === "Move") {
+//     body.classList.add("cursor-move-tool");
+//   } else {
+//     body.classList.remove("cursor-move-tool");
+//   }
+
+//   return () => {
+//     body.classList.remove("cursor-move-tool");
+//   };
+// }, [activeTool]);
+
   // Move: V
   Shortcut({ key: "v" }, () => {
     handleToolClick("Move");

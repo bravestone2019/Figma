@@ -35,6 +35,7 @@
 }
 
 .icon-wrapper {
+  user-select: none;
   position: relative;
   padding: 8px; /* Space for hover background */
   border-radius: 10px; /* Rounded corners for the icon wrapper */
@@ -108,12 +109,14 @@
 }  
 
 .icon {
+  user-select: none;
   width: 18px;
   height: 18px;
   display: block; 
 }
 
 .icon-down {
+  user-select: none;
   width: 10px;
   height: 10px;
   display: inline-block;
@@ -137,4 +140,24 @@
   visibility: hidden !important;
   opacity: 0 !important;
   transition-delay: 0s !important;
+}
+
+.tools-disabled .icon-wrapper:not(.active),
+.tools-disabled .icon-wrapper-other {
+  pointer-events: none !important;
+  background: transparent !important;
+}
+.tools-disabled .icon-wrapper:not(.active):hover,
+.tools-disabled .icon-wrapper-other:hover {
+  background: transparent !important;
+}
+.tools-disabled .tooltip {
+  display: none !important;
+}
+
+.icon-wrapper,
+.icon-wrapper-other,
+.move-dropdown-panel,
+.move-dropdown-item {
+  cursor: default !important;
 }

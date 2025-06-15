@@ -2,16 +2,16 @@ import { useEffect } from "react";
 
 const Shortcut = (keyCombo, callback) => {
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      const key = e.key.toLowerCase();
+    const handleKeyDown = (event) => {
+      const key = event.key.toLowerCase();
       const expectedKey = keyCombo.key.toLowerCase();
 
-      const ctrlMatch = keyCombo.ctrl ? e.ctrlKey : !e.ctrlKey;
-      const shiftMatch = keyCombo.shift ? e.shiftKey : !e.shiftKey;
+      const ctrlMatch = keyCombo.ctrl ? event.ctrlKey : !event.ctrlKey;
+      const shiftMatch = keyCombo.shift ? event.shiftKey : !event.shiftKey;
     //   const altMatch = keyCombo.alt ? e.altKey : !e.altKey; && altMatch
 
       if (key === expectedKey && ctrlMatch && shiftMatch ) {
-        e.preventDefault();
+        event.preventDefault();
         callback();
       }
     };

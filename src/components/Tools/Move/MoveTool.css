@@ -63,3 +63,8 @@
   color: inherit !important;
   cursor: default;
 }
+
+/* .cursor-move-tool {
+  cursor: url('/cursor.png') 16 16 !important;
+} */
+

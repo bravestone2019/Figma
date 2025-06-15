@@ -78,7 +78,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Image: Ctrl+Shift+I
-  Shortcut({ ctrl: true, shift: true, key: "i" }, () => {
+  Shortcut({ ctrl: true, shift: true, key: "k" }, () => {
     handleToolClick("Image");
   });
 
