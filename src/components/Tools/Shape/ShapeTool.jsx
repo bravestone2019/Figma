@@ -3,7 +3,7 @@ import './ShapeTool.css';
 import Image from './Image/images';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
-import Rectangle from '../../../assets/Shapes/rectangle.png';
+import RectangleIcon from '../../../assets/Shapes/rectangle.png';
 import DownArrow from '../../../assets/down.png';
 import Line from '../../../assets/Shapes/line.png';
 import Circle from '../../../assets/Shapes/circle.png';
@@ -12,14 +12,14 @@ import ImageIcon from '../../../assets/Shapes/image.png';
 
 
 const shapeTools = [
-  { key: "Rectangle", label: "Rectangle", shortcut: "R", icon: Rectangle },
+  { key: "Rectangle", label: "Rectangle", shortcut: "R", icon: RectangleIcon },
   { key: "Line", label: "Line", shortcut: "L", icon: Line },
   { key: "Circle", label: "Circle", shortcut: "C", icon: Circle },
   { key: "Triangle", label: "Triangle", shortcut: "shift+T", icon: Triangle },
   { key: "Image", label: "Image", shortcut: "ctrl+shift+I", icon: ImageIcon },
 ];
 
-const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip  }) => {
+const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale }) => {
   const [selected, setSelected] = useState(shapeTools[0]); // Default to Rectangle
   const dropdownRef = useRef();
   const tooltipTimeout = useRef();
@@ -36,6 +36,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
     };
   }, [openDropdown]);
 
+  
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -45,6 +46,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setOpenDropdown]);
+  
 
   useEffect(() => {
   if (isThisDropdownOpen) {

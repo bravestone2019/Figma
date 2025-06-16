@@ -2,19 +2,19 @@ import '../../../components/Tool.css';
 import './RegionTool.css';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
-import Grid from '../../../assets/region/grid.png';
+import Frame from '../../../assets/region/frame.png';
 import Section from '../../../assets/region/section.png';
 import Slice from '../../../assets/region/slice.png';
 import DownArrow from '../../../assets/down.png';
 
 const regionTools = [
-  { key: "Grid", label: "Grid", shortcut: "F", icon: Grid },
+  { key: "Frame", label: "Frame", shortcut: "F", icon: Frame },
   { key: "Section", label: "Section ", shortcut: "ctrl+S", icon: Section },
   { key: "Slice", label: "Slice", shortcut: "S", icon: Slice }
 ];
 
 const RegionTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip  }) => {
-  const [selected, setSelected] = useState(regionTools[0]); // Default to Grid
+  const [selected, setSelected] = useState(regionTools[0]); // Default to Frame
   const dropdownRef = useRef();
   const tooltipTimeout = useRef();
   const isThisDropdownOpen = openDropdown === "region";
@@ -50,9 +50,9 @@ const RegionTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, 
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
 
-  // Grid: F
+  // Frame: F
   Shortcut({ key: "f" }, () => {
-    handleToolClick("Grid");
+    handleToolClick("Frame");
   });
 
   // Section: Ctrl + S

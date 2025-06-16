@@ -7,8 +7,7 @@ import CreationTool from "./Tools/Creation/CreationTool";
 import TextTool from "./Tools/TextTool";
 import Generate from "../components/Generate/Generate";
 
-const Tool = () => {
-  const [ activeTool, setActiveTool ] = useState( null );
+const Tool = ({ activeTool, setActiveTool, position, scale }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showTooltip, setShowTooltip] = useState(null);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
@@ -25,49 +24,61 @@ const Tool = () => {
   return (
     <div className={`tools-container${isGenerateOpen ? ' tools-disabled' : ''}`}>
       <MoveTool
-        activeTool={ activeTool }
-        setActiveTool={ isGenerateOpen ? () => {} : setActiveTool }
-        openDropdown={ isGenerateOpen ? null : openDropdown }
-        setOpenDropdown={ isGenerateOpen ? () => {} : setOpenDropdown }
-        showTooltip={ isGenerateOpen ? false : showTooltip }
-        setShowTooltip={ setShowTooltip }
+        activeTool={activeTool}
+        setActiveTool={isGenerateOpen ? () => {} : setActiveTool}
+        openDropdown={isGenerateOpen ? null : openDropdown}
+        setOpenDropdown={isGenerateOpen ? () => {} : setOpenDropdown}
+        showTooltip={isGenerateOpen ? false : showTooltip}
+        setShowTooltip={setShowTooltip}
+        position={position}
+        scale={scale}
       />
       <RegionTool
-        activeTool={ activeTool }
-        setActiveTool={ isGenerateOpen ? () => {} : setActiveTool }
-        openDropdown={ isGenerateOpen ? null : openDropdown }
-        setOpenDropdown={ isGenerateOpen ? () => {} : setOpenDropdown }
-        showTooltip={ isGenerateOpen ? false : showTooltip }
-        setShowTooltip={ setShowTooltip }
+        activeTool={activeTool}
+        setActiveTool={isGenerateOpen ? () => {} : setActiveTool}
+        openDropdown={isGenerateOpen ? null : openDropdown}
+        setOpenDropdown={isGenerateOpen ? () => {} : setOpenDropdown}
+        showTooltip={isGenerateOpen ? false : showTooltip}
+        setShowTooltip={setShowTooltip}
+        position={position}
+        scale={scale}
       />
-      < ShapeTool 
-        activeTool={ activeTool } 
-        setActiveTool={ isGenerateOpen ? () => {} : setActiveTool } 
-        openDropdown={ isGenerateOpen ? null : openDropdown }
-        setOpenDropdown={ isGenerateOpen ? () => {} : setOpenDropdown }
-        showTooltip={ isGenerateOpen ? false : showTooltip }
-        setShowTooltip={ setShowTooltip }
-        />
-      < CreationTool 
-        activeTool={ activeTool } 
-        setActiveTool={ isGenerateOpen ? () => {} : setActiveTool } 
-        openDropdown={ isGenerateOpen ? null : openDropdown }
-        setOpenDropdown={ isGenerateOpen ? () => {} : setOpenDropdown }
-        showTooltip={ isGenerateOpen ? false : showTooltip }
-        setShowTooltip={ setShowTooltip }
-        />
-      < TextTool 
-        activeTool={ activeTool } 
-        setActiveTool={ isGenerateOpen ? () => {} : setActiveTool } 
-        openDropdown={ isGenerateOpen ? null : openDropdown }
-        />
-      < Generate 
-        activeTool={ activeTool } 
-        setActiveTool={ setActiveTool } 
-        openDropdown={ openDropdown }
-        isGenerateOpen={ isGenerateOpen }
-        setIsGenerateOpen={ handleGenerateOpen }
-        />
+      <ShapeTool 
+        activeTool={activeTool} 
+        setActiveTool={isGenerateOpen ? () => {} : setActiveTool} 
+        openDropdown={isGenerateOpen ? null : openDropdown}
+        setOpenDropdown={isGenerateOpen ? () => {} : setOpenDropdown}
+        showTooltip={isGenerateOpen ? false : showTooltip}
+        setShowTooltip={setShowTooltip}
+        position={position}
+        scale={scale}
+      />
+      <CreationTool 
+        activeTool={activeTool} 
+        setActiveTool={isGenerateOpen ? () => {} : setActiveTool} 
+        openDropdown={isGenerateOpen ? null : openDropdown}
+        setOpenDropdown={isGenerateOpen ? () => {} : setOpenDropdown}
+        showTooltip={isGenerateOpen ? false : showTooltip}
+        setShowTooltip={setShowTooltip}
+        position={position}
+        scale={scale}
+      />
+      <TextTool 
+        activeTool={activeTool} 
+        setActiveTool={isGenerateOpen ? () => {} : setActiveTool} 
+        openDropdown={openDropdown}
+        position={position}
+        scale={scale}
+      />
+      <Generate 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool} 
+        openDropdown={openDropdown}
+        isGenerateOpen={isGenerateOpen}
+        setIsGenerateOpen={handleGenerateOpen}
+        position={position}
+        scale={scale}
+      />
     </div>
   );
 };

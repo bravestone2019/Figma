@@ -19,9 +19,13 @@ const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, sh
   const tooltipTimeout = useRef();
   const isThisDropdownOpen = openDropdown === "move";
 
+  // Update selected tool when activeTool changes
   useEffect(() => {
-    setActiveTool("Move");
-  }, [setActiveTool]);
+    const found = moveTools.find(tool => tool.key === activeTool);
+    if (found) {
+      setSelected(found);
+    }
+  }, [activeTool]);
   
   useEffect(() => {
     if (openDropdown) {
