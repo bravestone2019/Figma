@@ -3,11 +3,14 @@ import './Canvas.css';
 import { handleZoom, handlePinchZoom } from '../../utils/zoom';
 import { handleHorizontalPan, handleVerticalPan } from '../../utils/panning';
 
-const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setScale, drawnRectangles, setDrawnRectangles }) => {
+const Canvas = ({ activeTool, position, setPosition, scale, setScale, drawnRectangles, setDrawnRectangles }) => {
   const canvasRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [drawingRectangle, setDrawingRectangle] = useState(null); // New state for dynamic rectangle drawing
+  const [drawnImages, setDrawnImages] = useState([]); // State for placed images
+  const fileInputRef = useRef(null); // Ref for hidden file input
+  const [pendingImagePos, setPendingImagePos] = useState(null); // Store click position for image
 
   // Grid configuration
   const GRID_SIZE = 5; // Size of each grid cell in pixels
@@ -16,7 +19,7 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    // const ctx = canvas.getContext('2d');
 
     // Set canvas size to window size
     const resizeCanvas = () => {
@@ -101,6 +104,21 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
       );
     });
 
+    // Draw images
+    drawnImages.forEach(img => {
+      if (img.imageObj) {
+        ctx.globalAlpha = img.opacity || 1;
+        ctx.drawImage(
+          img.imageObj,
+          (img.x + position.x) * scale,
+          (img.y + position.y) * scale,
+          img.width * scale,
+          img.height * scale
+        );
+        ctx.globalAlpha = 1;
+      }
+    });
+
     // Draw the rectangle being currently drawn (dynamic preview)
     if (drawingRectangle) {
       const startX = drawingRectangle.startX;
@@ -123,10 +141,10 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
     }
   };
 
-  // Re-draw canvas content when position, scale, or drawnRectangles changes
+  // Re-draw canvas content when position, scale, drawnRectangles, drawnImages, or drawingRectangle changes
   useEffect(() => {
     drawCanvasContent();
-  }, [position, scale, drawnRectangles, drawingRectangle]); // Add drawingRectangle to dependencies
+  }, [position, scale, drawnRectangles, drawnImages, drawingRectangle]);
 
   // Handle mouse wheel for zooming and panning
   const handleWheel = (e) => {
@@ -172,7 +190,7 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
     }
   };
 
-  // Handle mouse down for panning or starting rectangle draw
+  // Handle mouse down for panning, starting rectangle draw, or image placement
   const handleMouseDown = (e) => {
     if (activeTool === 'Hand') {
       setIsDragging(true);
@@ -184,7 +202,49 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
         currentX: e.clientX,
         currentY: e.clientY,
       });
+    } else if (activeTool === 'Image') {
+      // Store click position and trigger file input
+      setPendingImagePos({ x: e.clientX, y: e.clientY });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+        fileInputRef.current.click();
+      }
     }
+  };
+
+  // Handle file input change for image placement
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file || !pendingImagePos) return;
+    const reader = new window.FileReader();
+    reader.onload = () => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Default size: 100x100 or image natural size (scaled down if too large)
+        const maxDim = 100;
+        let width = img.naturalWidth;
+        let height = img.naturalHeight;
+        if (width > maxDim || height > maxDim) {
+          const scale = Math.min(maxDim / width, maxDim / height);
+          width = width * scale;
+          height = height * scale;
+        }
+        setDrawnImages(prev => [
+          ...prev,
+          {
+            x: (pendingImagePos.x - position.x) / scale,
+            y: (pendingImagePos.y - position.y) / scale,
+            width,
+            height,
+            imageObj: img,
+            opacity: 1,
+          },
+        ]);
+        setPendingImagePos(null);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   // Handle mouse move for panning or drawing rectangle
@@ -238,18 +298,28 @@ const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setSc
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`canvas ${activeTool === 'Hand' ? 'hand-tool' : ''}`}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className={`canvas ${activeTool === 'Hand' ? 'hand-tool' : ''}`}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+      />
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+    </>
   );
 };
 
-export default Canvas; 
+export default Canvas;

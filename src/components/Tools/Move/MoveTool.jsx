@@ -58,6 +58,12 @@ const MoveTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, sh
     return () => clearTimeout(tooltipTimeout.current);
   }, [setShowTooltip, isThisDropdownOpen]);
 
+  useEffect(() => {
+    // Set Move as the default active tool and selected on mount
+    setActiveTool("Move");
+    setSelected(moveTools[0]);
+  }, [setActiveTool]);
+
 //   useEffect(() => {
 //   const body = document.body;
 //   if (activeTool === "Move") {

@@ -1,5 +1,6 @@
 import './App.css';
 import Tool from './components/Tool.jsx';
+import Panel from './components/Panel/Panel.jsx';
 import Canvas from './components/Canvas/Canvas';
 import { useState } from 'react';
 
@@ -11,22 +12,26 @@ function App() {
 
   return (
     <>
-      <Canvas 
-        activeTool={activeTool} 
-        setActiveTool={setActiveTool}
-        position={position}
-        setPosition={setPosition}
-        scale={scale}
-        setScale={setScale}
-        drawnRectangles={drawnRectangles}
-        setDrawnRectangles={setDrawnRectangles}
-      />
-      <Tool 
-        activeTool={activeTool} 
-        setActiveTool={setActiveTool} 
-        position={position}
-        scale={scale}
-      />
+      <Panel />
+      {/* <div className="main-content"> */}
+        <Canvas 
+          activeTool={activeTool} 
+          setActiveTool={setActiveTool}
+          position={position}
+          setPosition={setPosition}
+          scale={scale}
+          setScale={setScale}
+          drawnRectangles={drawnRectangles}
+          setDrawnRectangles={setDrawnRectangles}
+        />
+        {/* </div> */}
+        <Tool 
+          activeTool={activeTool} 
+          setActiveTool={setActiveTool} 
+          position={position}
+          scale={scale}
+        />
+      
     </>
   )
 }
