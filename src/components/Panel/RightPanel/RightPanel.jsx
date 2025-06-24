@@ -6,9 +6,9 @@ import Corner from "../../../assets/corner.png";
 
 const RightPanel = ({ collapsed, scale, position = { x: 100, y: 100 } }) => {
   const zoomPercent = Math.round((scale || 1) * 100);
-  const [isFillOpen, setIsFillOpen] = useState(true);
-  const [isStrokeOpen, setIsStrokeOpen] = useState(true);
-  const [isEffectsOpen, setIsEffectsOpen] = useState(true);
+  const [isFillOpen, setIsFillOpen] = useState(false);
+  const [isStrokeOpen, setIsStrokeOpen] = useState(false);
+  const [isEffectsOpen, setIsEffectsOpen] = useState(false);
   // const [strokeAlign, setStrokeAlign] = useState("Inside");
   // const [showStrokeAlignDropdown, setShowStrokeAlignDropdown] = useState(false);
 
