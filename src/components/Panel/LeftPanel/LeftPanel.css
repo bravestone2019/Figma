@@ -7,7 +7,7 @@
   border-right: 2px solid #e0e0e0;
   transition: all 0.3s ease;
   /* box-sizing: border-box; */
-  flex-direction: column; ;
+  flex-direction: column; 
 }  
 
 /* Toggle Button */
@@ -16,22 +16,31 @@
   align-items: center;
   justify-content: space-between; 
   position: relative;
-  /* border-bottom: 1px solid #e0e0e0; */
+  top: -18px;
 }
 
 /*  LOGO ICON */
 .logo-area {
-  display: flex;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;     
+  height: 45px;
+  top: 13px;
+  right: 70px;
+  margin: 16px 14px 0 auto;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.logo-area:hover{
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 .logo-icon {
   width: 42px;
   height: 40px;
-  display: block;
-  position: absolute;
-  padding: 3px 18px;
-  transition: background 0.2s;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -45,16 +54,12 @@
   border-radius: 10px;
   font-size: 12px;
   position: absolute;
-  transform: translateX(70%);
+  /* top: 20px; */
+  transform: translateX(86%);
   white-space: nowrap;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   z-index: 10;
-
-}
-
-.logo-area:hover{
-  background-color: rgba(0, 0, 0, 0.08);
 }
 
 .logo-area:hover .logo-tooltip {
@@ -124,25 +129,36 @@
   overflow-y: hidden;
   padding: 18px; 
   height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .left-panel-header {
   flex-shrink: 0;
   background: white;
   padding: 0 2px;
-  /* border-bottom: 1px solid #e0e0e0; */
 }
 
 .left-section-header {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: bold;
   cursor: default;
-  padding: 30px 0 14px 0;
-  /* border-bottom: 2px solid #e0e0e0; */
+  padding: 15px 0 14px 0;
+  margin-left: -10px; 
+}
+
+.left-section-header span {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  margin-right: 40px; 
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 .left-section-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: bold;
   cursor: default;
   padding: 15px 0 14px 0;
@@ -154,10 +170,34 @@
   content: "";
   position: absolute;
   bottom: 0;
-  left: -18px;
+  left: -20px;
   right: -20px;
   height: 1px;
   background-color: #e0e0e0;
+}
+
+.left-section-title.collapsed.scrolled::after {
+  content: none;
+}
+
+.left-section-title .arrow-icon {
+  width: 10px;
+  height: 10px;
+  margin-left: -15px;
+  margin-top: -2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none; /* ensures the icon doesn't interfere with hover */
+}
+
+.left-section-title:hover .arrow-icon {
+  opacity: 1;
+}
+
+.layers-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .left-header-divider {
@@ -166,18 +206,22 @@
   /* width: 100vh; */
   background-color: #e0e0e0;
    /* force full width ignoring parent padding */
-  margin-left: -18px;
+  margin-left: -20px;
   margin-right: -20px;
 }
 
 /* Scroll only inside this */
 .assets-scroll {
   flex-grow: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 10px 12px 0;
   margin-top: 8px;
   scroll-behavior: smooth;
   max-height: calc(100vh - 200px);
+}
+
+.assets-scroll:hover {
+  overflow-y: auto; /* show scrollbar on hover */
 }
 
 .assets-list {

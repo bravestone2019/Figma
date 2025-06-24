@@ -1,33 +1,44 @@
 import "./LeftPanel.css"; 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useLayoutEffect  } from "react";
+import Back from "../../../assets/back.png";
+import Down from "../../../assets/down.png";
 import Logo from "../../../assets/Logo.png";
 import Minimize from "../../../assets/layout.png";
 
 const LeftPanel = ({ collapsed, toggleCollapsed }) => {
     const titleRef = useRef(null);
     const scrollRef = useRef(null);
+    const scrollPosition = useRef(0);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [assetsCollapsed, setAssetsCollapsed] = useState(false);
 
-    useEffect(() => {
+    // Restore scroll position when expanding
+    useLayoutEffect(() => {
     const node = scrollRef.current;
 
-    const handleScroll = () => {
-        // const title = title.current;
-        if(node) {
-            setIsScrolled(node.scrollTop > 0);
-            };
-        };
+    if (!collapsed && !assetsCollapsed && node) {
+      node.scrollTop = scrollPosition.current;
 
-        if (node) {
-        node.addEventListener("scroll", handleScroll);
-        };
-        return () => {
-        if (node) {
-            node.removeEventListener("scroll", handleScroll);
-            };
-        };
-    }, []);
+      const handleScroll = () => {
+        setIsScrolled(node.scrollTop > 0);
+      };
 
+      node.addEventListener("scroll", handleScroll);
+      handleScroll(); 
+
+      return () => {
+        node.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, [collapsed, assetsCollapsed]);
+
+  // Save scroll position before collapsing
+  const handleAssetsCollapse = () => {
+    if (scrollRef.current && !assetsCollapsed) {
+      scrollPosition.current = scrollRef.current.scrollTop;
+    }
+    setAssetsCollapsed(!assetsCollapsed);
+  };
 
     return (
         <div className={`left-panel ${collapsed ? "collapsed" : ""}`}>
@@ -53,13 +64,29 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
             {!collapsed && (
                 <div className="left-panel-content">
                     <div className="left-panel-header">
-                        <div className="left-section-header">Files</div>
+                        <div className="left-section-header">
+                            <span>Files</span>
+                        </div>
                         <div className="left-header-divider" />
-                        <div className={`left-section-title ${isScrolled ? "scrolled" : ""}`} ref={titleRef}>Assets</div>
+                        <div className={`left-section-title ${isScrolled ? "scrolled" : ""} 
+                        ${assetsCollapsed ? "collapsed" : ""}`} 
+                        ref={titleRef} onClick={handleAssetsCollapse} 
+                        style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                            <div className="layers-header">
+                            <img
+                            className="arrow-icon"
+                                src={assetsCollapsed ? Back : Down}
+                                alt={assetsCollapsed ? "Expand" : "Collapse"}
+                                style={{ width: "10px", height: "10px", marginLeft: "-16px", marginTop: "-2px", transition: "transform 0.2s ease" }}
+                            />
+                            <span>Layers</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Scrolls only this part */}
-                    <div className="assets-scroll" ref={scrollRef} >
+                    {!assetsCollapsed && (
+                    <div className="assets-scroll" ref={scrollRef}  >
                         <ul className="assets-list">
                         {[
                             "Layer 1", "Layer 2", "Layer 3", "Background", "Text Box", "Image 1",
@@ -74,7 +101,7 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
                         <div style={{ height: "35px" }} /> {/* Spacer at the bottom */}
                         </ul>
                     </div>
-                    
+                    )}
                 </div>
             )}
         </div>
@@ -82,5 +109,4 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
 };
 
 export default LeftPanel;
-
 

@@ -3,14 +3,24 @@ import { useEffect } from "react";
 const Shortcut = (keyCombo, callback) => {
   useEffect(() => {
     const handleKeyDown = (event) => {
+      const el = document.activeElement;
+      const tag = el?.tagName?.toLowerCase();
+
+      // ❌ BLOCK all shortcuts if focused in <input>, <textarea>, or contentEditable
+      if (
+        tag === 'textarea' ||
+        tag === 'input' ||
+        el?.isContentEditable
+      ) {
+        return;
+      }
+
       const key = event.key.toLowerCase();
       const expectedKey = keyCombo.key.toLowerCase();
-
       const ctrlMatch = keyCombo.ctrl ? event.ctrlKey : !event.ctrlKey;
       const shiftMatch = keyCombo.shift ? event.shiftKey : !event.shiftKey;
-    //   const altMatch = keyCombo.alt ? e.altKey : !e.altKey; && altMatch
 
-      if (key === expectedKey && ctrlMatch && shiftMatch ) {
+      if (key === expectedKey && ctrlMatch && shiftMatch) {
         event.preventDefault();
         callback();
       }
@@ -22,4 +32,3 @@ const Shortcut = (keyCombo, callback) => {
 };
 
 export default Shortcut;
-

@@ -13,7 +13,6 @@ function App() {
   return (
     <>
       <Panel />
-      {/* <div className="main-content"> */}
         <Canvas 
           activeTool={activeTool} 
           setActiveTool={setActiveTool}
@@ -24,7 +23,6 @@ function App() {
           drawnRectangles={drawnRectangles}
           setDrawnRectangles={setDrawnRectangles}
         />
-        {/* </div> */}
         <Tool 
           activeTool={activeTool} 
           setActiveTool={setActiveTool} 
