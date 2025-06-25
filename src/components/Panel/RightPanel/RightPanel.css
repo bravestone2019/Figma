@@ -13,8 +13,7 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
   overflow-y: hidden;
-} 
-
+}
 
 .right-panel-content {
   display: flex;
@@ -25,19 +24,19 @@
   /* padding: 18px;  */
   height: 100%;
   padding: 0 18px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .right-panel-header {
   display: flex;
-  justify-content: space-between; 
-  align-Items: center;
+  justify-content: space-between;
+  align-items: center;
   /* flex-shrink: 0; */
   background: white;
   padding: 18px 0 0;
   z-index: 2;
   position: sticky;
-  top: 0; 
+  top: 0;
 }
 
 .right-section-header {
@@ -52,7 +51,7 @@
   height: 1px;
   /* width: 100vh; */
   background-color: #e0e0e0;
-   /* force full width ignoring parent padding */
+  /* force full width ignoring parent padding */
   margin-left: -20px;
   margin-right: -18px;
 }
@@ -72,7 +71,7 @@
   cursor: default;
   padding: 15px 0 14px 0;
   position: relative;
-} 
+}
 
 .clickable {
   /* cursor: pointer; */
@@ -80,11 +79,11 @@
 }
 
 .position-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    width: 75%;
-    margin-left: 30px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  width: 75%;
+  margin-left: 25px;
 }
 
 .pos-box {
@@ -93,7 +92,7 @@
   align-items: center;
   background-color: #ededed;
   border-radius: 10px;
-  padding: 8px 15px;
+  padding: 7px 12px;
   font-weight: bold;
   font-size: 12px;
   gap: 2px;
@@ -110,16 +109,16 @@
 }
 
 .pos-box span:first-child {
-    font-weight: bold;
-    font-size: 10px;
-    margin-right: 6px;
+  font-weight: bold;
+  font-size: 10px;
+  margin-right: 6px;
 }
 
 .pos-box input {
   margin-left: 2px;
-  width: 22px;
+  width: 40px;
   border: none;
-  background:none;
+  background: none;
   cursor: default;
   font-weight: bold;
   font-size: 12px;
@@ -148,7 +147,7 @@
   /* padding: 8px 15px 8px; */
   padding: 8px 12px;
   width: 160%;
-  font-weight:bold;
+  font-weight: bold;
   font-size: 12px;
   gap: 2px;
 }
@@ -179,7 +178,7 @@
 
 .pos-box-fill input:first-child {
   margin-left: 0;
-  left: 0  
+  left: 0;
 }
 
 .pos-box-fill span {
@@ -199,21 +198,18 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-
-
-
 .zoom-indicator {
-    font-size: 12px;
-    font-weight:bold;
-    margin-left: 40%;
-    padding: 10px;
-    background: white;
-    border-radius: 8px;
-    user-select: none;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 40%;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  user-select: none;
 }
 
-.zoom-indicator:hover { 
-    background-color: rgba(0, 0, 0, 0.08);
+.zoom-indicator:hover {
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Scrollable body */
@@ -222,13 +218,13 @@ input[type="number"]::-webkit-outer-spin-button {
   padding-top: 10px;
   padding-bottom: 18px;
   flex-grow: 1;
-  scrollbar-width: none;          
-  -ms-overflow-style: none;   
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* Chrome, Edge, Safari scrollbar styling */
 .right-panel-scrollable::-webkit-scrollbar {
-  display: none;         
+  display: none;
 }
 
 .right-panel-scrollable::-webkit-scrollbar-track {
@@ -244,30 +240,11 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #999;
 }
 
-.reset-size-btn{
-  background: none;
-  border: none;
-  /* margin-left: 4px; */
-  /* margin-top: 2px; */
-  border-radius: 8px;
-  padding: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  position: relative;
-}
-
-.reset-size-btn:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
 .stroke-top-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 
 .stroke-bottom-row {
   display: flex;
@@ -317,4 +294,26 @@ input[type="number"]::-webkit-outer-spin-button {
   border-radius: 6px;
   font-size: 12px;
   padding: 0 6px;
+}
+
+.zoom-collapsed-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: rgba(128, 128, 128, 0.8);
+}
+
+.zoom-collapsed-indicator {
+  background: #fff;
+  color: #111;
+  font-size: 2rem;
+  padding: 1.2rem 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  font-family: inherit;
+  font-weight: 400;
+  text-align: center;
+  min-width: 120px;
+  user-select: none;
 }

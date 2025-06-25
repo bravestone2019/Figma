@@ -1,0 +1,17 @@
+.reset-size-btn{
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  position: relative;
+  margin-left: -2px;
+  margin-top: -2px;
+}
+
+.reset-size-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
