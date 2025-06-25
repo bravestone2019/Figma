@@ -11,22 +11,24 @@ function App() {
 
   return (
     <>
-      <Canvas 
-        activeTool={activeTool} 
-        setActiveTool={setActiveTool}
-        position={position}
-        setPosition={setPosition}
-        scale={scale}
-        setScale={setScale}
-        drawnRectangles={drawnRectangles}
-        setDrawnRectangles={setDrawnRectangles}
-      />
-      <Tool 
-        activeTool={activeTool} 
-        setActiveTool={setActiveTool} 
-        position={position}
-        scale={scale}
-      />
+      {/* <div className="main-content"> */}
+        <Canvas 
+          activeTool={activeTool} 
+          setActiveTool={setActiveTool}
+          position={position}
+          setPosition={setPosition}
+          scale={scale}
+          setScale={setScale}
+          drawnRectangles={drawnRectangles}
+          setDrawnRectangles={setDrawnRectangles}
+        />
+        {/* </div> */}
+        <Tool 
+          activeTool={activeTool} 
+          setActiveTool={setActiveTool} 
+          position={position}
+          scale={scale}
+        />
     </>
   )
 }
