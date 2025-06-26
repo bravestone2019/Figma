@@ -23,13 +23,13 @@ function App() {
           drawnRectangles={drawnRectangles}
           setDrawnRectangles={setDrawnRectangles}
         />
+        {/* </div> */}
         <Tool 
           activeTool={activeTool} 
           setActiveTool={setActiveTool} 
           position={position}
           scale={scale}
         />
-      
     </>
   )
 }

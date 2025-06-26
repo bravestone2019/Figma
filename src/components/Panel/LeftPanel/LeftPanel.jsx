@@ -42,24 +42,25 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
 
     return (
         <div className={`left-panel ${collapsed ? "collapsed" : ""}`}>
-            <div className="left-toggle-panel">
-                <div className="logo-area">
+            {/* <div className="left-toggle-panel"> */}
+                {/* <div className="logo-area">
                     <img
                         src={Logo}
                         alt="Minimize"
                         className="logo-icon"
                     />
                     <span className="logo-tooltip">Main Menu</span>
-                </div>
+                </div> */}
                 <div className="toggle-wrapper" onClick={toggleCollapsed}>
-                    <img
-                        src={Minimize}
-                        alt="Minimize"
-                        className="toggle-icon"
-                    />
-                    <span className="left-toggle"> {collapsed ? "Expand UI" : "Minimize UI"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/</span>
-                </div>
+              <img src={Minimize} alt="Minimize" className="toggle-icon" />
+              <span className="left-toggle">
+                {" "}
+                {collapsed ? "Expand UI" : "Minimize UI"}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/
+              </span>
             </div>
+                
+            {/* </div> */}
 
             {!collapsed && (
                 <div className="left-panel-content">

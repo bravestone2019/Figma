@@ -63,4 +63,32 @@
   padding: 8px 10px;
 } */
 
+.toggle-left {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 96%;
+  /* z-index: 100; */
+}
 
+.toggle-right {
+  position: relative;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top:0
+}
+
+/* position: fixed;
+  top: 0;
+  right: 0;
+  width: 60px; 
+  height: 100vh;
+  background-color: #fff;
+  border-left: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100; */
