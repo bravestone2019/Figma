@@ -26,6 +26,16 @@ const isPointInShape = (shape, x, y, ctx = null, scale = 1) => {
     const A2 = area(x1, y1, x, y, x3, y3);
     const A3 = area(x1, y1, x2, y2, x, y);
     return Math.abs(A - (A1 + A2 + A3)) < 0.5;
+  } else if (shape.type === "image") {
+    // Add a small tolerance for better image selection
+    const tolerance = 2 / scale; // 2 pixels tolerance, scaled by zoom level
+    
+    return (
+      x >= shape.x - tolerance &&
+      x <= shape.x + shape.width + tolerance &&
+      y >= shape.y - tolerance &&
+      y <= shape.y + shape.height + tolerance
+    );
   } else if (shape.type === "text") {
     let width = shape.width || 50;
     let height = shape.height || 20;

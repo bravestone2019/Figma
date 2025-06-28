@@ -11,6 +11,7 @@ const CanvasDrawing = forwardRef(({
   drawingLine,
   drawingCircle,
   drawingTriangle,
+  drawingImage,
   textBox,
   hoveredShape,
   activeTool,
@@ -37,6 +38,19 @@ const CanvasDrawing = forwardRef(({
   useEffect(() => {
     drawCanvas();
   }, [drawCanvas]);
+
+  // Set up redraw callback for images
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.redrawCallback = drawCanvas;
+    }
+    
+    return () => {
+      if (canvasRef.current) {
+        canvasRef.current.redrawCallback = null;
+      }
+    };
+  }, [canvasRef, drawCanvas]);
 
   // Expose redraw method
   useImperativeHandle(ref, () => ({

@@ -1,5 +1,5 @@
 // shapePreview.js
-// Draws the preview shape on the canvas (rectangle, line, circle, triangle, text box)
+// Draws the preview shape on the canvas (rectangle, line, circle, triangle, text box, image)
 
 export function shapePreview({
   preview,
@@ -69,6 +69,29 @@ export function shapePreview({
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
+  } else if (preview.type === "image") {
+    const { startX, startY, currentX, currentY } = preview;
+    const rectX = Math.min(startX, currentX);
+    const rectY = Math.min(startY, currentY);
+    const rectWidth = Math.abs(currentX - startX);
+    const rectHeight = Math.abs(currentY - startY);
+    
+    // Draw image preview placeholder
+    ctx.fillStyle = "rgba(100, 150, 255, 0.3)";
+    ctx.strokeStyle = "#6496ff";
+    ctx.lineWidth = 2 / scale;
+    ctx.globalAlpha = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+    ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+    ctx.setLineDash([]);
+    
+    // Draw image icon
+    ctx.fillStyle = "#6496ff";
+    ctx.font = `${Math.min(rectWidth, rectHeight) / 4}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("📷", rectX + rectWidth / 2, rectY + rectHeight / 2);
   } else if (preview.type === "text") {
     const { startX, startY, currentX, currentY } = preview;
     const rectX = Math.min(startX, currentX);

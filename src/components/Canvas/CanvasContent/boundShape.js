@@ -41,6 +41,14 @@ export function getBoundingRect(shape) {
       const height = Math.max(...ys) - y;
       return { x, y, width, height };
     }
+    case 'image': {
+      return {
+        x: shape.x,
+        y: shape.y,
+        width: shape.width,
+        height: shape.height,
+      };
+    }
     case 'text': {
       // For text, we need width and height, which may be stored or measured elsewhere
       // Here, we assume shape has x, y, width, height (fallback to fontSize if not)
@@ -62,7 +70,9 @@ export function getBoundingRect(shape) {
       const height = Math.max(...ys) - y;
       return { x, y, width, height };
     }
-    default:
+    default: {
+      console.warn(`Unknown shape type: ${shape.type}`);
       return { x: 0, y: 0, width: 0, height: 0 };
+    }
   }
 } 

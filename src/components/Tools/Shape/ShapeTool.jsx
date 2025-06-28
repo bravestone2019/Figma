@@ -1,6 +1,6 @@
 import '../../../components/Tool.css';
 import './ShapeTool.css';
-import Image from './Image/images';
+import Image from './Image/Images';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
 import RectangleIcon from '../../../assets/Shapes/rectangle.png';
@@ -19,7 +19,7 @@ const shapeTools = [
   { key: "Image", label: "Image", shortcut: "ctrl+shift+I", icon: ImageIcon },
 ];
 
-const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale }) => {
+const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale, setDrawnRectangles }) => {
   const [selected, setSelected] = useState(shapeTools[0]); // Default to Rectangle
   const dropdownRef = useRef();
   const tooltipTimeout = useRef();
@@ -80,7 +80,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Image: Ctrl+Shift+I
-  Shortcut({ ctrl: true, shift: true, key: "k" }, () => {
+  Shortcut({ ctrl: true, shift: true, key: "i" }, () => {
     handleToolClick("Image");
   });
 
@@ -131,7 +131,13 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
         )}
       </div>
       {/* {activeTool === "Image" && <Image activeTool={activeTool} />}                 */}
-      <Image activeTool={activeTool} />
+      <Image 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool}
+        setDrawnRectangles={setDrawnRectangles} 
+        position={position} 
+        scale={scale} 
+      />
     </>
   );
 };

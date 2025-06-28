@@ -146,6 +146,24 @@ function drawCanvasContent({
           ctx.lineWidth = shape.borderWidth / scale;
         }
         ctx.stroke();
+      } else if (shape.type === "image") {
+        ctx.globalAlpha = shape.opacity;
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, shape.x, shape.y, shape.width, shape.height);
+        };
+        img.src = shape.src;
+        
+        // Draw border for selected/locked images
+        if (shape.locked) {
+          ctx.strokeStyle = "red";
+          ctx.lineWidth = 2 / scale;
+          ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+        } else if (activeTool === "Move" && i === hoveredShape) {
+          ctx.strokeStyle = "#2196f3";
+          ctx.lineWidth = Math.max(2 / scale, 1);
+          ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+        }
       } else if (shape.type === "text") {
         ctx.font = `${shape.fontSize || 16}px Arial`;
         ctx.fillStyle = shape.color;

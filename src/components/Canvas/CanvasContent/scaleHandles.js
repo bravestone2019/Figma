@@ -122,7 +122,7 @@ export function drawLineHandles(ctx, line, scale) {
  * @returns {Object} - The new shape object
  */
 export function resizeShape(shape, handleType, origBounds, mouse) {
-  if (shape.type === 'rectangle' || shape.type === 'text') {
+  if (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image') {
     let { x, y, width, height } = origBounds;
     let newX = x, newY = y, newW = width, newH = height;
     switch (handleType) {

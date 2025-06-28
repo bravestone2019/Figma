@@ -28,6 +28,7 @@ function App() {
           setActiveTool={setActiveTool} 
           position={position}
           scale={scale}
+          setDrawnRectangles={setDrawnRectangles}
         />
     </>
   )

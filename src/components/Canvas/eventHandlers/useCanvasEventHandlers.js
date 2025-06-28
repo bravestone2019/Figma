@@ -27,6 +27,8 @@ const useCanvasEventHandlers = ({
   setDrawingCircle,
   drawingTriangle,
   setDrawingTriangle,
+  drawingImage,
+  setDrawingImage,
   textInput,
   setTextInput,
   textBox,
@@ -69,10 +71,10 @@ const useCanvasEventHandlers = ({
   }, [position, scale, setPosition, setScale]);
 
   // Handle mouse down for panning or starting shape draw
-  const handleMouseDownCb = handleMouseDown(position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setTextBox, setScalingHandle);
+  const handleMouseDownCb = handleMouseDown(position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setDrawingImage, setTextBox, setScalingHandle);
 
   // Handle mouse move for panning or drawing shapes
-  const handleMouseMoveCb = handleMouseMove(position, scale, canvasRef, textInput, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox, scalingHandle, setScalingHandle);
+  const handleMouseMoveCb = handleMouseMove(position, scale, canvasRef, textInput, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, drawingImage, setDrawingImage, textBox, setTextBox, scalingHandle, setScalingHandle);
 
   // Handle mouse up to stop panning or finalize shape drawing
   const handleMouseUpCb = handleMouseUp(
@@ -95,6 +97,8 @@ const useCanvasEventHandlers = ({
     setDrawingCircle,
     drawingTriangle,
     setDrawingTriangle,
+    drawingImage,
+    setDrawingImage,
     textBox,
     setTextBox,
     setActiveTool,
@@ -113,10 +117,11 @@ const useCanvasEventHandlers = ({
     setDrawingLine(null);
     setDrawingCircle(null);
     setDrawingTriangle(null);
+    setDrawingImage(null);
     setTextBox(null);
     setSelectionBox(null);
     setSelectedShapes([]);
-  }, [setIsDragging, setMovingShape, setHoveredShape, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setTextBox, setSelectionBox, setSelectedShapes]);
+  }, [setIsDragging, setMovingShape, setHoveredShape, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setDrawingImage, setTextBox, setSelectionBox, setSelectedShapes]);
 
   // Add context menu handler for locking shapes
   const handleContextMenuCb = handleContextMenu(canvasRef, position, scale, drawnRectangles, isPointInShape, setDrawnRectangles);

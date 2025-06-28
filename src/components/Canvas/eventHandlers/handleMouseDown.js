@@ -18,6 +18,7 @@ const handleMouseDown = (
   setDrawingLine,
   setDrawingCircle,
   setDrawingTriangle,
+  setDrawingImage,
   setTextBox,
   setScalingHandle
 ) =>
@@ -31,6 +32,7 @@ const handleMouseDown = (
       setDrawingLine(null);
       setDrawingCircle(null);
       setDrawingTriangle(null);
+      setDrawingImage(null);
       setTextBox(null);
       if (activeTool === "Hand") {
         setIsDragging(true);
@@ -103,21 +105,31 @@ const handleMouseDown = (
             } else if (shape.type === "triangle") {
               offsetX = mouseX - shape.x1;
               offsetY = mouseY - shape.y1;
+            } else if (shape.type === "image") {
+              offsetX = mouseX - shape.x;
+              offsetY = mouseY - shape.y;
             }
+            
+            // Check if this shape is already selected
+            const isAlreadySelected = selectedShapes.includes(i);
+            
             // Select the shape if not already selected
-            if (!selectedShapes.includes(i)) {
+            if (!isAlreadySelected) {
               setSelectedShapes([i]);
             }
-            if (selectedShapes.includes(i)) {
+            
+            // Always start moving the shape, whether it was already selected or not
+            if (isAlreadySelected && selectedShapes.length > 1) {
+              // Multi-selection move - move all selected shapes
               const originalPositions = {};
               selectedShapes.forEach(shapeIndex => {
-                const shape = drawnRectangles[shapeIndex];
-                if (shape.type === "rectangle" || shape.type === "text" || shape.type === "circle") {
-                  originalPositions[shapeIndex] = { x: shape.x, y: shape.y };
-                } else if (shape.type === "line") {
-                  originalPositions[shapeIndex] = { x1: shape.x1, y1: shape.y1, x2: shape.x2, y2: shape.y2 };
-                } else if (shape.type === "triangle") {
-                  originalPositions[shapeIndex] = { x1: shape.x1, y1: shape.y1, x2: shape.x2, y2: shape.y2, x3: shape.x3, y3: shape.y3 };
+                const selectedShape = drawnRectangles[shapeIndex];
+                if (selectedShape.type === "rectangle" || selectedShape.type === "text" || selectedShape.type === "circle" || selectedShape.type === "image") {
+                  originalPositions[shapeIndex] = { x: selectedShape.x, y: selectedShape.y };
+                } else if (selectedShape.type === "line") {
+                  originalPositions[shapeIndex] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2 };
+                } else if (selectedShape.type === "triangle") {
+                  originalPositions[shapeIndex] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2, x3: selectedShape.x3, y3: selectedShape.y3 };
                 }
               });
               setMovingShape({ 
@@ -129,6 +141,7 @@ const handleMouseDown = (
                 mouseStart: { x: mouseX, y: mouseY }
               });
             } else {
+              // Single shape move
               setMovingShape({ index: i, offsetX, offsetY });
             }
             return;
@@ -146,9 +159,11 @@ const handleMouseDown = (
         setDrawingCircle({ startX: mouseX, startY: mouseY, currentX: mouseX, currentY: mouseY });
       } else if (activeTool === "Triangle") {
         setDrawingTriangle({ startX: mouseX, startY: mouseY, currentX: mouseX, currentY: mouseY });
+      } else if (activeTool === "Image") {
+        setDrawingImage({ startX: mouseX, startY: mouseY, currentX: mouseX, currentY: mouseY });
       } else if (activeTool === "Text") {
         setTextBox({ startX: mouseX, startY: mouseY, currentX: mouseX, currentY: mouseY });
       }
-    }, [position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setTextBox, setScalingHandle]);
+    }, [position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setDrawingImage, setTextBox, setScalingHandle]);
 
 export default handleMouseDown; 

@@ -28,6 +28,7 @@ const Canvas = ({
   const [drawingLine, setDrawingLine] = useState(null);
   const [drawingCircle, setDrawingCircle] = useState(null);
   const [drawingTriangle, setDrawingTriangle] = useState(null);
+  const [drawingImage, setDrawingImage] = useState(null);
   const [textInput, setTextInput] = useState(null);
   const [textBox, setTextBox] = useState(null);
   const [movingShape, setMovingShape] = useState(null);
@@ -73,6 +74,8 @@ const Canvas = ({
     setDrawingCircle,
     drawingTriangle,
     setDrawingTriangle,
+    drawingImage,
+    setDrawingImage,
     textInput,
     setTextInput,
     textBox,
@@ -178,6 +181,7 @@ const Canvas = ({
         drawingLine={drawingLine}
         drawingCircle={drawingCircle}
         drawingTriangle={drawingTriangle}
+        drawingImage={drawingImage}
         textBox={textBox}
         hoveredShape={hoveredShape}
         activeTool={activeTool}
