@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { resizeShape } from '../CanvasContent/scaleHandles';
 
 const handleMouseMove = (
   position,
@@ -26,7 +27,9 @@ const handleMouseMove = (
   drawingTriangle,
   setDrawingTriangle,
   textBox,
-  setTextBox
+  setTextBox,
+  scalingHandle,
+  setScalingHandle
 ) =>
   useCallback(
     (e) => {
@@ -34,6 +37,23 @@ const handleMouseMove = (
       const rect = canvasRef.current.getBoundingClientRect();
       const mouseX = (e.clientX - rect.left - position.x) / scale;
       const mouseY = (e.clientY - rect.top - position.y) / scale;
+      if (scalingHandle) {
+        setHoveredShape(null);
+        setDrawnRectangles((prev) =>
+          prev.map((shape, idx) => {
+            if (idx === scalingHandle.shapeIdx) {
+              return resizeShape(
+                shape,
+                scalingHandle.handleType,
+                scalingHandle.origBounds,
+                { x: mouseX, y: mouseY }
+              );
+            }
+            return shape;
+          })
+        );
+        return;
+      }
       if (selectionBox) {
         setSelectionBox((prev) => ({ ...prev, currentX: mouseX, currentY: mouseY }));
         return;
@@ -131,6 +151,6 @@ const handleMouseMove = (
       } else if (activeTool === "Text" && textBox) {
         setTextBox({ ...textBox, currentX: mouseX, currentY: mouseY });
       }
-    }, [textInput, canvasRef, position, scale, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox]);
+    }, [textInput, canvasRef, position, scale, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox, scalingHandle, setScalingHandle]);
 
 export default handleMouseMove; 

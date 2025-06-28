@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { getScaleHandlePositions } from '../CanvasContent/scaleHandles';
 
 const handleMouseDown = (
   position,
@@ -17,7 +18,8 @@ const handleMouseDown = (
   setDrawingLine,
   setDrawingCircle,
   setDrawingTriangle,
-  setTextBox
+  setTextBox,
+  setScalingHandle
 ) =>
   useCallback(
     (e) => {
@@ -44,6 +46,46 @@ const handleMouseDown = (
         });
         return;
       }
+      // --- SCALE HANDLE LOGIC ---
+      if (activeTool === "Move" && selectedShapes.length === 1) {
+        const shapeIdx = selectedShapes[0];
+        const shape = drawnRectangles[shapeIdx];
+        if (shape) {
+          if (shape.type === 'line') {
+            // Check endpoints
+            const handleSize = 10 / scale;
+            const half = handleSize / 2;
+            const endpoints = [
+              { x: shape.x1, y: shape.y1, type: 'endpoint1' },
+              { x: shape.x2, y: shape.y2, type: 'endpoint2' },
+            ];
+            for (const handle of endpoints) {
+              if (
+                mouseX >= handle.x - half && mouseX <= handle.x + half &&
+                mouseY >= handle.y - half && mouseY <= handle.y + half
+              ) {
+                setScalingHandle({ shapeIdx, handleType: handle.type, startX: mouseX, startY: mouseY, origBounds: { x1: shape.x1, y1: shape.y1, x2: shape.x2, y2: shape.y2 } });
+                return;
+              }
+            }
+          } else {
+            const bounds = (typeof getBoundingRect !== 'undefined') ? getBoundingRect(shape) : { x: shape.x, y: shape.y, width: shape.width, height: shape.height };
+            const handles = getScaleHandlePositions(bounds);
+            const handleSize = 10 / scale;
+            const half = handleSize / 2;
+            for (const handle of handles) {
+              if (
+                mouseX >= handle.x - half && mouseX <= handle.x + half &&
+                mouseY >= handle.y - half && mouseY <= handle.y + half
+              ) {
+                setScalingHandle({ shapeIdx, handleType: handle.type, startX: mouseX, startY: mouseY, origBounds: bounds });
+                return;
+              }
+            }
+          }
+        }
+      }
+      // --- END SCALE HANDLE LOGIC ---
       if (activeTool === "Move") {
         for (let i = drawnRectangles.length - 1; i >= 0; i--) {
           const shape = drawnRectangles[i];
@@ -61,6 +103,10 @@ const handleMouseDown = (
             } else if (shape.type === "triangle") {
               offsetX = mouseX - shape.x1;
               offsetY = mouseY - shape.y1;
+            }
+            // Select the shape if not already selected
+            if (!selectedShapes.includes(i)) {
+              setSelectedShapes([i]);
             }
             if (selectedShapes.includes(i)) {
               const originalPositions = {};
@@ -84,11 +130,12 @@ const handleMouseDown = (
               });
             } else {
               setMovingShape({ index: i, offsetX, offsetY });
-              setSelectedShapes([]);
             }
             return;
           }
         }
+        // If no shape is clicked, clear selection
+        setSelectedShapes([]);
         setIsDragging(true);
         setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
       } else if (activeTool === "Rectangle") {
@@ -102,6 +149,6 @@ const handleMouseDown = (
       } else if (activeTool === "Text") {
         setTextBox({ startX: mouseX, startY: mouseY, currentX: mouseX, currentY: mouseY });
       }
-    }, [position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setTextBox]);
+    }, [position, scale, activeTool, setIsDragging, setDragStart, setSelectionBox, drawnRectangles, setDrawnRectangles, isPointInShape, selectedShapes, setMovingShape, setSelectedShapes, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setTextBox, setScalingHandle]);
 
 export default handleMouseDown; 

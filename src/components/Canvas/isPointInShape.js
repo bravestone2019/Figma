@@ -32,8 +32,8 @@ const isPointInShape = (shape, x, y, ctx = null, scale = 1) => {
     if (ctx) {
       ctx.save();
       ctx.font = `${shape.fontSize || 16}px Arial`;
-      width = ctx.measureText(shape.text).width;
-      height = (shape.fontSize || 16) * 1.2;
+      const lineHeight = (shape.fontSize || 16) * 1.2;
+      height = measureWrappedTextHeight(ctx, shape.text, width, lineHeight);
       ctx.restore();
     }
     return (
@@ -45,5 +45,26 @@ const isPointInShape = (shape, x, y, ctx = null, scale = 1) => {
   }
   return false;
 };
+
+// Helper to measure the height of wrapped text (matches drawWrappedText logic)
+function measureWrappedTextHeight(ctx, text, maxWidth, lineHeight) {
+  const words = text.split(/\s+/);
+  let line = '';
+  let testLine = '';
+  let testWidth = 0;
+  let lines = 0;
+  for (let n = 0; n < words.length; n++) {
+    testLine = line + (line ? ' ' : '') + words[n];
+    testWidth = ctx.measureText(testLine).width;
+    if (testWidth > maxWidth && n > 0) {
+      lines++;
+      line = words[n];
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) lines++;
+  return Math.max(lineHeight, lines * lineHeight);
+}
 
 export default isPointInShape; 

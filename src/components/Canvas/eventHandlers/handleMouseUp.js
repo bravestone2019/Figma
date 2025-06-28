@@ -24,13 +24,16 @@ const handleMouseUp = (
   setTextBox,
   setActiveTool,
   setTextInput,
-  activeTool
+  activeTool,
+  scalingHandle,
+  setScalingHandle
 ) =>
   useCallback(
     (e) => {
       if (textInput) return;
       setIsDragging(false);
       setMovingShape(null);
+      if (setScalingHandle) setScalingHandle(null);
       const rect = canvasRef.current.getBoundingClientRect();
       const mouseX = (e.clientX - rect.left - position.x) / scale;
       const mouseY = (e.clientY - rect.top - position.y) / scale;
@@ -194,6 +197,6 @@ const handleMouseUp = (
         if (setActiveTool) setActiveTool("Move");
         return;
       }
-    }, [textInput, setIsDragging, setMovingShape, canvasRef, position, scale, selectionBox, setSelectedShapes, setSelectionBox, drawnRectangles, setDrawnRectangles, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox, setActiveTool, setTextInput, activeTool]);
+    }, [textInput, setIsDragging, setMovingShape, canvasRef, position, scale, selectionBox, setSelectedShapes, setSelectionBox, drawnRectangles, setDrawnRectangles, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox, setActiveTool, setTextInput, activeTool, scalingHandle, setScalingHandle]);
 
 export default handleMouseUp; 

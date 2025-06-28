@@ -29,8 +29,9 @@ const CanvasDrawing = forwardRef(({
       activeTool,
       hoveredShape,
       textInput,
+      selectedShapes,
     });
-  }, [canvasRef, position, scale, drawnRectangles, activeTool, hoveredShape, textInput]);
+  }, [canvasRef, position, scale, drawnRectangles, activeTool, hoveredShape, textInput, selectedShapes]);
 
   // Effect to handle initial render and updates
   useEffect(() => {

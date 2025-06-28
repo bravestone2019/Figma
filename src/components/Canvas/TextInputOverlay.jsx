@@ -75,6 +75,11 @@ const TextInputOverlay = ({
 
   if (!textInput) return null;
 
+  // Calculate the position to match where text is drawn in the canvas
+  // The text is drawn at textInput.y + fontSize, so we need to adjust the overlay accordingly
+  const fontSize = textInput.fontSize || 16;
+  const adjustedY = textInput.y + fontSize;
+
   return (
     <div
       ref={containerRef}
@@ -82,7 +87,7 @@ const TextInputOverlay = ({
       style={{
         position: "absolute",
         left: textInput.x * scale + position.x,
-        top: textInput.y * scale + position.y,
+        top: adjustedY * scale + position.y,
         zIndex: 1000,
         pointerEvents: "auto",
       }}
@@ -92,10 +97,11 @@ const TextInputOverlay = ({
         onChange={handleTextChange}
         onKeyDown={handleTextInput}
         autoFocus
+        wrap="soft"
         style={{
           width: textInput.width * scale,
-          height: textInput.height * scale,
-          fontSize: textInput.fontSize * scale,
+          height: (textInput.height - fontSize) * scale, // Adjust height to account for font offset
+          fontSize: fontSize * scale,
           color: textInput.color,
           opacity: textInput.opacity,
           border: "none",
@@ -106,6 +112,11 @@ const TextInputOverlay = ({
           lineHeight: "1.2",
           padding: "4px",
           pointerEvents: "auto",
+          overflow: "hidden",
+          overflowWrap: "break-word",
+          wordBreak: "break-word",
+          whiteSpace: "pre-wrap",
+          boxSizing: "border-box",
         }}
       />
     </div>

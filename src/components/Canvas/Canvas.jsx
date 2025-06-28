@@ -7,6 +7,7 @@ import TextInputOverlay from "./TextInputOverlay";
 import useCanvasEventHandlers from "./eventHandlers/useCanvasEventHandlers";
 import isPointInShape from "./isPointInShape";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
+import { handleDeleteShapeKey } from "./deleteShapeHandler";
 
 const Canvas = ({
   activeTool,
@@ -33,6 +34,7 @@ const Canvas = ({
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectionBox, setSelectionBox] = useState(null);
   const [selectedShapes, setSelectedShapes] = useState([]);
+  const [scalingHandle, setScalingHandle] = useState(null);
 
   // Grid configuration
   const GRID_SIZE = 5; // Size of each grid cell in pixels
@@ -88,6 +90,8 @@ const Canvas = ({
     selectedShapes,
     setSelectedShapes,
     isPointInShape,
+    scalingHandle,
+    setScalingHandle,
   });
 
   useEffect(() => {
@@ -139,6 +143,16 @@ const Canvas = ({
       canvas.removeEventListener("wheel", handler, { passive: false });
     };
   }, [handleWheel]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [drawnRectangles, selectedShapes]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

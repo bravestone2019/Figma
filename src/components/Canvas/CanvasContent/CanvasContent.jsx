@@ -1,6 +1,8 @@
 // CanvasContent.jsx
 // This file contains the drawCanvasContent function extracted from CanvasDrawing.jsx
 
+import { getBoundingRect } from './boundShape';
+
 function drawCanvasContent({
   canvasRef,
   position,
@@ -173,6 +175,18 @@ function drawCanvasContent({
       }
     }
     ctx.restore();
+
+    // Draw bounding box if shape is selected
+    if (selectedShapes && selectedShapes.includes(i)) {
+      const bounds = getBoundingRect(shape);
+      ctx.save();
+      ctx.setLineDash([6, 3]);
+      ctx.strokeStyle = '#2196f3';
+      ctx.lineWidth = 1.5 / scale;
+      ctx.globalAlpha = 1;
+      ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      ctx.restore();
+    }
   });
 
   // Only draw dynamic previews if not in text input mode
