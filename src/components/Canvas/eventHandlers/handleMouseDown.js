@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { getScaleHandlePositions } from '../CanvasContent/scaleHandles';
+import { createSelectionBox, shouldActivateSelectionBox } from '../CanvasContent/boxSelection';
 
 const handleMouseDown = (
   position,
@@ -39,13 +40,8 @@ const handleMouseDown = (
         setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
         return;
       }
-      if (activeTool === "Move" && e.button === 2) {
-        setSelectionBox({
-          startX: mouseX,
-          startY: mouseY,
-          currentX: mouseX,
-          currentY: mouseY,
-        });
+      if (shouldActivateSelectionBox(activeTool, e.button)) {
+        setSelectionBox(createSelectionBox(mouseX, mouseY));
         return;
       }
       // --- SCALE HANDLE LOGIC ---
@@ -80,7 +76,31 @@ const handleMouseDown = (
                 mouseX >= handle.x - half && mouseX <= handle.x + half &&
                 mouseY >= handle.y - half && mouseY <= handle.y + half
               ) {
-                setScalingHandle({ shapeIdx, handleType: handle.type, startX: mouseX, startY: mouseY, origBounds: bounds });
+                // Store aspect ratio for rectangles, text, and images when Shift is held
+                let aspectRatio = null;
+                if (e.shiftKey && (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image')) {
+                  aspectRatio = shape.width / shape.height;
+                }
+                
+                setScalingHandle({ 
+                  shapeIdx, 
+                  handleType: handle.type, 
+                  startX: mouseX, 
+                  startY: mouseY, 
+                  origBounds: bounds,
+                  preserveAspectRatio: e.shiftKey,
+                  aspectRatio: aspectRatio
+                });
+                // Store globally for visual indicator access
+                window.scalingHandle = { 
+                  shapeIdx, 
+                  handleType: handle.type, 
+                  startX: mouseX, 
+                  startY: mouseY, 
+                  origBounds: bounds,
+                  preserveAspectRatio: e.shiftKey,
+                  aspectRatio: aspectRatio
+                };
                 return;
               }
             }

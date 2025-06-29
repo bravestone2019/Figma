@@ -3,41 +3,16 @@
 
 import { getBoundingRect } from './boundShape';
 import { drawScaleHandles, drawCornerScaleHandles, drawLineHandles, drawCircleHandle, drawTriangleHandles } from './scaleHandles';
-
-// Image cache to store loaded images
-const imageCache = new Map();
-const loadingImages = new Set(); // Track images currently loading
-
-// Helper function to load and cache images
-function loadImage(src) {
-  if (imageCache.has(src)) {
-    return imageCache.get(src);
-  }
-  
-  if (loadingImages.has(src)) {
-    // Image is already loading, return existing promise
-    return imageCache.get(src);
-  }
-  
-  const img = new Image();
-  const promise = new Promise((resolve, reject) => {
-    img.onload = () => {
-      imageCache.set(src, img); // Store the actual image, not the promise
-      loadingImages.delete(src);
-      resolve(img);
-    };
-    img.onerror = () => {
-      imageCache.set(src, null); // Store null to indicate error
-      loadingImages.delete(src);
-      reject(new Error('Failed to load image'));
-    };
-  });
-  
-  loadingImages.add(src);
-  imageCache.set(src, promise); // Store promise while loading
-  img.src = src;
-  return promise;
-}
+import { 
+  drawRectangle, 
+  drawLine, 
+  drawCircle, 
+  drawTriangle, 
+  drawImage, 
+  drawText 
+} from './shapeRenderers';
+import { drawPreviewShapes } from './previewRenderer';
+import { drawSelectionBox } from './boxSelection';
 
 export function redraw({
   canvasRef,
@@ -48,6 +23,13 @@ export function redraw({
   hoveredShape,
   textInput,
   selectedShapes = [],
+  drawingRectangle,
+  drawingLine,
+  drawingCircle,
+  drawingTriangle,
+  drawingImage,
+  textBox,
+  selectionBox,
 }) {
   const canvas = canvasRef.current;
   if (!canvas) return;
@@ -67,8 +49,8 @@ export function redraw({
   const GRID_COLOR = "#e0e0e0"; // Light gray color for grid lines
   const MIN_SCALE_FOR_GRID = 2; // Minimum scale to show grid lines
 
-  // Draw grid lines (before drawing shapes) in screen (pixel) units
-  if (scale >= MIN_SCALE_FOR_GRID) {
+  // Utility function to draw the grid
+  function drawGrid(ctx, canvas, position, scale) {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for grid
     ctx.strokeStyle = GRID_COLOR;
@@ -93,7 +75,12 @@ export function redraw({
     ctx.restore();
   }
 
-  // Draw all shapes
+  // Draw grid lines (before drawing shapes) in screen (pixel) units
+  if (scale >= MIN_SCALE_FOR_GRID) {
+    drawGrid(ctx, canvas, position, scale);
+  }
+
+  // Draw all shapes using the new shape renderer modules
   drawnRectangles.forEach((shape, i) => {
     // Skip the current text input shape to prevent double drawing
     if (textInput && 
@@ -103,179 +90,37 @@ export function redraw({
       return;
     }
 
-    ctx.save();
-    if (shape.locked) {
-      ctx.setLineDash([4, 2]);
-      ctx.strokeStyle = "red";
-      ctx.lineWidth = 2 / scale;
-    } else if (activeTool === "Move" && i === hoveredShape) {
-      ctx.setLineDash([]);
-      ctx.strokeStyle = "#2196f3";
-      ctx.lineWidth = Math.max(2 / scale, 1);
-      ctx.globalAlpha = 1;
-    }
+    const renderOptions = {
+      isHovered: activeTool === "Move" && i === hoveredShape,
+      isLocked: shape.locked,
+      scale,
+      activeTool,
+      canvas
+    };
 
-    if (shape.type === "rectangle") {
-      ctx.fillStyle = shape.backgroundColor;
-      ctx.globalAlpha = shape.opacity;
-      ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-      } else {
-        ctx.strokeStyle = shape.borderColor;
-        ctx.lineWidth = shape.borderWidth / scale;
-      }
-      ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-    } else if (shape.type === "line") {
-      ctx.globalAlpha = shape.opacity;
-      ctx.beginPath();
-      ctx.moveTo(shape.x1, shape.y1);
-      ctx.lineTo(shape.x2, shape.y2);
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-      } else {
-        ctx.strokeStyle = shape.color;
-        ctx.lineWidth = shape.width / scale;
-      }
-      ctx.stroke();
-    } else if (shape.type === "circle") {
-      ctx.fillStyle = shape.backgroundColor;
-      ctx.globalAlpha = shape.opacity;
-      ctx.beginPath();
-      ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
-      ctx.fill();
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-      } else {
-        ctx.strokeStyle = shape.borderColor;
-        ctx.lineWidth = shape.borderWidth / scale;
-      }
-      ctx.stroke();
-    } else if (shape.type === "triangle") {
-      ctx.fillStyle = shape.backgroundColor;
-      ctx.globalAlpha = shape.opacity;
-      ctx.beginPath();
-      ctx.moveTo(shape.x1, shape.y1);
-      ctx.lineTo(shape.x2, shape.y2);
-      ctx.lineTo(shape.x3, shape.y3);
-      ctx.closePath();
-      ctx.fill();
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-      } else {
-        ctx.strokeStyle = shape.borderColor;
-        ctx.lineWidth = shape.borderWidth / scale;
-      }
-      ctx.stroke();
-    } else if (shape.type === "image") {
-      ctx.globalAlpha = shape.opacity;
-      
-      // Check if image is already loaded
-      const cachedImage = imageCache.get(shape.src);
-      
-      if (cachedImage && !cachedImage.then) {
-        // Image is loaded, draw it
-        if (cachedImage) {
-          ctx.drawImage(cachedImage, shape.x, shape.y, shape.width, shape.height);
-        }
-      } else {
-        // Image is loading or not started, draw placeholder
-        ctx.fillStyle = "#f0f0f0";
-        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
-        ctx.strokeStyle = "#ccc";
-        ctx.lineWidth = 1 / scale;
-        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-        
-        ctx.fillStyle = "#666";
-        ctx.font = `${12 / scale}px Arial`;
-        ctx.textAlign = "center";
-        ctx.fillText("Loading...", shape.x + shape.width / 2, shape.y + shape.height / 2);
-        
-        // Start loading if not already loading
-        if (!cachedImage && !loadingImages.has(shape.src)) {
-          loadImage(shape.src).then(() => {
-            // Only trigger redraw once when image loads
-            if (canvas.redrawCallback && !canvas.redrawScheduled) {
-              canvas.redrawScheduled = true;
-              setTimeout(() => {
-                canvas.redrawCallback();
-                canvas.redrawScheduled = false;
-              }, 16); // ~60fps
-            }
-          }).catch(() => {
-            // Handle error silently, placeholder will remain
-            if (canvas.redrawCallback && !canvas.redrawScheduled) {
-              canvas.redrawScheduled = true;
-              setTimeout(() => {
-                canvas.redrawCallback();
-                canvas.redrawScheduled = false;
-              }, 16);
-            }
-          });
-        }
-      }
-      
-      // Draw border for selected/locked images
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        // Draw hover border with better visibility
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-        ctx.globalAlpha = 1; // Ensure full opacity for hover border
-        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-        
-        // Add subtle background highlight for better visual feedback
-        ctx.fillStyle = "rgba(33, 150, 243, 0.1)";
-        ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
-      }
-    } else if (shape.type === "text") {
-      ctx.font = `${shape.fontSize || 16}px Arial`;
-      ctx.fillStyle = shape.color;
-      ctx.globalAlpha = shape.opacity;
-      const lineHeight = (shape.fontSize || 16) * 1.2;
-      drawWrappedText(ctx, shape.text, shape.x, shape.y + (shape.fontSize || 16), shape.width, lineHeight);
-      // Draw bounding box for text if selected/locked
-      const measuredHeight = measureWrappedTextHeight(ctx, shape.text, shape.width, lineHeight);
-      if (shape.locked) {
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2 / scale;
-        ctx.strokeRect(
-          shape.x,
-          shape.y,
-          shape.width,
-          measuredHeight
-        );
-      } else if (activeTool === "Move" && i === hoveredShape) {
-        ctx.strokeStyle = "#2196f3";
-        ctx.lineWidth = Math.max(2 / scale, 1);
-        ctx.strokeRect(
-          shape.x,
-          shape.y,
-          shape.width,
-          measuredHeight
-        );
-      }
+    // Use the appropriate shape renderer based on shape type
+    switch (shape.type) {
+      case "rectangle":
+        drawRectangle(ctx, shape, renderOptions);
+        break;
+      case "line":
+        drawLine(ctx, shape, renderOptions);
+        break;
+      case "circle":
+        drawCircle(ctx, shape, renderOptions);
+        break;
+      case "triangle":
+        drawTriangle(ctx, shape, renderOptions);
+        break;
+      case "image":
+        drawImage(ctx, shape, renderOptions);
+        break;
+      case "text":
+        drawText(ctx, shape, renderOptions);
+        break;
+      default:
+        console.warn(`Unknown shape type: ${shape.type}`);
     }
-    ctx.restore();
   });
 
   // Draw bounding boxes for selected shapes (draw on top of all shapes)
@@ -303,49 +148,48 @@ export function redraw({
     });
   }
 
+  // Draw aspect ratio preservation indicator if scaling handle is active with preserveAspectRatio
+  if (window.scalingHandle && window.scalingHandle.preserveAspectRatio) {
+    const shape = drawnRectangles[window.scalingHandle.shapeIdx];
+    if (shape && (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image')) {
+      ctx.save();
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = '#2196f3';
+      ctx.lineWidth = 2 / scale;
+      ctx.globalAlpha = 0.8;
+      
+      // Draw diagonal line from top-left to bottom-right
+      ctx.beginPath();
+      ctx.moveTo(shape.x, shape.y);
+      ctx.lineTo(shape.x + shape.width, shape.y + shape.height);
+      ctx.stroke();
+      
+      // Draw diagonal line from top-right to bottom-left
+      ctx.beginPath();
+      ctx.moveTo(shape.x + shape.width, shape.y);
+      ctx.lineTo(shape.x, shape.y + shape.height);
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+  }
+
+  // Draw selection box using the dedicated module
+  drawSelectionBox(ctx, selectionBox, scale);
+
+  // Draw preview shapes on top of all committed shapes
+  if (!textInput) {
+    const previews = {
+      drawingRectangle,
+      drawingLine,
+      drawingCircle,
+      drawingTriangle,
+      drawingImage,
+      textBox
+    };
+    drawPreviewShapes(ctx, previews, scale);
+  }
+
   // Restore the canvas state
   ctx.restore();
-}
-
-function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
-  const words = text.split(/\s+/);
-  let line = '';
-  let testLine = '';
-  let testWidth = 0;
-  let currentY = y;
-  for (let n = 0; n < words.length; n++) {
-    testLine = line + (line ? ' ' : '') + words[n];
-    testWidth = ctx.measureText(testLine).width;
-    if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line, x, currentY);
-      line = words[n];
-      currentY += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  if (line) {
-    ctx.fillText(line, x, currentY);
-  }
-}
-
-// Helper to measure the height of wrapped text (matches drawWrappedText logic)
-function measureWrappedTextHeight(ctx, text, maxWidth, lineHeight) {
-  const words = text.split(/\s+/);
-  let line = '';
-  let testLine = '';
-  let testWidth = 0;
-  let lines = 0;
-  for (let n = 0; n < words.length; n++) {
-    testLine = line + (line ? ' ' : '') + words[n];
-    testWidth = ctx.measureText(testLine).width;
-    if (testWidth > maxWidth && n > 0) {
-      lines++;
-      line = words[n];
-    } else {
-      line = testLine;
-    }
-  }
-  if (line) lines++;
-  return Math.max(lineHeight, lines * lineHeight);
 } 

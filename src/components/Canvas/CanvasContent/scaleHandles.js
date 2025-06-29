@@ -119,12 +119,16 @@ export function drawLineHandles(ctx, line, scale) {
  * @param {string} handleType - The handle type (e.g., 'nw', 'se', 'n', 'e', etc. or 'endpoint1', 'endpoint2' for lines)
  * @param {Object} origBounds - The original bounding box or points
  * @param {Object} mouse - The new mouse position {x, y}
+ * @param {boolean} preserveAspectRatio - Whether to preserve aspect ratio (for rectangles, text, images)
+ * @param {number} aspectRatio - The original aspect ratio to preserve
  * @returns {Object} - The new shape object
  */
-export function resizeShape(shape, handleType, origBounds, mouse) {
+export function resizeShape(shape, handleType, origBounds, mouse, preserveAspectRatio = false, aspectRatio = null) {
   if (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image') {
     let { x, y, width, height } = origBounds;
     let newX = x, newY = y, newW = width, newH = height;
+    
+    // Calculate new dimensions based on handle type
     switch (handleType) {
       case 'nw':
         newW = width + (x - mouse.x);
@@ -161,6 +165,75 @@ export function resizeShape(shape, handleType, origBounds, mouse) {
         newW = mouse.x - x;
         break;
     }
+    
+    // Preserve aspect ratio if requested
+    if (preserveAspectRatio && aspectRatio && aspectRatio > 0) {
+      const isCornerHandle = ['nw', 'ne', 'sw', 'se'].includes(handleType);
+      const isEdgeHandle = ['n', 's', 'w', 'e'].includes(handleType);
+      
+      if (isCornerHandle) {
+        // For corner handles, determine which dimension to prioritize based on handle type
+        let primaryDimension, secondaryDimension;
+        let primaryValue, secondaryValue;
+        
+        if (handleType === 'nw' || handleType === 'se') {
+          // These handles allow both dimensions to change
+          // Use the dimension that changed more as the primary
+          const widthChange = Math.abs(newW - width);
+          const heightChange = Math.abs(newH - height);
+          
+          if (widthChange > heightChange) {
+            primaryDimension = 'width';
+            primaryValue = newW;
+            secondaryValue = primaryValue / aspectRatio;
+          } else {
+            primaryDimension = 'height';
+            primaryValue = newH;
+            secondaryValue = primaryValue * aspectRatio;
+          }
+        } else {
+          // For ne and sw, we need to be more careful about anchor points
+          if (handleType === 'ne') {
+            primaryDimension = 'width';
+            primaryValue = newW;
+            secondaryValue = primaryValue / aspectRatio;
+            // Adjust Y position to maintain aspect ratio
+            newY = y + height - secondaryValue;
+          } else { // sw
+            primaryDimension = 'height';
+            primaryValue = newH;
+            secondaryValue = primaryValue * aspectRatio;
+            // Adjust X position to maintain aspect ratio
+            newX = x + width - secondaryValue;
+          }
+        }
+        
+        // Apply the calculated dimensions
+        if (primaryDimension === 'width') {
+          newW = primaryValue;
+          newH = secondaryValue;
+        } else {
+          newH = primaryValue;
+          newW = secondaryValue;
+        }
+      } else if (isEdgeHandle) {
+        // For edge handles, maintain aspect ratio by adjusting the other dimension
+        if (handleType === 'n' || handleType === 's') {
+          // Vertical edge - adjust width
+          newW = newH * aspectRatio;
+          if (handleType === 'n') {
+            newX = x + width - newW;
+          }
+        } else {
+          // Horizontal edge - adjust height
+          newH = newW / aspectRatio;
+          if (handleType === 'w') {
+            newY = y + height - newH;
+          }
+        }
+      }
+    }
+    
     // Prevent negative width/height
     newW = Math.max(1, newW);
     newH = Math.max(1, newH);

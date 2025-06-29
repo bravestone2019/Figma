@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { resizeShape } from '../CanvasContent/scaleHandles';
+import { updateSelectionBox } from '../CanvasContent/boxSelection';
 
 const handleMouseMove = (
   position,
@@ -48,7 +49,9 @@ const handleMouseMove = (
                 shape,
                 scalingHandle.handleType,
                 scalingHandle.origBounds,
-                { x: mouseX, y: mouseY }
+                { x: mouseX, y: mouseY },
+                scalingHandle.preserveAspectRatio,
+                scalingHandle.aspectRatio
               );
             }
             return shape;
@@ -57,7 +60,7 @@ const handleMouseMove = (
         return;
       }
       if (selectionBox) {
-        setSelectionBox((prev) => ({ ...prev, currentX: mouseX, currentY: mouseY }));
+        setSelectionBox(updateSelectionBox(selectionBox, mouseX, mouseY));
         return;
       }
       if (activeTool === "Move" && !movingShape) {
