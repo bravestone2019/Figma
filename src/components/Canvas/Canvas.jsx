@@ -7,6 +7,7 @@ import TextInputOverlay from "./TextInputOverlay";
 import useCanvasEventHandlers from "./eventHandlers/useCanvasEventHandlers";
 import isPointInShape from "./isPointInShape";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
+import { handleDeleteShapeKey } from "./deleteShapeHandler";
 
 const Canvas = ({
   activeTool,
@@ -27,15 +28,14 @@ const Canvas = ({
   const [drawingLine, setDrawingLine] = useState(null);
   const [drawingCircle, setDrawingCircle] = useState(null);
   const [drawingTriangle, setDrawingTriangle] = useState(null);
+  const [drawingImage, setDrawingImage] = useState(null);
   const [textInput, setTextInput] = useState(null);
   const [textBox, setTextBox] = useState(null);
   const [movingShape, setMovingShape] = useState(null);
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectionBox, setSelectionBox] = useState(null);
   const [selectedShapes, setSelectedShapes] = useState([]);
-  // const [drawnImages, setDrawnImages] = useState([]); 
-  // const [pendingImagePos, setPendingImagePos] = useState(null);
-  // const fileInputRef = useRef(null);
+  const [scalingHandle, setScalingHandle] = useState(null);
 
   // Grid configuration
   const GRID_SIZE = 5; // Size of each grid cell in pixels
@@ -74,6 +74,8 @@ const Canvas = ({
     setDrawingCircle,
     drawingTriangle,
     setDrawingTriangle,
+    drawingImage,
+    setDrawingImage,
     textInput,
     setTextInput,
     textBox,
@@ -91,6 +93,8 @@ const Canvas = ({
     selectedShapes,
     setSelectedShapes,
     isPointInShape,
+    scalingHandle,
+    setScalingHandle,
   });
 
   useEffect(() => {
@@ -143,6 +147,16 @@ const Canvas = ({
     };
   }, [handleWheel]);
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [drawnRectangles, selectedShapes]);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <canvas
@@ -167,6 +181,7 @@ const Canvas = ({
         drawingLine={drawingLine}
         drawingCircle={drawingCircle}
         drawingTriangle={drawingTriangle}
+        drawingImage={drawingImage}
         textBox={textBox}
         hoveredShape={hoveredShape}
         activeTool={activeTool}

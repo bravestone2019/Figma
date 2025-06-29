@@ -18,7 +18,7 @@ const shapeTools = [
   { key: "Image", label: "Image", shortcut: "ctrl+shift+k", icon: ImageIcon },
 ];
 
-const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip }) => {
+const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale, setDrawnRectangles }) => {
   const [selected, setSelected] = useState(shapeTools[0]); // Default to Rectangle
   const dropdownRef = useRef();
   const tooltipTimeout = useRef();
@@ -79,7 +79,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Image: Ctrl+Shift+I
-  Shortcut({ ctrl: true, shift: true, key: "k" }, () => {
+  Shortcut({ ctrl: true, shift: true, key: "i" }, () => {
     handleToolClick("Image");
   });
 
@@ -129,8 +129,14 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
           </div>
         )}
       </div>
-      {/* {activeTool === "Image" && <Image activeTool={activeTool} />} */}
-      <Image activeTool={activeTool} />
+      {/* {activeTool === "Image" && <Image activeTool={activeTool} />}                 */}
+      <Image 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool}
+        setDrawnRectangles={setDrawnRectangles} 
+        position={position} 
+        scale={scale} 
+      />
     </>
   );
 };

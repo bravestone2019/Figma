@@ -1,4 +1,6 @@
 import { useCallback } from "react";
+import { resizeShape } from '../CanvasContent/scaleHandles';
+import { updateSelectionBox } from '../CanvasContent/boxSelection';
 
 const handleMouseMove = (
   position,
@@ -25,8 +27,12 @@ const handleMouseMove = (
   setDrawingCircle,
   drawingTriangle,
   setDrawingTriangle,
+  drawingImage,
+  setDrawingImage,
   textBox,
-  setTextBox
+  setTextBox,
+  scalingHandle,
+  setScalingHandle
 ) =>
   useCallback(
     (e) => {
@@ -34,13 +40,34 @@ const handleMouseMove = (
       const rect = canvasRef.current.getBoundingClientRect();
       const mouseX = (e.clientX - rect.left - position.x) / scale;
       const mouseY = (e.clientY - rect.top - position.y) / scale;
+      if (scalingHandle) {
+        setHoveredShape(null);
+        setDrawnRectangles((prev) =>
+          prev.map((shape, idx) => {
+            if (idx === scalingHandle.shapeIdx) {
+              return resizeShape(
+                shape,
+                scalingHandle.handleType,
+                scalingHandle.origBounds,
+                { x: mouseX, y: mouseY },
+                scalingHandle.preserveAspectRatio,
+                scalingHandle.aspectRatio
+              );
+            }
+            return shape;
+          })
+        );
+        return;
+      }
       if (selectionBox) {
-        setSelectionBox((prev) => ({ ...prev, currentX: mouseX, currentY: mouseY }));
+        setSelectionBox(updateSelectionBox(selectionBox, mouseX, mouseY));
         return;
       }
       if (activeTool === "Move" && !movingShape) {
         let found = null;
         const ctx = canvasRef.current.getContext("2d");
+        
+        // Check shapes from top to bottom (reverse order for proper layering)
         for (let i = drawnRectangles.length - 1; i >= 0; i--) {
           const shape = drawnRectangles[i];
           if (!shape.locked && isPointInShape(shape, mouseX, mouseY, ctx, scale)) {
@@ -48,6 +75,8 @@ const handleMouseMove = (
             break;
           }
         }
+        
+        // Update hover state
         setHoveredShape(found);
       } else {
         setHoveredShape(null);
@@ -60,27 +89,38 @@ const handleMouseMove = (
               const dy = mouseY - movingShape.mouseStart.y;
               if (shape.type === "rectangle" || shape.type === "text" || shape.type === "circle") {
                 const orig = movingShape.originalPositions[idx];
-                return { ...shape, x: orig.x + dx, y: orig.y + dy };
+                if (orig) {
+                  return { ...shape, x: orig.x + dx, y: orig.y + dy };
+                }
               } else if (shape.type === "line") {
                 const orig = movingShape.originalPositions[idx];
-                return {
-                  ...shape,
-                  x1: orig.x1 + dx,
-                  y1: orig.y1 + dy,
-                  x2: orig.x2 + dx,
-                  y2: orig.y2 + dy,
-                };
+                if (orig) {
+                  return {
+                    ...shape,
+                    x1: orig.x1 + dx,
+                    y1: orig.y1 + dy,
+                    x2: orig.x2 + dx,
+                    y2: orig.y2 + dy,
+                  };
+                }
               } else if (shape.type === "triangle") {
                 const orig = movingShape.originalPositions[idx];
-                return {
-                  ...shape,
-                  x1: orig.x1 + dx,
-                  y1: orig.y1 + dy,
-                  x2: orig.x2 + dx,
-                  y2: orig.y2 + dy,
-                  x3: orig.x3 + dx,
-                  y3: orig.y3 + dy,
-                };
+                if (orig) {
+                  return {
+                    ...shape,
+                    x1: orig.x1 + dx,
+                    y1: orig.y1 + dy,
+                    x2: orig.x2 + dx,
+                    y2: orig.y2 + dy,
+                    x3: orig.x3 + dx,
+                    y3: orig.y3 + dy,
+                  };
+                }
+              } else if (shape.type === "image") {
+                const orig = movingShape.originalPositions[idx];
+                if (orig) {
+                  return { ...shape, x: orig.x + dx, y: orig.y + dy };
+                }
               }
             } else if (idx === movingShape.index) {
               if (shape.type === "rectangle" || shape.type === "text") {
@@ -109,6 +149,8 @@ const handleMouseMove = (
                   x3: shape.x3 + dx,
                   y3: shape.y3 + dy,
                 };
+              } else if (shape.type === "image") {
+                return { ...shape, x: mouseX - movingShape.offsetX, y: mouseY - movingShape.offsetY };
               }
             }
             return shape;
@@ -128,9 +170,11 @@ const handleMouseMove = (
         setDrawingCircle({ ...drawingCircle, currentX: mouseX, currentY: mouseY });
       } else if (activeTool === "Triangle" && drawingTriangle) {
         setDrawingTriangle({ ...drawingTriangle, currentX: mouseX, currentY: mouseY });
+      } else if (activeTool === "Image" && drawingImage) {
+        setDrawingImage({ ...drawingImage, currentX: mouseX, currentY: mouseY });
       } else if (activeTool === "Text" && textBox) {
         setTextBox({ ...textBox, currentX: mouseX, currentY: mouseY });
       }
-    }, [textInput, canvasRef, position, scale, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox]);
+    }, [textInput, canvasRef, position, scale, selectionBox, setSelectionBox, activeTool, movingShape, setHoveredShape, drawnRectangles, isPointInShape, setDrawnRectangles, selectedShapes, isDragging, dragStart, setPosition, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, drawingImage, setDrawingImage, textBox, setTextBox, scalingHandle, setScalingHandle]);
 
 export default handleMouseMove; 

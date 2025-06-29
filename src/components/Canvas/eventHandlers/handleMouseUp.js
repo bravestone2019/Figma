@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { getShapesInSelectionBox } from '../CanvasContent/boxSelection';
 
 const handleMouseUp = (
   textInput,
@@ -20,58 +21,29 @@ const handleMouseUp = (
   setDrawingCircle,
   drawingTriangle,
   setDrawingTriangle,
+  drawingImage,
+  setDrawingImage,
   textBox,
   setTextBox,
   setActiveTool,
   setTextInput,
-  activeTool
+  activeTool,
+  scalingHandle,
+  setScalingHandle
 ) =>
   useCallback(
     (e) => {
       if (textInput) return;
       setIsDragging(false);
       setMovingShape(null);
+      if (setScalingHandle) setScalingHandle(null);
+      // Clear global scaling handle state
+      window.scalingHandle = null;
       const rect = canvasRef.current.getBoundingClientRect();
       const mouseX = (e.clientX - rect.left - position.x) / scale;
       const mouseY = (e.clientY - rect.top - position.y) / scale;
       if (selectionBox) {
-        const { startX, startY, currentX, currentY } = selectionBox;
-        const x1 = Math.min(startX, currentX);
-        const y1 = Math.min(startY, currentY);
-        const x2 = Math.max(startX, currentX);
-        const y2 = Math.max(startY, currentY);
-        const selected = drawnRectangles.map((shape, i) => {
-          if (shape.type === "rectangle") {
-            return (
-              shape.x >= x1 && shape.y >= y1 &&
-              shape.x + shape.width <= x2 && shape.y + shape.height <= y2
-            );
-          } else if (shape.type === "circle") {
-            return (
-              shape.x - shape.radius >= x1 && shape.y - shape.radius >= y1 &&
-              shape.x + shape.radius <= x2 && shape.y + shape.radius <= y2
-            );
-          } else if (shape.type === "line") {
-            return (
-              shape.x1 >= x1 && shape.x1 <= x2 && shape.y1 >= y1 && shape.y1 <= y2 &&
-              shape.x2 >= x1 && shape.x2 <= x2 && shape.y2 >= y1 && shape.y2 <= y2
-            );
-          } else if (shape.type === "triangle") {
-            return (
-              shape.x1 >= x1 && shape.x1 <= x2 && shape.y1 >= y1 && shape.y1 <= y2 &&
-              shape.x2 >= x1 && shape.x2 <= x2 && shape.y2 >= y1 && shape.y2 <= y2 &&
-              shape.x3 >= x1 && shape.x3 <= x2 && shape.y3 >= y1 && shape.y3 <= y2
-            );
-          } else if (shape.type === "text") {
-            return (
-              shape.x >= x1 && shape.y >= y1 &&
-              shape.x + (shape.width || 50) <= x2 && shape.y + (shape.height || 20) <= y2
-            );
-          }
-          return false;
-        })
-        .map((inside, i) => inside ? i : null)
-        .filter(i => i !== null);
+        const selected = getShapesInSelectionBox(drawnRectangles, selectionBox);
         setSelectedShapes(selected);
         setSelectionBox(null);
         return;
@@ -173,6 +145,24 @@ const handleMouseUp = (
         if (setActiveTool) setActiveTool("Move");
         return;
       }
+      if (drawingImage) {
+        // For image preview, we need to trigger file selection
+        // The actual image placement will be handled by the Image component
+        // We'll use a custom event to signal that file selection should be triggered
+        const imagePlacementEvent = new CustomEvent('imagePlacementRequested', {
+          detail: {
+            startX: drawingImage.startX,
+            startY: drawingImage.startY,
+            currentX: drawingImage.currentX,
+            currentY: drawingImage.currentY
+          }
+        });
+        document.dispatchEvent(imagePlacementEvent);
+        
+        setDrawingImage(null);
+        if (setActiveTool) setActiveTool("Move");
+        return;
+      }
       if (textBox) {
         const { startX, startY, currentX, currentY } = textBox;
         const rectX = Math.min(startX, currentX);
@@ -194,6 +184,6 @@ const handleMouseUp = (
         if (setActiveTool) setActiveTool("Move");
         return;
       }
-    }, [textInput, setIsDragging, setMovingShape, canvasRef, position, scale, selectionBox, setSelectedShapes, setSelectionBox, drawnRectangles, setDrawnRectangles, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, textBox, setTextBox, setActiveTool, setTextInput]);
+    }, [textInput, setIsDragging, setMovingShape, canvasRef, position, scale, selectionBox, setSelectedShapes, setSelectionBox, drawnRectangles, setDrawnRectangles, drawingRectangle, setDrawingRectangle, drawingLine, setDrawingLine, drawingCircle, setDrawingCircle, drawingTriangle, setDrawingTriangle, drawingImage, setDrawingImage, textBox, setTextBox, setActiveTool, setTextInput, activeTool, scalingHandle, setScalingHandle]);
 
 export default handleMouseUp; 
