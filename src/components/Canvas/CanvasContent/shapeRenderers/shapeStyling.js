@@ -16,20 +16,20 @@ export function applyShapeStyling(ctx, shape, isHovered, isLocked, scale, active
 
 export function drawShapeBorder(ctx, shape, isHovered, isLocked, scale, activeTool) {
   if (isLocked) {
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "transparent";
     ctx.lineWidth = 2 / scale;
   } else if (activeTool === "Move" && isHovered) {
     ctx.strokeStyle = "#2196f3";
     ctx.lineWidth = Math.max(2 / scale, 1);
   } else {
-    ctx.strokeStyle = shape.borderColor;
+    ctx.strokeStyle = "transparent";
     ctx.lineWidth = shape.borderWidth / scale;
   }
 }
 
 export function drawLineStroke(ctx, shape, isHovered, isLocked, scale, activeTool) {
   if (isLocked) {
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "transparent";
     ctx.lineWidth = 2 / scale;
   } else if (activeTool === "Move" && isHovered) {
     ctx.strokeStyle = "#2196f3";
