@@ -1,5 +1,7 @@
 import "../../RightPanel.css";
-import Angle from "../../../../../assets/angle.png";
+import degrees from "../../../../../assets/RightPanel/degrees.png";
+import horizontal from "../../../../../assets/RightPanel/horizontal-flip.png";
+import Angle from "../../../../../assets/RightPanel/angle.png";
 
 const Position = () => {
   return (
@@ -15,7 +17,7 @@ const Position = () => {
           <input type="number" defaultValue={1000} />
         </div>
         <div className="pos-box" style={{ gap: 6 }}>
-          <img src={Angle} alt={Angle} style={{ width: 12, height: 10 }} />
+          <img src={Angle} alt={Angle} style={{ width: 13, height: 10 }} />
           <input type="number" defaultValue={0} />
         </div>
         <div className="pos-box" style={{ display: "flex", gap: "10px" }}>
@@ -28,9 +30,9 @@ const Position = () => {
             }}
           >
             <img
-              src={Angle}
-              alt={Angle}
-              style={{ width: 12, height: 10, marginRight: "8px" }}
+              src={degrees}
+              alt={degrees}
+              style={{ width: 13, height: 12, marginRight: "8px" }}
             />
           </button>
           <button
@@ -43,9 +45,9 @@ const Position = () => {
             }}
           >
             <img
-              src={Angle}
-              alt={Angle}
-              style={{ width: 12, height: 10, marginRight: "8px" }}
+              src={horizontal}
+              alt={horizontal}
+              style={{ width: 13, height: 12, marginRight: "8px" }}
             />
           </button>
           <button style={{ background: "none", border: "none", padding: 0 }}>

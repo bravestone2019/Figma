@@ -1,4 +1,5 @@
 import "../../RightPanel.css";
+import "../Effects/Effects.css"
 import { useState } from "react";
 
 const Stroke = () => {
@@ -12,12 +13,7 @@ const Stroke = () => {
       >
         Stroke
         <button
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "16px",
-            marginLeft: "auto",
-          }}
+          className="expand-collapse-btn"
           onClick={() => setIsStrokeOpen(!isStrokeOpen)}
           aria-label={isStrokeOpen ? "Add Stroke" : "Remove Stroke"}
         >
@@ -46,8 +42,18 @@ const Stroke = () => {
                         defaultValue={Math.round(position.y)}
                     /> */}
 
-            <input type="number" defaultValue={100} />
-            <span>%</span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: "4px",
+                flex: 1,
+              }}
+            >
+              <input type="number" defaultValue={100} />
+              <div>%</div>
+            </div>
           </div>
         </div>
       )}

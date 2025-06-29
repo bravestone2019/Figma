@@ -1,10 +1,10 @@
-import '../../../components/Tool.css';
+import '../../../components/Tools/Tool.css';
 import './RegionTool.css';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
-import Frame from '../../../assets/region/frame.png';
-import Section from '../../../assets/region/section.png';
-import Slice from '../../../assets/region/slice.png';
+import Frame from '../../../assets/Tools/region/frame.png';
+import Section from '../../../assets/Tools/region/section.png';
+import Slice from '../../../assets/Tools/region/slice.png';
 import DownArrow from '../../../assets/down.png';
 
 const regionTools = [

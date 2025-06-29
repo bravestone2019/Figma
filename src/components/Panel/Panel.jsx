@@ -1,107 +1,89 @@
 import "./Panel.css";
-import { useState } from "react";
-import Canvas from "../Canvas/Canvas";
+import { useState, useEffect, useRef } from "react";
+// import Shortcut from "../Shortcut";
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
 const Panel = () => {
-  // { position, setPosition, activeTool, drawnRectangles, setDrawnRectangles,}
-  const MAX_WIDTH = 600;
-  // const [scale, setScale] = useState(1);
-  // const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const DEFAULT_PANEL_WIDTH = 275;
-  // const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
-  // const [rightPanelWidth, setRightPanelWidth] = useState(DEFAULT_PANEL_WIDTH);  useEffect, useCallback, useRef
-  // const [isResizingLeft, setIsResizingLeft] = useState(false);
-  // const [isResizingRight, setIsResizingRight] = useState(false);
-
   const [collapsed, setCollapsed] = useState(false);
-  // const [hidden, setHidden] = useState(false);
-
-  // Refs for the left and right panels
-  // const mainContentRef = useRef(null);
-
-  // Handle mouse move for resizing
-  // const leftResize = useCallback(() => {
-  //     setIsResizingLeft(true);
-  // });
-
-  // // Handle mouse move for resizing
-  // const rightResize = useCallback(() => {
-  //     setIsResizingRight(true);
-  // });
-
-  // Handles mouse move globally
-  // const handleMouseMove = useCallback((e) => {
-  //     if (isResizingLeft) {
-  //         const newWidth = e.clientX - mainContentRef.current.getBoundingClientRect().left;
-  //         if (newWidth >= DEFAULT_PANEL_WIDTH && newWidth <= MAX_WIDTH) {
-  //             setLeftPanelWidth(newWidth);
-  //         }
-  //     } else if (isResizingRight) {
-  //         const newWidth = mainContentRef.current.getBoundingClientRect().right - e.clientX;
-  //         if (newWidth >= DEFAULT_PANEL_WIDTH && newWidth <= MAX_WIDTH) {
-  //             setRightPanelWidth(newWidth);
-  //         }
-  //     }
-  // }, [isResizingLeft, isResizingRight, mainContentRef]);
-
-  // Handle mouse up to stop resizing
-  // const handleMouseUp = useCallback(() => {
-  //     setIsResizingLeft(false);
-  //     setIsResizingRight(false);
-  // }, []);
-
-  // Attach event listeners for mouse move and mouse up
-  // useEffect(() => {
-  //     document.addEventListener('mousemove', handleMouseMove);
-  //     document.addEventListener('mouseup', handleMouseUp);
-
-  //     return () => {
-  //         document.removeEventListener('mousemove', handleMouseMove);
-  //         document.removeEventListener('mouseup', handleMouseUp);
-  //     };
-  // }, [handleMouseMove, handleMouseUp]);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(275);
+  const [rightPanelWidth, setRightPanelWidth] = useState(275);
+  const isDraggingLeft = useRef(false);
+  const isDraggingRight = useRef(false);
 
   const togglePanel = () => {
-    // setCollapsed(!collapsed);
-    setCollapsed((prev) => !prev);
-    // setHidden(hidden);
+    // setCollapsed((prev) => !prev);
+    setCollapsed(!collapsed);
   };
 
-  // const hideThePanels = () => {
-  //   setCollapsed(true);
-  //   setHidden(true);
-  // };
+  // Shortcut({ key: "/", shift: true }, togglePanel);
+
+  const handleMouseDownLeft = () => {
+    isDraggingLeft.current = true;
+    document.body.style.cursor = "col-resize";
+  };
+
+  const handleMouseDownRight = () => {
+    isDraggingRight.current = true;
+    document.body.style.cursor = "col-resize";
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDraggingLeft.current) {
+      const newLeftWidth = Math.max(275, Math.min(450, e.clientX));
+      setLeftPanelWidth(newLeftWidth);
+    }
+
+    if (isDraggingRight.current) {
+      const windowWidth = window.innerWidth;
+      const newRightWidth = Math.max(
+        275,
+        Math.min(450, windowWidth - e.clientX)
+      );
+      setRightPanelWidth(newRightWidth);
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDraggingLeft.current = false;
+    isDraggingRight.current = false;
+    document.body.style.cursor = "default";
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
 
   return (
     <>
-      {/* <div className="panel-wrapper"> */}
       {!collapsed && (
         <>
-          <div className="panel-container left">
+          <div
+            className="panel-container left"
+            style={{ width: `${leftPanelWidth}px` }}
+          >
             <LeftPanel collapsed={collapsed} toggleCollapsed={togglePanel} />
+            <div className="resize-handle-left" onMouseDown={handleMouseDownLeft} />
           </div>
 
-          <div className="panel-container right">
+          <div
+            className="panel-container right"
+            style={{ width: `${rightPanelWidth}px` }}
+          >
+            <div className="resize-handle-right" onMouseDown={handleMouseDownRight} />
             <RightPanel collapsed={collapsed} />
           </div>
         </>
       )}
-      {/* </div> */}
 
       {/* Optionally, render something when collapsed is true */}
       {collapsed && (
-        <>
-          <div className="toggle-left">
-            <LeftPanel collapsed={collapsed} toggleCollapsed={togglePanel} />
-          </div>
-
-          {/* <div className="toggle-right">
-            <RightPanel collapsed={collapsed}  />
-          </div> */}
-        </>
+        <LeftPanel collapsed={collapsed} toggleCollapsed={togglePanel} />
       )}
     </>
   );

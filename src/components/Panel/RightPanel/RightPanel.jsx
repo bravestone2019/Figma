@@ -1,5 +1,4 @@
 import "./RightPanel.css";
-import Minimize from "../../../assets/layout.png";
 import Fill from "./RightSections/Fill/Fill";
 import Stroke from "./RightSections/Stroke/Stroke";
 import Layout from "./RightSections/Layout/Layout";

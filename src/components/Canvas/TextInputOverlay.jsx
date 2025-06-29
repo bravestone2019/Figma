@@ -62,7 +62,7 @@ const TextInputOverlay = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [textInput]);
+  }, [textInput, completeTextInput]);
 
   // Ensure redraw happens after text input state changes
   useEffect(() => {

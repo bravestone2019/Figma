@@ -1,6 +1,6 @@
-import "./Layout.css"
+import "./Layout.css";
 import "../../RightPanel.css";
-import Corner from "../../../../../assets/corner.png";
+import Corner from "../../../../../assets/RightPanel/corner.png";
 
 const Layout = () => {
   return (
@@ -23,16 +23,13 @@ const Layout = () => {
           <span>H</span>
           <input type="number" defaultValue={100} />
         </div>
-        <button
-          className="reset-size-btn"
-          style={{ width: "36px", height: "24px" }}
-        >
-          <img src={Corner} alt={Corner} style={{ width: 18, height: 13 }}/>
+        <button className="reset-size-btn">
+          <img src={Corner} alt={Corner} style={{ width: 18, height: 13 }} />
         </button>
       </div>
 
-    {/* Thin grey line divider */}
-    <div className="section-divider" />
+      {/* Thin grey line divider */}
+      <div className="section-divider" />
     </>
   );
 };

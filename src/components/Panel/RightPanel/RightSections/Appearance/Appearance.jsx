@@ -1,5 +1,5 @@
 import "../../RightPanel.css"
-import clock from "../../../../../assets/clock.png";
+import clock from "../../../../../assets/RightPanel/clock.png";
 
 const Appearance = () => {
   return (

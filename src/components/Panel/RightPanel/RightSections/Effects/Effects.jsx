@@ -1,4 +1,5 @@
 import "../../RightPanel.css";
+import "./Effects.css"
 import { useState } from "react";
 
 const Effects = () => {
@@ -12,12 +13,7 @@ const Effects = () => {
       >
         Effects
         <button
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "16px",
-            marginLeft: "auto",
-          }}
+          className="expand-collapse-btn"
           onClick={() => setIsEffectsOpen(!isEffectsOpen)}
           aria-label={isEffectsOpen ? "Add Effects" : "Remove Effects"}
         >
@@ -28,7 +24,18 @@ const Effects = () => {
       {isEffectsOpen && (
         <div className="position-grid">
           <div className="pos-box-fill">
-            <span>100</span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: "4px",
+                flex: 1,
+              }}
+            >
+              <input type="number" defaultValue={100} />
+              <div>%</div>
+            </div>
           </div>
         </div>
       )}

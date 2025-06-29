@@ -3,6 +3,7 @@
     height: 100vh;
     position: fixed;
     top: 0;
+    cursor: default;
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -17,78 +18,32 @@
   right: 0;
 } 
 
-
-
-
-
-.canvas-container {
-  flex-grow: 1;
-  overflow: hidden;
-  display: flex;
-}
-
-.panel-wrapper {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.panel-container.left,
-.panel-container.right {
-  width: 275px; /* Or whatever width you're using */
-  height: 100%;
-}
-
-/* .floating-toggle {
-  position: fixed;
-  top: 2px;
-  /* left: 0; */
-  /* margin: 8px 0 0 8px;
-  z-index: 10;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.3);
-  padding: 8px 10px;
-} */ 
-
-/* .floating-toggle {
-  position: fixed;
-  top: 28px;
-  left: 23px;
-  z-index: 200;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.3);
-  padding: 8px 10px;
-} */
-
-.toggle-left {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 96%;
-  /* z-index: 100; */
-}
-
-.toggle-right {
-  position: relative;
-  width: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top:0
-}
-
-/* position: fixed;
+/* Left Panel Resize Handle (right edge of left panel) */
+.resize-handle-left {
+  position: absolute;
   top: 0;
   right: 0;
-  width: 60px; 
-  height: 100vh;
-  background-color: #fff;
-  border-left: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100; */
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 1000;
+}
+
+/* Right Panel Resize Handle (left edge of right panel) */
+.resize-handle-right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 1000;
+}
+
+
+
+
+
+
+
+

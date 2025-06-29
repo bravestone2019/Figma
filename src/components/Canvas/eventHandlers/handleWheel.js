@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { handleZoom } from "../../../utils/zoom";
 import { handleHorizontalPan, handleVerticalPan } from "../../../utils/panning";
 
-const handleWheel = (position, scale, setPosition, setScale) =>
+const useHandleWheel = (position, scale, setPosition, setScale) =>
   useCallback((e) => {
     // The textInput check should be handled in the parent hook
     e.preventDefault();
@@ -27,4 +27,4 @@ const handleWheel = (position, scale, setPosition, setScale) =>
     }
   }, [position, scale, setPosition, setScale]);
 
-export default handleWheel; 
+export default useHandleWheel; 

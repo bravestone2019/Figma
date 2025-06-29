@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 
-const handleTouchStart = () =>
+const useHandleTouchStart = () =>
   useCallback((e) => {
     if (e.touches.length === 2) {
       e.preventDefault();
     }
   }, []);
 
-export default handleTouchStart; 
+export default useHandleTouchStart; 

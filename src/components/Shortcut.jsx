@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const Shortcut = (keyCombo, callback) => {
+const useShortcut = (keyCombo, callback) => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       const el = document.activeElement;
@@ -31,4 +31,4 @@ const Shortcut = (keyCombo, callback) => {
   }, [callback, keyCombo]);
 };
 
-export default Shortcut;
+export default useShortcut;

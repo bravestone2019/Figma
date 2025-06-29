@@ -1,5 +1,5 @@
 import './App.css';
-import Tool from './components/Tool.jsx';
+import Tool from './components/Tools/Tool.jsx';
 import Panel from './components/Panel/Panel.jsx';
 import Canvas from './components/Canvas/Canvas';
 import { useState } from 'react';

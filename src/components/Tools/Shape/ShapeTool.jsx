@@ -1,14 +1,14 @@
-import '../../../components/Tool.css';
+import '../../../components/Tools/Tool.css';
 import './ShapeTool.css';
 import Image from './Image/Images';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
-import RectangleIcon from '../../../assets/Shapes/rectangle.png';
+import RectangleIcon from '../../../assets/Tools/Shapes/rectangle.png';
 import DownArrow from '../../../assets/down.png';
-import Line from '../../../assets/Shapes/line.png';
-import Circle from '../../../assets/Shapes/circle.png';
-import Triangle from '../../../assets/Shapes/triangle.png';
-import ImageIcon from '../../../assets/Shapes/image.png';
+import Line from '../../../assets/Tools/Shapes/line.png';
+import Circle from '../../../assets/Tools/Shapes/circle.png';
+import Triangle from '../../../assets/Tools/Shapes/triangle.png';
+import ImageIcon from '../../../assets/Tools/Shapes/image.png';
 
 const shapeTools = [
   { key: "Rectangle", label: "Rectangle", shortcut: "R", icon: RectangleIcon },

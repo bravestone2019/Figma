@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import "../../components/Tool.css";
-import Shortcut from "../Shortcut";
-import Text from "../../assets/Text.png";
+import Shortcut from "../../Shortcut";
+import "../../../components/Tools/Tool.css";
+import Text from "../../../assets/Tools/Text.png";
 
-const TextTool = ({ activeTool, setActiveTool, openDropdown, position, scale }) => {
-  // const [text, setText] = useState([]); // Array to store text objects
-  // const [isTextMode, setIsTextMode] = useState(false); // activate text mode 
+const TextTool = ({ activeTool, setActiveTool, openDropdown }) => {
 
   useEffect(() => {
     if (openDropdown) {
@@ -17,10 +15,6 @@ const TextTool = ({ activeTool, setActiveTool, openDropdown, position, scale }) 
       document.body.classList.remove("dropdown-open");
     };
   }, [openDropdown]);
-
-  // useEffect(() => {
-  //   document.body.style.cursor = setActiveTool ? "crosshair" : "default";
-  // }, [setActiveTool]);
 
   Shortcut({ key: "t" }, () => {
     setActiveTool("Text");

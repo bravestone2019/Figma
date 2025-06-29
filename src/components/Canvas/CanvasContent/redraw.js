@@ -36,7 +36,7 @@ export function redraw({
     ctx.save();
     if (shape.locked) {
       ctx.setLineDash([4, 2]);
-      ctx.strokeStyle = "red";
+      ctx.strokeStyle = "transparent";
       ctx.lineWidth = 2 / scale;
     } else if (activeTool === "Move" && i === hoveredShape) {
       ctx.setLineDash([]);
@@ -50,13 +50,13 @@ export function redraw({
       ctx.globalAlpha = shape.opacity;
       ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
       if (shape.locked) {
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = 2 / scale;
       } else if (activeTool === "Move" && i === hoveredShape) {
         ctx.strokeStyle = "#2196f3";
         ctx.lineWidth = Math.max(2 / scale, 1);
       } else {
-        ctx.strokeStyle = shape.borderColor;
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = shape.borderWidth / scale;
       }
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
@@ -66,7 +66,7 @@ export function redraw({
       ctx.moveTo(shape.x1, shape.y1);
       ctx.lineTo(shape.x2, shape.y2);
       if (shape.locked) {
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = 2 / scale;
       } else if (activeTool === "Move" && i === hoveredShape) {
         ctx.strokeStyle = "#2196f3";
@@ -83,13 +83,13 @@ export function redraw({
       ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
       ctx.fill();
       if (shape.locked) {
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = 2 / scale;
       } else if (activeTool === "Move" && i === hoveredShape) {
         ctx.strokeStyle = "#2196f3";
         ctx.lineWidth = Math.max(2 / scale, 1);
       } else {
-        ctx.strokeStyle = shape.borderColor;
+        ctx.strokeStyle =  "transparent";
         ctx.lineWidth = shape.borderWidth / scale;
       }
       ctx.stroke();
@@ -103,13 +103,13 @@ export function redraw({
       ctx.closePath();
       ctx.fill();
       if (shape.locked) {
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = 2 / scale;
       } else if (activeTool === "Move" && i === hoveredShape) {
         ctx.strokeStyle = "#2196f3";
         ctx.lineWidth = Math.max(2 / scale, 1);
       } else {
-        ctx.strokeStyle = shape.borderColor;
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = shape.borderWidth / scale;
       }
       ctx.stroke();
@@ -121,7 +121,7 @@ export function redraw({
       const measuredWidth = ctx.measureText(shape.text).width;
       const measuredHeight = (shape.fontSize || 16) * 1.2;
       if (shape.locked) {
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "transparent";
         ctx.lineWidth = 2 / scale;
         ctx.strokeRect(
           shape.x,

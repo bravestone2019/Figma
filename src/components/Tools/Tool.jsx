@@ -1,11 +1,11 @@
 import "./Tool.css";
 import { useState } from "react";
-import MoveTool from "./Tools/Move/MoveTool";
-import RegionTool from "./Tools/Region/RegionTool";
-import ShapeTool from "./Tools/Shape/ShapeTool";
-import CreationTool from "./Tools/Creation/CreationTool";
-import TextTool from "./Tools/TextTool";
-import Generate from "../components/Generate/Generate";
+import MoveTool from "./Move/MoveTool";
+import RegionTool from "./Region/RegionTool";
+import ShapeTool from "./Shape/ShapeTool";
+import CreationTool from "./Creation/CreationTool";
+import TextTool from "./Text/TextTool";
+import Generate from "../Generate/Generate";
 
 const Tool = ({ activeTool, setActiveTool, position, scale }) => {
   const [openDropdown, setOpenDropdown] = useState(null);

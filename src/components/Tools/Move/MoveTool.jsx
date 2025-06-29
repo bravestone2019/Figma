@@ -1,11 +1,11 @@
-import '../../../components/Tool.css';
+import '../../../components/Tools/Tool.css';
 import './MoveTool.css';
 import Shortcut from '../../Shortcut';
-import { useState, useRef, useEffect } from "react";
-import Move from '../../../assets/move_Tools/move.png';
-import Hand from '../../../assets/move_Tools/hand.png';
-import Scale from '../../../assets/move_Tools/scale.png';
 import DownArrow from '../../../assets/down.png';
+import { useState, useRef, useEffect } from "react";
+import Move from '../../../assets/Tools/move_Tools/move.png';
+import Hand from '../../../assets/Tools/move_Tools/hand.png';
+import Scale from '../../../assets/Tools/move_Tools/scale.png';
 
 const moveTools = [
   { key: "Move", label: "Move", shortcut: "V", icon: Move },
