@@ -24,15 +24,6 @@ const RightPanel = ({ collapsed }) => {
           <div className="right-panel-header">
             <div className="right-section-header">Design</div>
             {/* <div className="zoom-indicator">{zoomPercent}%</div> */}
-            {/*
-            <div className="toggle-wrapper" onClick={toggleCollapsed}>
-              <img src={Minimize} alt="Minimize" className="toggle-icon" />
-              <span className="left-toggle">
-                {collapsed ? "Expand UI" : "Minimize UI"}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/
-              </span>
-            </div>
-            */}
           </div>
           <div className="right-header-divider" />
 

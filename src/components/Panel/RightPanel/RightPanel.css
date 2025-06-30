@@ -1,6 +1,6 @@
-*::-webkit-scrollbar {
+/* *::-webkit-scrollbar {
   display: none !important;
-}
+} */
 
 .right-panel {
   position: relative;
@@ -13,7 +13,7 @@
   box-shadow: none;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 
 .right-panel.collapsed {

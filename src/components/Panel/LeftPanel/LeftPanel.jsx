@@ -1,5 +1,5 @@
 import "./LeftPanel.css";
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Back from "../../../assets/back.png";
 import Down from "../../../assets/down.png";
 import Minimize from "../../../assets/LeftPanel/layout.png";
@@ -11,25 +11,60 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [assetsCollapsed, setAssetsCollapsed] = useState(false);
 
-  // Restore scroll position when expanding
-  useLayoutEffect(() => {
+  // Consolidated effect for scroll handling and state (isScrolled)
+  useEffect(() => {
     const node = scrollRef.current;
 
-    if (!collapsed && !assetsCollapsed && node) {
-      node.scrollTop = scrollPosition.current;
+    // Logic for restoring scroll position after expansion
+    if (node && !assetsCollapsed) { // When assets section is *not* collapsed (i.e., expanding or already open)
+      const handleTransitionEnd = () => {
+        const computedMaxHeight = window.getComputedStyle(node).maxHeight;
 
+        // Check if the transition ended with a non-zero max-height (i.e., it's now open)
+        // and if a previous scroll position exists.
+        if (computedMaxHeight !== "0px" && scrollPosition.current > 0) {
+          node.scrollTo({
+            top: scrollPosition.current,
+            behavior: "instant", // Use "instant" for immediate jump after expand animation
+          });
+        }
+        node.removeEventListener("transitionend", handleTransitionEnd);
+      };
+
+      // If the assets section is *just* becoming uncollapsed (from being collapsed)
+      // or if it's already open and we need to ensure the scroll position on first render
+      const currentMaxHeight = window.getComputedStyle(node).maxHeight;
+      if (currentMaxHeight === "0px") { // If it was collapsed and is now opening
+        node.addEventListener("transitionend", handleTransitionEnd);
+      } else if (scrollPosition.current > 0) { // If it's already open and we have a scroll to restore
+        node.scrollTo({
+          top: scrollPosition.current,
+          behavior: "instant",
+        });
+      }
+
+      // Logic for `isScrolled` (header shadow)
       const handleScroll = () => {
         setIsScrolled(node.scrollTop > 0);
       };
-
       node.addEventListener("scroll", handleScroll);
+      // Initial check on mount/update
       handleScroll();
 
       return () => {
         node.removeEventListener("scroll", handleScroll);
+        // Ensure transitionend listener is removed if the component unmounts
+        node.removeEventListener("transitionend", handleTransitionEnd);
       };
+    } else if (node && assetsCollapsed) {
+        // When assets section is collapsed, remove scroll listener to avoid unnecessary checks
+        // (the isScrolled state becomes irrelevant for a collapsed section)
+        const handleScroll = () => {
+            setIsScrolled(node.scrollTop > 0);
+        };
+        node.removeEventListener("scroll", handleScroll); // Ensure removal if it was added
     }
-  }, [collapsed, assetsCollapsed]);
+  }, [assetsCollapsed]); // Dependency: run when assetsCollapsed changes
 
   // Save scroll position before collapsing
   const handleAssetsCollapse = () => {
@@ -41,23 +76,6 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
 
   return (
     <div className={`left-panel ${collapsed ? "collapsed" : ""}`}>
-      {collapsed && (
-        <div className="toggle-container">
-        <div className="toggle-left">
-          <img
-            src={Minimize}
-            alt={Minimize}
-            className="toggle-icon"
-            onClick={toggleCollapsed}
-          />
-          </div>
-          <span className="left-toggle-tooltip">Expand UI
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/
-          </span>
-          
-        </div>
-      )}
-
       {!collapsed && (
         <>
           <div className="toggle-wrapper" onClick={toggleCollapsed}>
@@ -99,7 +117,7 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
 
             {/* Scrolls only this part */}
             {!assetsCollapsed && (
-              <div className="assets-scroll" ref={scrollRef}>
+              <div className={`assets-scroll ${assetsCollapsed ? "hidden" : ""}`} ref={scrollRef}>
                 <ul className="assets-list">
                   {[
                     "Layer 1",

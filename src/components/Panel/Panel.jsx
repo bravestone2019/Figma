@@ -1,6 +1,7 @@
 import "./Panel.css";
 import { useState, useEffect, useRef } from "react";
 // import Shortcut from "../Shortcut";
+import Minimize from "../../assets/LeftPanel/layout.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
@@ -83,7 +84,19 @@ const Panel = () => {
 
       {/* Optionally, render something when collapsed is true */}
       {collapsed && (
-        <LeftPanel collapsed={collapsed} toggleCollapsed={togglePanel} />
+        <div className="toggle-container">
+        <div className="toggle-left">
+          <img
+            src={Minimize}
+            alt={Minimize}
+            className="toggle-icon"
+            onClick={togglePanel}
+          />
+          </div>
+          <span className="left-toggle-tooltip">Expand UI
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/
+          </span>
+        </div>
       )}
     </>
   );
