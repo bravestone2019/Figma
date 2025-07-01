@@ -3,3 +3,10 @@
   user-select: none;
   -webkit-user-drag: none;
 }
+
+/* Remove default scrollbars and overflow */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}

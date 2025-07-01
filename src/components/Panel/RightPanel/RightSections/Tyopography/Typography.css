@@ -1,0 +1,22 @@
+.font-list-scrollable-area::-webkit-scrollbar {
+  width: 8px; /* Make it thin */
+  background: transparent; /* Make the track transparent */
+}
+.font-list-scrollable-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.font-list-scrollable-area::-webkit-scrollbar-thumb {
+  background-color: rgba(128, 128, 128, 0.3); /* Light grey, semi-transparent */
+  border-radius: 4px; /* Rounded thumb */
+}
+
+.font-list-scrollable-area::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128, 128, 128, 0.6); /* Darker on hover */
+}
+
+/* For Firefox */
+.font-list-scrollable-area {
+  scrollbar-width: thin; /* Make it thin */
+  scrollbar-color: rgba(128, 128, 128, 0.3) transparent; /* thumb color and track color */
+}

@@ -1,11 +1,19 @@
 import "./Generate.css";
+import Upload from "./Upload/Upload";
+import Download from "./download/download";
 import Shortcut from "../Shortcut";
 import { useEffect, useState } from "react";
 import folder from "../../assets/auto.png";
 
-const Generate = ({ activeTool, setActiveTool, openDropdown, isGenerateOpen, setIsGenerateOpen }) => {
+const Generate = ({
+  activeTool,
+  setActiveTool,
+  openDropdown,
+  isGenerateOpen,
+  setIsGenerateOpen,
+}) => {
   const [open, setOpen] = useState(false);
-
+ 
   useEffect(() => {
     if (openDropdown) {
       document.body.classList.add("dropdown-open");
@@ -58,7 +66,14 @@ const Generate = ({ activeTool, setActiveTool, openDropdown, isGenerateOpen, set
       {open && (
         <div className="preview-modal-overlay">
           <div className="preview-modal">
-            <button className="close-btn" onClick={handleClose}>×</button>
+            <button className="close-btn" onClick={handleClose}>
+              x
+            </button>
+
+            <div className="generate-container">
+              <Upload />
+              <Download />
+            </div>
           </div>
         </div>
       )}

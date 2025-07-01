@@ -3,9 +3,6 @@
     left: 90%;
     bottom: 65%;
     transform: translateX(-58%); 
-    /* background: rgba(0,0,0,0.10); */
-    background-color: white;
-    /* box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.3); */
     z-index: 2000;
     display: flex;
     align-items: center;
@@ -14,19 +11,6 @@
     padding: 8px 10px;
 }
 
-/* position: fixed; 
-  bottom: 15px;  
-  /* Center the container horizontally */
-  /* background-color: white; */
-  /* border: 2px solid #ddd; width | style | color  */
-  /* border-radius: 18px; */
-   /*  X-axis | Y-axis | blur | color  */
-  /* display: flex; */
-   /*  X-axis | Y-axis  */
-  /* z-index: 1000;  Ensure the tools are above other content */
-  /* min-height: 30px; Ensure consistent height even on hover */
-  /* gap: 2px;   */
-
 .preview-modal {
     background: #fff;
     border-radius: 12px;
@@ -34,8 +18,6 @@
     padding: 32px 24px 24px 24px;
     min-width: 1300px;
     min-height: 560px;
-    /* max-width: 1000px;
-    max-height: 650px; */
     position: relative;
     display: flex;
     flex-direction: column;
@@ -50,9 +32,26 @@
     right: 18px;
     background: none;
     border: none;
-    font-size: 2rem;
+    font-size: 25px;
     cursor: pointer;
 }
 .close-btn:hover {
     color: #ff0000;
+}
+
+.generate-container {
+  position: fixed; 
+  bottom: 20px;  
+  left: 50%;
+  transform: translateX(-60%); /* Center the container horizontally */
+  background-color: white;
+  border: 2px solid #ddd; /* width | style | color  */
+  border-radius: 18px;
+  box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.3); /*  X-axis | Y-axis | blur | color  */
+  display: flex;
+  padding: 8px 10px; /*  X-axis | Y-axis  */
+  z-index: 1000;  /* Ensure the tools are above other content */
+  min-height: 30px; /* Ensure consistent height even on hover */
+  gap: 2px; /* Add space between icon groups */
+  /* cursor: default;  */
 }

@@ -1,6 +1,6 @@
 import "./Panel.css";
 import { useState, useEffect, useRef } from "react";
-// import Shortcut from "../Shortcut";
+import Shortcut from "../Shortcut";
 import Minimize from "../../assets/LeftPanel/layout.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
@@ -17,7 +17,7 @@ const Panel = () => {
     setCollapsed(!collapsed);
   };
 
-  // Shortcut({ key: "/", shift: true }, togglePanel);
+  Shortcut({ ctrl:true, key: "/" }, togglePanel);
 
   const handleMouseDownLeft = () => {
     isDraggingLeft.current = true;
