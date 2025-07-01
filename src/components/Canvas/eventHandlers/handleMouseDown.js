@@ -46,8 +46,8 @@ const handleMouseDown = (
       }
       // --- SCALE HANDLE LOGIC ---
       if (activeTool === "Move" && selectedShapes.length === 1) {
-        const shapeIdx = selectedShapes[0];
-        const shape = drawnRectangles[shapeIdx];
+        const shapeId = selectedShapes[0];
+        const shape = drawnRectangles.find(s => s.id === shapeId);
         if (shape) {
           if (shape.type === 'line') {
             // Check endpoints
@@ -62,7 +62,7 @@ const handleMouseDown = (
                 mouseX >= handle.x - half && mouseX <= handle.x + half &&
                 mouseY >= handle.y - half && mouseY <= handle.y + half
               ) {
-                setScalingHandle({ shapeIdx, handleType: handle.type, startX: mouseX, startY: mouseY, origBounds: { x1: shape.x1, y1: shape.y1, x2: shape.x2, y2: shape.y2 } });
+                setScalingHandle({ shapeId, handleType: handle.type, startX: mouseX, startY: mouseY, origBounds: { x1: shape.x1, y1: shape.y1, x2: shape.x2, y2: shape.y2 } });
                 return;
               }
             }
@@ -83,7 +83,7 @@ const handleMouseDown = (
                 }
                 
                 setScalingHandle({ 
-                  shapeIdx, 
+                  shapeId, 
                   handleType: handle.type, 
                   startX: mouseX, 
                   startY: mouseY, 
@@ -93,7 +93,7 @@ const handleMouseDown = (
                 });
                 // Store globally for visual indicator access
                 window.scalingHandle = { 
-                  shapeIdx, 
+                  shapeId, 
                   handleType: handle.type, 
                   startX: mouseX, 
                   startY: mouseY, 
@@ -129,27 +129,24 @@ const handleMouseDown = (
               offsetX = mouseX - shape.x;
               offsetY = mouseY - shape.y;
             }
-            
-            // Check if this shape is already selected
-            const isAlreadySelected = selectedShapes.includes(i);
-            
+            // Check if this shape is already selected (by id)
+            const isAlreadySelected = selectedShapes.includes(shape.id);
             // Select the shape if not already selected
             if (!isAlreadySelected) {
-              setSelectedShapes([i]);
+              setSelectedShapes([shape.id]);
             }
-            
             // Always start moving the shape, whether it was already selected or not
             if (isAlreadySelected && selectedShapes.length > 1) {
               // Multi-selection move - move all selected shapes
               const originalPositions = {};
-              selectedShapes.forEach(shapeIndex => {
-                const selectedShape = drawnRectangles[shapeIndex];
-                if (selectedShape.type === "rectangle" || selectedShape.type === "text" || selectedShape.type === "circle" || selectedShape.type === "image") {
-                  originalPositions[shapeIndex] = { x: selectedShape.x, y: selectedShape.y };
-                } else if (selectedShape.type === "line") {
-                  originalPositions[shapeIndex] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2 };
-                } else if (selectedShape.type === "triangle") {
-                  originalPositions[shapeIndex] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2, x3: selectedShape.x3, y3: selectedShape.y3 };
+              selectedShapes.forEach(shapeId => {
+                const selectedShape = drawnRectangles.find(s => s.id === shapeId);
+                if (selectedShape && (selectedShape.type === "rectangle" || selectedShape.type === "text" || selectedShape.type === "circle" || selectedShape.type === "image")) {
+                  originalPositions[selectedShape.id] = { x: selectedShape.x, y: selectedShape.y };
+                } else if (selectedShape && selectedShape.type === "line") {
+                  originalPositions[selectedShape.id] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2 };
+                } else if (selectedShape && selectedShape.type === "triangle") {
+                  originalPositions[selectedShape.id] = { x1: selectedShape.x1, y1: selectedShape.y1, x2: selectedShape.x2, y2: selectedShape.y2, x3: selectedShape.x3, y3: selectedShape.y3 };
                 }
               });
               setMovingShape({ 

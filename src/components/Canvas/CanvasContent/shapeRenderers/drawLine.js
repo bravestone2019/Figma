@@ -8,23 +8,33 @@ export function drawLine(ctx, shape, options = {}) {
     isHovered = false, 
     isLocked = false, 
     scale = 1,
-    activeTool = null 
+    activeTool = null,
+    x1, y1, x2, y2, rotation = 0
   } = options;
 
+  // Calculate center
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const angle = (rotation * Math.PI) / 180;
+  const rotatePoint = (x, y) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    return {
+      x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
+      y: cy + dx * Math.sin(angle) + dy * Math.cos(angle),
+    };
+  };
+  const p1 = rotation ? rotatePoint(x1, y1) : { x: x1, y: y1 };
+  const p2 = rotation ? rotatePoint(x2, y2) : { x: x2, y: y2 };
+
   ctx.save();
-  
-  // Apply shape styling based on state
+  // No need to rotate context, just use rotated points
   applyShapeStyling(ctx, shape, isHovered, isLocked, scale, activeTool);
-  
-  // Draw line
   ctx.globalAlpha = shape.opacity;
   ctx.beginPath();
-  ctx.moveTo(shape.x1, shape.y1);
-  ctx.lineTo(shape.x2, shape.y2);
-  
-  // Apply stroke styling
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
   drawLineStroke(ctx, shape, isHovered, isLocked, scale, activeTool);
   ctx.stroke();
-  
   ctx.restore();
 } 

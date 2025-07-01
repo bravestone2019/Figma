@@ -9,28 +9,36 @@ function App() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
   const [drawnRectangles, setDrawnRectangles] = useState([]);
+  const [selectedShapes, setSelectedShapes] = useState([]);
 
   return (
     <>
-      <Panel />
-        <Canvas 
-          activeTool={activeTool} 
-          setActiveTool={setActiveTool}
-          position={position}
-          setPosition={setPosition}
-          scale={scale}
-          setScale={setScale}
-          drawnRectangles={drawnRectangles}
-          setDrawnRectangles={setDrawnRectangles}
-        />
-        {/* </div> */}
-        <Tool 
-          activeTool={activeTool} 
-          setActiveTool={setActiveTool} 
-          position={position}
-          scale={scale}
-          setDrawnRectangles={setDrawnRectangles}
-        />
+      <Panel 
+        selectedShapes={selectedShapes}
+        setSelectedShapes={setSelectedShapes}
+        drawnRectangles={drawnRectangles}
+        setDrawnRectangles={setDrawnRectangles}
+      />
+      <Canvas 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool}
+        position={position}
+        setPosition={setPosition}
+        scale={scale}
+        setScale={setScale}
+        drawnRectangles={drawnRectangles}
+        setDrawnRectangles={setDrawnRectangles}
+        selectedShapes={selectedShapes}
+        setSelectedShapes={setSelectedShapes}
+      />
+      {/* </div> */}
+      <Tool 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool} 
+        position={position}
+        scale={scale}
+        setDrawnRectangles={setDrawnRectangles}
+      />
     </>
   )
 }

@@ -44,10 +44,16 @@ export function drawImage(ctx, shape, options = {}) {
     isLocked = false, 
     scale = 1,
     activeTool = null,
-    canvas = null
+    canvas = null,
+    x, y, width, height, rotation = 0
   } = options;
 
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
   ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate((rotation * Math.PI) / 180);
+  ctx.translate(-centerX, -centerY);
   ctx.globalAlpha = shape.opacity;
   
   // Check if image is already loaded

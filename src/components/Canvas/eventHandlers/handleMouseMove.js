@@ -43,8 +43,8 @@ const handleMouseMove = (
       if (scalingHandle) {
         setHoveredShape(null);
         setDrawnRectangles((prev) =>
-          prev.map((shape, idx) => {
-            if (idx === scalingHandle.shapeIdx) {
+          prev.map((shape) => {
+            if (shape.id === scalingHandle.shapeId) {
               return resizeShape(
                 shape,
                 scalingHandle.handleType,

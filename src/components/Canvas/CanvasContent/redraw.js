@@ -95,7 +95,12 @@ export function redraw({
       isLocked: shape.locked,
       scale,
       activeTool,
-      canvas
+      canvas,
+      x: shape.x,
+      y: shape.y,
+      width: shape.width,
+      height: shape.height,
+      rotation: shape.rotation || 0
     };
 
     // Use the appropriate shape renderer based on shape type
@@ -104,7 +109,13 @@ export function redraw({
         drawRectangle(ctx, shape, renderOptions);
         break;
       case "line":
-        drawLine(ctx, shape, renderOptions);
+        drawLine(ctx, shape, {
+          ...renderOptions,
+          x1: shape.x1,
+          y1: shape.y1,
+          x2: shape.x2,
+          y2: shape.y2
+        });
         break;
       case "circle":
         drawCircle(ctx, shape, renderOptions);
@@ -125,32 +136,55 @@ export function redraw({
 
   // Draw bounding boxes for selected shapes (draw on top of all shapes)
   if (selectedShapes && selectedShapes.length > 0) {
-    selectedShapes.forEach((i) => {
-      const shape = drawnRectangles[i];
+    selectedShapes.forEach((id) => {
+      const shape = drawnRectangles.find(s => s.id === id);
       if (!shape) return;
       if (shape.type === 'line') {
-        drawLineHandles(ctx, shape, scale);
+        drawRotatedLineHandles(ctx, shape, scale);
       } else if (shape.type === 'circle') {
         drawCircleHandle(ctx, shape, scale);
       } else if (shape.type === 'triangle') {
         drawTriangleHandles(ctx, shape, scale);
       } else {
         const bounds = getBoundingRect(shape);
+        // Draw rotated bounding box
+        const cx = bounds.x + bounds.width / 2;
+        const cy = bounds.y + bounds.height / 2;
+        const angle = (shape.rotation || 0);
+        function rotatePoint(x, y, cx, cy, angle) {
+          const rad = (angle * Math.PI) / 180;
+          const dx = x - cx;
+          const dy = y - cy;
+          return {
+            x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+            y: cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+          };
+        }
+        const corners = [
+          rotatePoint(bounds.x, bounds.y, cx, cy, angle),
+          rotatePoint(bounds.x + bounds.width, bounds.y, cx, cy, angle),
+          rotatePoint(bounds.x + bounds.width, bounds.y + bounds.height, cx, cy, angle),
+          rotatePoint(bounds.x, bounds.y + bounds.height, cx, cy, angle)
+        ];
         ctx.save();
         ctx.setLineDash([6, 3]);
         ctx.strokeStyle = '#2196f3';
         ctx.lineWidth = 2 / scale;
         ctx.globalAlpha = 1;
-        ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x, corners[0].y);
+        for (let i = 1; i < 4; i++) ctx.lineTo(corners[i].x, corners[i].y);
+        ctx.closePath();
+        ctx.stroke();
         ctx.restore();
-        drawCornerScaleHandles(ctx, bounds, scale);
+        drawRotatedCornerHandles(ctx, corners, scale);
       }
     });
   }
 
   // Draw aspect ratio preservation indicator if scaling handle is active with preserveAspectRatio
   if (window.scalingHandle && window.scalingHandle.preserveAspectRatio) {
-    const shape = drawnRectangles[window.scalingHandle.shapeIdx];
+    const shape = drawnRectangles.find(s => s.id === window.scalingHandle.shapeId);
     if (shape && (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image')) {
       ctx.save();
       ctx.setLineDash([3, 3]);
@@ -191,5 +225,47 @@ export function redraw({
   }
 
   // Restore the canvas state
+  ctx.restore();
+}
+
+function drawRotatedCornerHandles(ctx, corners, scale) {
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#2196f3";
+  const size = 8 / scale;
+  corners.forEach(corner => {
+    ctx.beginPath();
+    ctx.rect(corner.x - size / 2, corner.y - size / 2, size, size);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawRotatedLineHandles(ctx, shape, scale) {
+  const { x1, y1, x2, y2, rotation = 0 } = shape;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const rad = (rotation * Math.PI) / 180;
+  function rotatePoint(x, y) {
+    const dx = x - cx;
+    const dy = y - cy;
+    return {
+      x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+      y: cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+    };
+  }
+  const p1 = rotatePoint(x1, y1);
+  const p2 = rotatePoint(x2, y2);
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#2196f3";
+  const size = 8 / scale;
+  [p1, p2].forEach(pt => {
+    ctx.beginPath();
+    ctx.rect(pt.x - size / 2, pt.y - size / 2, size, size);
+    ctx.fill();
+    ctx.stroke();
+  });
   ctx.restore();
 } 
