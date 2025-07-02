@@ -7,7 +7,13 @@ import Position from "./RightSections/Position/Position";
 import Appearance from "./RightSections/Appearance/Appearance";
 import TextPropertiesPanel from "./RightSections/Tyopography/Tyopography";
 
-const RightPanel = ({ collapsed, selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles }) => {
+const RightPanel = ({
+  collapsed,
+  selectedShapes,
+  setSelectedShapes,
+  drawnRectangles,
+  setDrawnRectangles,
+}) => {
   // const zoomPercent = Math.round((scale || 1) * 100); scale
 
   return (
@@ -23,24 +29,33 @@ const RightPanel = ({ collapsed, selectedShapes, setSelectedShapes, drawnRectang
         <div className="right-panel-content">
           <div className="right-panel-header">
             <div className="right-section-header">
-              <div style={{ padding: "6px", borderRadius: "8px" ,background: "rgba(0, 0, 0, 0.08)"}}>Design</div>
+              <div
+                style={{
+                  padding: "6px",
+                  borderRadius: "8px",
+                  background: "rgba(0, 0, 0, 0.08)",
+                }}
+              >
+                Design
+              </div>
             </div>
             {/* <div className="zoom-indicator">{zoomPercent}%</div> */}
           </div>
           <div className="right-header-divider" />
 
           <div className="right-panel-scrollable">
-          <Position 
-            selectedShapes={selectedShapes}
-            setSelectedShapes={setSelectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <Layout />
-          <Appearance />
-          <Fill />
-          <Stroke />
-          <Effects />
+            <Position
+              selectedShapes={selectedShapes}
+              setSelectedShapes={setSelectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            <Layout />
+            <Appearance />
+            <TextPropertiesPanel />
+            <Fill />
+            <Stroke />
+            <Effects />
           </div>
         </div>
       )}

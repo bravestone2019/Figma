@@ -5,7 +5,9 @@ import FontSize from "./font/fontsize";
 import FontWeight from "./font/fontweight";
 import { useState, useEffect, useRef } from "react";
 import Down from "../../../../../assets/down.png";
-// import demo from "../../../../../assets/LeftPanel/layout.png";
+import AlignLeft from "../../../../../assets/RightPanel/left.png"; 
+import AlignCenter from "../../../../../assets/RightPanel/center.png";
+import AlignRight from "../../../../../assets/RightPanel/right.png";
 
 const fonts = [
   "Josefin Sans",
@@ -40,6 +42,12 @@ const TextPropertiesPanel = () => {
   const fontSizeInputRef = useRef(null); // Ref for the "100" input box
   const fontSizeDropdownRef = useRef(null); // Ref for the FontSizeDropdown itself
   const [fontSizePanelCoords, setFontSizePanelCoords] = useState(null);
+
+  // NEW STATE FOR ALIGNMENT
+  const [selectedHorizontalAlignment, setSelectedHorizontalAlignment] =
+    useState("left"); // Default
+  // const [selectedVerticalAlignment, setSelectedVerticalAlignment] =
+  // useState("top"); // Default
 
   const filteredFonts = fonts.filter((font) =>
     font.toLowerCase().includes(searchTerm.toLowerCase())
@@ -266,6 +274,44 @@ const TextPropertiesPanel = () => {
               />
             )}
 
+          <div
+            className="alignment-panel"
+            style={{ marginTop: "-12px", marginLeft: "50px", marginRight: "-50px" }}
+          >
+            <div className="alignment-group">
+              <button
+                className={`alignment-button ${
+                  selectedHorizontalAlignment === "left" ? "active" : ""
+                }`}
+                onClick={() => setSelectedHorizontalAlignment("left")}
+              >
+                <img src={AlignLeft} alt="Align Left" />
+              </button>
+              <button
+                className={`alignment-button ${
+                  selectedHorizontalAlignment === "center" ? "active" : ""
+                }`}
+                onClick={() => setSelectedHorizontalAlignment("center")}
+              >
+                <img src={AlignCenter} alt="Align Center" />
+              </button>
+              <button
+                className={`alignment-button ${
+                  selectedHorizontalAlignment === "right" ? "active" : ""
+                }`}
+                onClick={() => setSelectedHorizontalAlignment("right")}
+              >
+                <img src={AlignRight} alt="Align Right" />
+              </button>
+              {/* <button
+              className={`alignment-button ${selectedHorizontalAlignment === "justify" ? "active" : ""}`}
+              onClick={() => setSelectedHorizontalAlignment("justify")}
+            >
+              <img src={Justify} alt="Justify" />
+            </button> */}
+            </div>
+          </div>
+
           {/* <div
             className="pos-box"
             style={{
@@ -287,8 +333,6 @@ const TextPropertiesPanel = () => {
               <img src={demo} alt={demo} style={{ width: 14, height: 14 }} />
             </button>
           </div> */}
-
-
         </div>
       </div>
 
