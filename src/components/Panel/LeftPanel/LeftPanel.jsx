@@ -1,15 +1,18 @@
 import "./LeftPanel.css";
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import Back from "../../../assets/back.png";
 import Down from "../../../assets/down.png";
 import Minimize from "../../../assets/LeftPanel/layout.png";
 
-const LeftPanel = ({ collapsed, toggleCollapsed }) => {
+const LeftPanel = ({ collapsed, toggleCollapsed, drawnRectangles, selectedShapes, setSelectedShapes, setDrawnRectangles, setActiveTool }) => {
   const titleRef = useRef(null);
   const scrollRef = useRef(null);
   const scrollPosition = useRef(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [assetsCollapsed, setAssetsCollapsed] = useState(false);
+  const [renamingId, setRenamingId] = useState(null);
+  const [renameValue, setRenameValue] = useState("");
+  const renameInputRef = useRef(null);
 
   // Restore scroll position when expanding
   useLayoutEffect(() => {
@@ -37,6 +40,50 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
       scrollPosition.current = scrollRef.current.scrollTop;
     }
     setAssetsCollapsed(!assetsCollapsed);
+  };
+
+  // Focus input when entering rename mode
+  useEffect(() => {
+    if (renamingId && renameInputRef.current) {
+      renameInputRef.current.focus();
+      renameInputRef.current.select();
+    }
+  }, [renamingId]);
+
+  // Keyboard shortcut: Shift+R to rename selected shape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.shiftKey && (e.key === 'R' || e.key === 'r')) {
+        if (selectedShapes && selectedShapes.length === 1) {
+          const shapeId = selectedShapes[0];
+          const shape = drawnRectangles.find(s => s.id === shapeId);
+          if (shape) {
+            setRenamingId(shapeId);
+            setRenameValue(shape.name || '');
+            e.preventDefault();
+          }
+        }
+      }
+      // Escape to cancel rename
+      if (renamingId && e.key === 'Escape') {
+        setRenamingId(null);
+        if (setActiveTool) setActiveTool("Move");
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedShapes, drawnRectangles, renamingId, setActiveTool]);
+
+  // Handle rename submit
+  const handleRenameSubmit = (e) => {
+    e.preventDefault();
+    if (renameValue.trim() && renamingId) {
+      setDrawnRectangles(prev => prev.map(shape =>
+        shape.id === renamingId ? { ...shape, name: renameValue.trim() } : shape
+      ));
+    }
+    setRenamingId(null);
+    if (setActiveTool) setActiveTool("Move");
   };
 
   return (
@@ -101,48 +148,32 @@ const LeftPanel = ({ collapsed, toggleCollapsed }) => {
             {!assetsCollapsed && (
               <div className="assets-scroll" ref={scrollRef}>
                 <ul className="assets-list">
-                  {[
-                    "Layer 1",
-                    "Layer 2",
-                    "Layer 3",
-                    "Background",
-                    "Text Box",
-                    "Image 1",
-                    "Shape 1",
-                    "Vector Path",
-                    "Group 1",
-                    "Button",
-                    "Icon",
-                    "Rectangle",
-                    "Line",
-                    "Text Label",
-                    "Dropdown",
-                    "Checkbox",
-                    "Radio Button",
-                    "Slider",
-                    "Layer 1",
-                    "Layer 2",
-                    "Layer 3",
-                    "Background",
-                    "Text Box",
-                    "Image 1",
-                    "Shape 1",
-                    "Vector Path",
-                    "Group 1",
-                    "Button",
-                    "Icon",
-                    "Rectangle",
-                    "Line",
-                    "Text Label",
-                    "Dropdown",
-                    "Checkbox",
-                    "Radio Button",
-                    "Slider",
-                  ].map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                  <div style={{ height: "35px" }} />{" "}
-                  {/* Spacer at the bottom */}
+                  {drawnRectangles && drawnRectangles.length > 0 ? (
+                    drawnRectangles.map((shape, i) => (
+                      <li
+                        key={shape.id || i}
+                        className={selectedShapes && selectedShapes.includes(shape.id) ? "selected" : ""}
+                        onClick={() => setSelectedShapes([shape.id])}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {renamingId === shape.id ? (
+                          <form onSubmit={handleRenameSubmit} style={{ display: 'inline' }}>
+                            <input
+                              ref={renameInputRef}
+                              value={renameValue}
+                              onChange={e => setRenameValue(e.target.value)}
+                              onBlur={handleRenameSubmit}
+                              style={{ width: '90%', fontSize: 'inherit' }}
+                              maxLength={32}
+                            />
+                          </form>
+                        ) : shape.name}
+                      </li>
+                    ))
+                  ) : (
+                    <li style={{ color: '#aaa', fontStyle: 'italic' }}>No shapes</li>
+                  )}
+                  <div style={{ height: "35px" }} />
                 </ul>
               </div>
             )}

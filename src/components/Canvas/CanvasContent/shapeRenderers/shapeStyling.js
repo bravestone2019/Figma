@@ -22,8 +22,17 @@ export function drawShapeBorder(ctx, shape, isHovered, isLocked, scale, activeTo
     ctx.strokeStyle = "#2196f3";
     ctx.lineWidth = Math.max(2 / scale, 1);
   } else {
-    ctx.strokeStyle = "transparent";
-    ctx.lineWidth = shape.borderWidth / scale;
+    // Use correct stroke color and width for each shape type
+    if (shape.type === "rectangle" || shape.type === "image") {
+      ctx.strokeStyle = shape.borderColor || "#000";
+      ctx.lineWidth = (shape.borderWidth || 1) / scale;
+    } else if (shape.type === "text") {
+      ctx.strokeStyle = shape.strokeColor || "#000";
+      ctx.lineWidth = (shape.strokeWidth || 1) / scale;
+    } else {
+      ctx.strokeStyle = "transparent";
+      ctx.lineWidth = 1;
+    }
   }
 }
 

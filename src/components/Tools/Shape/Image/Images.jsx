@@ -1,5 +1,22 @@
 import { useEffect, useRef } from "react";
 
+// Utility to get the next available shape name for a given type
+function getNextShapeName(type, drawnRectangles) {
+  const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+  const sameType = drawnRectangles.filter(s => s.type === type);
+  const namePattern = new RegExp(`^${typeName}(?: (\\d+))?$`, 'i');
+  const numbers = sameType
+    .map(s => {
+      const shapeName = s.name || typeName;
+      const match = shapeName.match(namePattern);
+      return match ? (match[1] ? parseInt(match[1], 10) : 1) : null;
+    })
+    .filter(n => n !== null);
+  let nextNumber = 1;
+  while (numbers.includes(nextNumber)) nextNumber++;
+  return nextNumber === 1 ? typeName : `${typeName} ${nextNumber}`;
+}
+
 const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale }) => {
   const fileInputRef = useRef(null);
 
@@ -55,30 +72,27 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
         const canvasY = viewportCenterY - height / 2;
 
         // Create complete image shape object for canvas system
-        const imageShape = {
-          type: "image",
-          x: canvasX,
-          y: canvasY,
-          width: width,
-          height: height,
-          src: src,
-          opacity: 1,
-          locked: false,
-          // Additional properties for consistency with other shapes
-          backgroundColor: "transparent",
-          borderColor: "transparent",
-          borderWidth: 0,
-          // Store original dimensions for reference
-          originalWidth: tempImage.width,
-          originalHeight: tempImage.height,
-          // Add unique identifier
-          id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        };
-
-        console.log("Image added to canvas:", imageShape);
-
-        // Add to drawnRectangles state instead of local state
-        setDrawnRectangles((prev) => [...prev, imageShape]);
+        setDrawnRectangles((prev) => {
+          const name = getNextShapeName("image", prev);
+          const imageShape = {
+            type: "image",
+            name,
+            x: canvasX,
+            y: canvasY,
+            width: width,
+            height: height,
+            src: src,
+            opacity: 1,
+            locked: false,
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            borderWidth: 0,
+            originalWidth: tempImage.width,
+            originalHeight: tempImage.height,
+            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          };
+          return [...prev, imageShape];
+        });
         
         // Reset active tool to Move after successful image placement
         setActiveTool("Move");
@@ -94,25 +108,28 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
         const canvasX = viewportCenterX - fallbackWidth / 2;
         const canvasY = viewportCenterY - fallbackHeight / 2;
 
-        const imageShape = {
-          type: "image",
-          x: canvasX,
-          y: canvasY,
-          width: fallbackWidth,
-          height: fallbackHeight,
-          src: src,
-          opacity: 1,
-          locked: false,
-          backgroundColor: "transparent",
-          borderColor: "transparent",
-          borderWidth: 0,
-          originalWidth: fallbackWidth,
-          originalHeight: fallbackHeight,
-          id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        };
-
-        console.log("Image added to canvas (fallback):", imageShape);
-        setDrawnRectangles((prev) => [...prev, imageShape]);
+        // Create complete image shape object for canvas system
+        setDrawnRectangles((prev) => {
+          const name = getNextShapeName("image", prev);
+          const imageShape = {
+            type: "image",
+            name,
+            x: canvasX,
+            y: canvasY,
+            width: fallbackWidth,
+            height: fallbackHeight,
+            src: src,
+            opacity: 1,
+            locked: false,
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            borderWidth: 0,
+            originalWidth: fallbackWidth,
+            originalHeight: fallbackHeight,
+            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          };
+          return [...prev, imageShape];
+        });
         
         // Reset active tool to Move after fallback image placement
         setActiveTool("Move");

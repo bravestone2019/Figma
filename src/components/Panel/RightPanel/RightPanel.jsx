@@ -43,10 +43,26 @@ const RightPanel = ({ collapsed, selectedShapes, setSelectedShapes, drawnRectang
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
           />
-          <Layout />
-          <Appearance />
-          <Fill />
-          <Stroke />
+          <Layout 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Appearance 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Fill 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Stroke 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
           <Effects />
           {/* </div> */}
         </div>
