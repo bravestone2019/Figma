@@ -12,7 +12,7 @@
 export function handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes) {
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedShapes.length > 0) {
     e.preventDefault();
-    const newShapes = drawnRectangles.filter((_, i) => !selectedShapes.includes(i));
+    const newShapes = drawnRectangles.filter((shape) => !selectedShapes.includes(shape.id));
     setDrawnRectangles(newShapes);
     setSelectedShapes([]);
   }

@@ -18,6 +18,8 @@ const Canvas = ({
   setScale,
   drawnRectangles,
   setDrawnRectangles,
+  selectedShapes,
+  setSelectedShapes,
 }) => {
   const canvasRef = useRef(null);
   const previewRef = useRef(null);
@@ -34,7 +36,6 @@ const Canvas = ({
   const [movingShape, setMovingShape] = useState(null);
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectionBox, setSelectionBox] = useState(null);
-  const [selectedShapes, setSelectedShapes] = useState([]);
   const [scalingHandle, setScalingHandle] = useState(null);
 
   // Grid configuration
@@ -149,7 +150,11 @@ const Canvas = ({
 
   useEffect(() => {
     const onKeyDown = (e) => {
-      handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes);
+      const tag = e.target.tagName.toLowerCase();
+      const isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
+      if (!isInput) {
+        handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes);
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {

@@ -8,10 +8,16 @@ export function drawText(ctx, shape, options = {}) {
     isHovered = false, 
     isLocked = false, 
     scale = 1,
-    activeTool = null 
+    activeTool = null,
+    x, y, width, height, rotation = 0
   } = options;
 
+  const centerX = x + (width || 50) / 2;
+  const centerY = y + (height || 20) / 2;
   ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate((rotation * Math.PI) / 180);
+  ctx.translate(-centerX, -centerY);
   
   // Set up text styling
   ctx.font = `${shape.fontSize || 16}px Arial`;

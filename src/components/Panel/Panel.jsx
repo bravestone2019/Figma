@@ -5,7 +5,7 @@ import Minimize from "../../assets/LeftPanel/layout.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
-const Panel = () => {
+const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(275);
   const [rightPanelWidth, setRightPanelWidth] = useState(275);
@@ -77,7 +77,13 @@ const Panel = () => {
             style={{ width: `${rightPanelWidth}px` }}
           >
             <div className="resize-handle-right" onMouseDown={handleMouseDownRight} />
-            <RightPanel collapsed={collapsed} />
+            <RightPanel 
+              collapsed={collapsed}
+              selectedShapes={selectedShapes}
+              setSelectedShapes={setSelectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
           </div>
         </>
       )}

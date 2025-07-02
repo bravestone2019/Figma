@@ -120,8 +120,7 @@ const useCanvasEventHandlers = ({
     setDrawingImage(null);
     setTextBox(null);
     setSelectionBox(null);
-    setSelectedShapes([]);
-  }, [setIsDragging, setMovingShape, setHoveredShape, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setDrawingImage, setTextBox, setSelectionBox, setSelectedShapes]);
+  }, [setIsDragging, setMovingShape, setHoveredShape, setDrawingRectangle, setDrawingLine, setDrawingCircle, setDrawingTriangle, setDrawingImage, setTextBox, setSelectionBox]);
 
   // Add context menu handler for locking shapes
   const handleContextMenuCb = handleContextMenu(canvasRef, position, scale, drawnRectangles, isPointInShape, setDrawnRectangles);

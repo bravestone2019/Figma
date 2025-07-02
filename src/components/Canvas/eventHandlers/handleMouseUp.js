@@ -57,11 +57,13 @@ const handleMouseUp = (
         setDrawnRectangles((prev) => [
           ...prev,
           {
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
             type: "rectangle",
             x: rectX,
             y: rectY,
             width: rectWidth,
             height: rectHeight,
+            rotation: 0,
             backgroundColor: "rgba(128, 128, 128, 0.2)",
             borderColor: "#808080",
             borderWidth: 1,
@@ -78,6 +80,7 @@ const handleMouseUp = (
         setDrawnRectangles((prev) => [
           ...prev,
           {
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
             type: "line",
             x1: startX,
             y1: startY,
@@ -87,6 +90,7 @@ const handleMouseUp = (
             width: 2,
             opacity: 1,
             locked: false,
+            rotation: 0
           },
         ]);
         setDrawingLine(null);
@@ -101,6 +105,7 @@ const handleMouseUp = (
         setDrawnRectangles((prev) => [
           ...prev,
           {
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
             type: "circle",
             x: startX,
             y: startY,
@@ -127,6 +132,7 @@ const handleMouseUp = (
         setDrawnRectangles((prev) => [
           ...prev,
           {
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
             type: "triangle",
             x1: startX,
             y1: startY,
@@ -158,9 +164,24 @@ const handleMouseUp = (
           }
         });
         document.dispatchEvent(imagePlacementEvent);
-        
         setDrawingImage(null);
         if (setActiveTool) setActiveTool("Move");
+        // Add a placeholder image shape with rotation
+        setDrawnRectangles((prev) => [
+          ...prev,
+          {
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
+            type: "image",
+            x: drawingImage.startX,
+            y: drawingImage.startY,
+            width: Math.abs(drawingImage.currentX - drawingImage.startX),
+            height: Math.abs(drawingImage.currentY - drawingImage.startY),
+            src: '',
+            rotation: 0,
+            opacity: 1,
+            locked: false,
+          },
+        ]);
         return;
       }
       if (textBox) {
@@ -179,6 +200,8 @@ const handleMouseUp = (
           color: "#000000",
           opacity: 1,
           locked: false,
+          rotation: 0,
+          id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + Math.random()).toString(),
         });
         setTextBox(null);
         if (setActiveTool) setActiveTool("Move");

@@ -7,7 +7,7 @@ import Position from "./RightSections/Position/Position";
 import Appearance from "./RightSections/Appearance/Appearance";
 import TextPropertiesPanel from "./RightSections/Tyopography/Tyopography";
 
-const RightPanel = ({ collapsed }) => {
+const RightPanel = ({ collapsed, selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles }) => {
   // const zoomPercent = Math.round((scale || 1) * 100); scale
 
   return (
@@ -30,13 +30,17 @@ const RightPanel = ({ collapsed }) => {
           <div className="right-header-divider" />
 
           <div className="right-panel-scrollable">
-            <Position />
-            <Layout />
-            <Appearance />
-            <TextPropertiesPanel />
-            <Fill />
-            <Stroke />
-            <Effects />
+          <Position 
+            selectedShapes={selectedShapes}
+            setSelectedShapes={setSelectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Layout />
+          <Appearance />
+          <Fill />
+          <Stroke />
+          <Effects />
           </div>
         </div>
       )}

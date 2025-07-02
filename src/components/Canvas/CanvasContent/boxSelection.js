@@ -86,7 +86,7 @@ export function isShapeInSelectionBox(shape, selectionBox) {
  * Gets all shapes that are contained within the selection box
  * @param {Array} drawnRectangles - Array of all shapes
  * @param {Object} selectionBox - Selection box bounds
- * @returns {Array} Array of shape indices that are selected
+ * @returns {Array} Array of shape ids that are selected
  */
 export function getShapesInSelectionBox(drawnRectangles, selectionBox) {
   return drawnRectangles
@@ -96,7 +96,7 @@ export function getShapesInSelectionBox(drawnRectangles, selectionBox) {
       isSelected: isShapeInSelectionBox(shape, selectionBox)
     }))
     .filter(item => item.isSelected && !item.shape.locked)
-    .map(item => item.index);
+    .map(item => item.shape.id);
 }
 
 /**
