@@ -255,8 +255,8 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
             >
               <button
                 style={{
-                  width: "22px",
-                  height: "22px",
+                  width: "20px",
+                  height: "20px",
                   border: "1.5px solid #ddd",
                   borderRadius: "6px",
                   background: color,

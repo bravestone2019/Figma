@@ -63,19 +63,19 @@ const FontWeightDropdown = ({
         <div
           key={idx}
           onClick={() => {
-            onSelect(weight);
+            onSelect(weight.label);
             onClose();
           }}
           style={{
             padding: "6px 15px", // Padding for individual items
-            background: weight === selectedWeight ? "#189eff" : "transparent", // Highlight selected
+            background: weight.label === selectedWeight ? "#189eff" : "transparent", // Highlight selected
             display: "flex",
             alignItems: "center",
             gap: "8px", // Space for checkmark if you add it
             borderRadius: "10px",
             // Optional: Add hover effect for better UX
             "&:hover": {
-              background: weight === selectedWeight ? "#f0f0f0" : "#f5f5f5",
+              background: weight.label === selectedWeight ? "#f0f0f0" : "#f5f5f5",
             },
           }}
         >
@@ -83,7 +83,7 @@ const FontWeightDropdown = ({
           {/* {weight === selectedWeight && (
             <span style={{ fontSize: "14px", marginRight: "5px" }}>✓</span>
           )} */}
-          {weight}
+          {weight.label}
         </div>
         
       ))}

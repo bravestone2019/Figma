@@ -52,10 +52,10 @@ const Position = ({
 
   // Sync local state with rectangle value when selection or rectangle changes
   useEffect(() => {
-    setInputX(rectX);
+    setInputX(rectX !== "" ? parseFloat(rectX).toFixed(2) : "");
   }, [rectX, selectedShapeId]);
   useEffect(() => {
-    setInputY(rectY);
+    setInputY(rectY !== "" ? parseFloat(rectY).toFixed(2) : "");
   }, [rectY, selectedShapeId]);
   useEffect(() => {
     setInputRotation(rectRotation);
@@ -152,13 +152,32 @@ const Position = ({
   return (
     <>
       <div className="right-section-title">Position</div>
-      <div className="position-grid">
+      <div
+        className="position-grid"
+        style={{
+          display: "grid",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          marginLeft: "20px",
+        }}
+      >
         <div
           className="pos-box"
-          style={{ gap: 6 }}
+          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
           onClick={() => focusInput(xInputRef)}
         >
-          <span>X</span>
+          <span
+            style={{
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "11px",
+              color: "#666",
+            }}
+          >
+            X
+          </span>
           <input
             type="number"
             value={inputX}
@@ -168,10 +187,21 @@ const Position = ({
         </div>
         <div
           className="pos-box"
-          style={{ gap: 6 }}
+          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
           onClick={() => focusInput(yInputRef)}
         >
-          <span>Y</span>
+          <span
+            style={{
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "11px",
+              color: "#666",
+            }}
+          >
+            Y
+          </span>
           <input
             type="number"
             value={inputY}
@@ -181,10 +211,23 @@ const Position = ({
         </div>
         <div
           className="pos-box"
-          style={{ gap: 6 }}
+          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
           onClick={() => focusInput(angleInputRef)}
         >
-          <img src={Angle} alt={Angle} style={{ width: 13, height: 10 }} />
+          <img
+            src={Angle}
+            alt={Angle}
+            style={{
+              width: 13,
+              height: 10,
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "11px",
+              color: "#666",
+            }}
+          />
           <input
             type="number"
             value={inputRotation}
