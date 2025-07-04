@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useRef, useCallback } from "react";
 
 const FontDropdown = ({
   top,
@@ -11,13 +12,58 @@ const FontDropdown = ({
   selectedFont,
   dropdownRef,
 }) => {
+  const panelRef = useRef(null);
+  const dragData = useRef(null);
+
+  // Drag Handlers
+  const handleDragging = useCallback((e) => {
+    if (!dragData.current || !panelRef.current) return;
+
+    const { startX, startY, origTop, origLeft } = dragData.current;
+
+    const newTop = origTop + (e.clientY - startY);
+    const newLeft = origLeft + (e.clientX - startX);
+
+    panelRef.current.style.top = `${newTop}px`;
+    panelRef.current.style.left = `${newLeft}px`;
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    dragData.current = null;
+    document.removeEventListener("mousemove", handleDragging);
+    document.removeEventListener("mouseup", handleDragEnd);
+    document.body.style.userSelect = "";
+  }, [handleDragging]);
+
+  const handleDragStart = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!panelRef.current) return;
+
+      dragData.current = {
+        startX: e.clientX,
+        startY: e.clientY,
+        origTop: panelRef.current.offsetTop,
+        origLeft: panelRef.current.offsetLeft,
+      };
+
+      document.addEventListener("mousemove", handleDragging);
+      document.addEventListener("mouseup", handleDragEnd);
+      document.body.style.userSelect = "none";
+    },
+    [handleDragging, handleDragEnd]
+  );
+
   // Function to stop event propagation
   const handlePanelClick = (e) => {
     e.stopPropagation(); // Prevents the click from reaching the document or other parents
   };
   return createPortal(
     <div
-      ref={dropdownRef}
+      ref={(node) => {
+        dropdownRef.current = node;
+        panelRef.current = node;
+      }}
       style={{
         position: "absolute",
         top,
@@ -41,6 +87,7 @@ const FontDropdown = ({
           alignItems: "center", // Vertically centers items
           marginBottom: "12px",
         }}
+        onMouseDown={handleDragStart}
       >
         <span
           style={{
@@ -67,6 +114,14 @@ const FontDropdown = ({
         </button>
       </div>
 
+      <div
+        style={{
+          height: "1px",
+          background: "#e0e0e0",
+          margin: "8px -12px",
+        }}
+      ></div>
+
       <input
         type="text"
         placeholder="Search fonts"
@@ -83,6 +138,7 @@ const FontDropdown = ({
           fontSize: "12px",
         }}
       />
+
       <div
         className="font-list-scrollable-area"
         style={{
@@ -92,9 +148,9 @@ const FontDropdown = ({
           padding: " 0 8px 0",
         }}
       >
-        {filteredFonts.map((font, idx) => (
+        {filteredFonts.map((font) => (
           <div
-            key={idx}
+            key={font}
             onClick={() => {
               onSelect(font);
               onClose();

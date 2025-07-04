@@ -128,5 +128,12 @@ function drawImageBorder(ctx, shape, isHovered, isLocked, scale, activeTool) {
     // Add subtle background highlight for better visual feedback
     ctx.fillStyle = "rgba(33, 150, 243, 0.1)";
     ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+  } else {
+    // Always draw a border using shape.borderColor and shape.borderWidth if set
+    if (shape.borderColor) {
+      ctx.strokeStyle = shape.borderColor;
+      ctx.lineWidth = shape.borderWidth && shape.borderWidth > 0 ? shape.borderWidth / scale : 1 / scale;
+      ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+    }
   }
 } 

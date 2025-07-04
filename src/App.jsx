@@ -18,6 +18,7 @@ function App() {
         setSelectedShapes={setSelectedShapes}
         drawnRectangles={drawnRectangles}
         setDrawnRectangles={setDrawnRectangles}
+        setActiveTool={setActiveTool}
       />
       <Canvas 
         activeTool={activeTool} 

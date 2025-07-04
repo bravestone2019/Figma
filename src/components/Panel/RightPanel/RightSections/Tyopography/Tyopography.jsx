@@ -1,11 +1,12 @@
 import "../../RightPanel.css";
 import "./Typography.css";
+import WebFont from "webfontloader";
 import Fonts from "./font/Font";
 import FontSize from "./font/fontsize";
 import FontWeight from "./font/fontweight";
 import { useState, useEffect, useRef } from "react";
 import Down from "../../../../../assets/down.png";
-import AlignLeft from "../../../../../assets/RightPanel/left.png"; 
+import AlignLeft from "../../../../../assets/RightPanel/left.png";
 import AlignCenter from "../../../../../assets/RightPanel/center.png";
 import AlignRight from "../../../../../assets/RightPanel/right.png";
 
@@ -128,9 +129,19 @@ const TextPropertiesPanel = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showFontPanel, showFontWeightPanel, showFontSizePanel]);
 
+  useEffect(() => {
+    if (selectedFont) {
+      WebFont.load({
+        google: {
+          families: [selectedFont],
+        },
+      });
+    }
+  }, [selectedFont]);
+
   return (
     <>
-      <div className="right-section-title">Tyopography</div>
+      <div className="right-section-title">Typography</div>
       <div style={{ marginBottom: "-10px" }}>
         <div
           className="pos-box"
@@ -142,10 +153,10 @@ const TextPropertiesPanel = () => {
             justifyContent: "space-between",
             background: "none",
             border: "2px solid #e0e0e0",
-            width: "72%",
+            width: "70%",
             height: "auto",
-            padding: "8px 10px",
-            margin: "10px 0 25px 10px",
+            padding: "3px 10px",
+            margin: "10px 0 25px 22px",
             gap: "8px",
           }}
           onClick={() => setShowFontPanel(!showFontPanel)}
@@ -159,6 +170,7 @@ const TextPropertiesPanel = () => {
               border: "none",
               background: "transparent",
               width: "100%",
+              fontFamily: selectedFont, 
             }}
           />
           <img
@@ -190,7 +202,7 @@ const TextPropertiesPanel = () => {
             gap: "8px",
             width: "75%",
             height: "75%",
-            marginLeft: "25px",
+            marginLeft: "35px",
             marginTop: "-18px",
           }}
         >
@@ -276,7 +288,11 @@ const TextPropertiesPanel = () => {
 
           <div
             className="alignment-panel"
-            style={{ marginTop: "-12px", marginLeft: "50px", marginRight: "-50px" }}
+            style={{
+              marginTop: "-22px",
+              marginLeft: "45px",
+              marginRight: "-54px",
+            }}
           >
             <div className="alignment-group">
               <button
@@ -311,28 +327,6 @@ const TextPropertiesPanel = () => {
             </button> */}
             </div>
           </div>
-
-          {/* <div
-            className="pos-box"
-            style={{
-              display: "flex",
-              width: "60%",
-              height: "10%",
-              marginTop: "-10px",
-              marginLeft: "-12px",
-              border: "2px solid #e0e0e0",
-              padding: "12px 26px",
-            }}
-          >
-            <button
-              style={{
-                background: "none",
-                border: "none",
-              }}
-            >
-              <img src={demo} alt={demo} style={{ width: 14, height: 14 }} />
-            </button>
-          </div> */}
         </div>
       </div>
 

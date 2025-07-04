@@ -1,5 +1,22 @@
 import { useEffect, useRef } from "react";
 
+// Utility to get the next available shape name for a given type
+function getNextShapeName(type, drawnRectangles) {
+  const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+  const sameType = drawnRectangles.filter(s => s.type === type);
+  const namePattern = new RegExp(`^${typeName}(?: (\\d+))?$`, 'i');
+  const numbers = sameType
+    .map(s => {
+      const shapeName = s.name || typeName;
+      const match = shapeName.match(namePattern);
+      return match ? (match[1] ? parseInt(match[1], 10) : 1) : null;
+    })
+    .filter(n => n !== null);
+  let nextNumber = 1;
+  while (numbers.includes(nextNumber)) nextNumber++;
+  return nextNumber === 1 ? typeName : `${typeName} ${nextNumber}`;
+}
+
 const TextInputOverlay = ({
   textInput,
   setTextInput,
@@ -13,14 +30,18 @@ const TextInputOverlay = ({
   // Handle text input completion
   const completeTextInput = () => {
     if (textInput?.text?.trim()) {
-      setDrawnRectangles((prev) => [
-        ...prev,
-        {
-          type: "text",
-          ...textInput,
-          locked: false,
-        },
-      ]);
+      setDrawnRectangles((prev) => {
+        const name = getNextShapeName("text", prev);
+        return [
+          ...prev,
+          {
+            type: "text",
+            name,
+            ...textInput,
+            locked: false,
+          },
+        ];
+      });
     }
     setTextInput(null);
   };

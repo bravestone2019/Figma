@@ -2,21 +2,20 @@ import { createPortal } from "react-dom";
 
 // Font weights array for the new dropdown
 const fontWeights = [
-  "Thin",
-  "ExtraLight",
-  "Light",
-  "Regular",
-  "Medium",
-  "SemiBold",
-  "Bold",
-  "Thin Italic",
-  "ExtraLight Italic",
-  "Light Italic",
-  "Italic",
-  "Medium Italic",
-  "SemiBold Italic",
-  "Bold Italic",
-  // You might add "Variable font axes..." and "Apply variable..." as static elements if needed.
+  { label: "Thin", weight: 100 },
+  { label: "ExtraLight", weight: 200 },
+  { label: "Light", weight: 300 },
+  { label: "Regular", weight: 400 },
+  { label: "Medium", weight: 500 },
+  { label: "SemiBold", weight: 600 },
+  { label: "Bold", weight: 700 },
+  { label: "Thin Italic", weight: 100, italic: true },
+  { label: "ExtraLight Italic", weight: 200, italic: true },
+  { label: "Light Italic", weight: 300, italic: true },
+  { label: "Italic", weight: 400, italic: true },
+  { label: "Medium Italic", weight: 500, italic: true },
+  { label: "SemiBold Italic", weight: 600, italic: true },
+  { label: "Bold Italic", weight: 700, italic: true },
 ];
 
 const FontWeightDropdown = ({

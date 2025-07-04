@@ -44,18 +44,34 @@ const RightPanel = ({
           <div className="right-header-divider" />
 
           <div className="right-panel-scrollable">
-            <Position
-              selectedShapes={selectedShapes}
-              setSelectedShapes={setSelectedShapes}
-              drawnRectangles={drawnRectangles}
-              setDrawnRectangles={setDrawnRectangles}
-            />
-            <Layout />
-            <Appearance />
-            <TextPropertiesPanel />
-            <Fill />
-            <Stroke />
-            <Effects />
+            <Position 
+            selectedShapes={selectedShapes}
+            setSelectedShapes={setSelectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Layout 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Appearance 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <TextPropertiesPanel/>
+          <Fill 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Stroke 
+            selectedShapes={selectedShapes}
+            drawnRectangles={drawnRectangles}
+            setDrawnRectangles={setDrawnRectangles}
+          />
+          <Effects />
           </div>
         </div>
       )}

@@ -5,7 +5,7 @@ import Minimize from "../../assets/LeftPanel/layout.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
-const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles }) => {
+const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles, setActiveTool }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(275);
   const [rightPanelWidth, setRightPanelWidth] = useState(275);
@@ -68,7 +68,15 @@ const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRec
             className="panel-container left"
             style={{ width: `${leftPanelWidth}px` }}
           >
-            <LeftPanel collapsed={collapsed} toggleCollapsed={togglePanel} />
+            <LeftPanel 
+              collapsed={collapsed} 
+              toggleCollapsed={togglePanel}
+              drawnRectangles={drawnRectangles}
+              selectedShapes={selectedShapes}
+              setSelectedShapes={setSelectedShapes}
+              setDrawnRectangles={setDrawnRectangles}
+              setActiveTool={setActiveTool}
+            />
             <div className="resize-handle-left" onMouseDown={handleMouseDownLeft} />
           </div>
 
@@ -102,7 +110,7 @@ const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRec
           <span className="left-toggle-tooltip">Expand UI
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;shift+/
           </span>
-        </div>
+        </div>  
       )}
     </>
   );

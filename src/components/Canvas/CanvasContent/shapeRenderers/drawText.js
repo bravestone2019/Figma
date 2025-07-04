@@ -24,10 +24,30 @@ export function drawText(ctx, shape, options = {}) {
   ctx.fillStyle = shape.color;
   ctx.globalAlpha = shape.opacity;
   
-  // Draw wrapped text
+  // Draw wrapped text (fill)
   const lineHeight = (shape.fontSize || 16) * 1.2;
-  drawWrappedText(ctx, shape.text, shape.x, shape.y + (shape.fontSize || 16), shape.width, lineHeight);
-  
+  const lines = getWrappedLines(ctx, shape.text, shape.width);
+  let currentY = shape.y + (shape.fontSize || 16);
+  lines.forEach(line => {
+    ctx.fillText(line, shape.x, currentY);
+    currentY += lineHeight;
+  });
+
+  // Draw wrapped text (stroke)
+  if (shape.strokeColor) {
+    ctx.save();
+    ctx.strokeStyle = shape.strokeColor;
+    ctx.lineWidth = shape.strokeWidth && shape.strokeWidth > 0 ? shape.strokeWidth : 1;
+    ctx.globalAlpha = shape.opacity;
+    ctx.font = `${shape.fontSize || 16}px Arial`;
+    currentY = shape.y + (shape.fontSize || 16);
+    lines.forEach(line => {
+      ctx.strokeText(line, shape.x, currentY);
+      currentY += lineHeight;
+    });
+    ctx.restore();
+  }
+
   // Draw bounding box for text if selected/locked
   const measuredHeight = measureWrappedTextHeight(ctx, shape.text, shape.width, lineHeight);
   drawTextBorder(ctx, shape, measuredHeight, isHovered, isLocked, scale, activeTool);
@@ -60,26 +80,24 @@ function drawTextBorder(ctx, shape, measuredHeight, isHovered, isLocked, scale, 
   }
 }
 
-function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+function getWrappedLines(ctx, text, maxWidth) {
   const words = text.split(/\s+/);
+  let lines = [];
   let line = '';
   let testLine = '';
   let testWidth = 0;
-  let currentY = y;
   for (let n = 0; n < words.length; n++) {
     testLine = line + (line ? ' ' : '') + words[n];
     testWidth = ctx.measureText(testLine).width;
     if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line, x, currentY);
+      lines.push(line);
       line = words[n];
-      currentY += lineHeight;
     } else {
       line = testLine;
     }
   }
-  if (line) {
-    ctx.fillText(line, x, currentY);
-  }
+  if (line) lines.push(line);
+  return lines;
 }
 
 // Helper to measure the height of wrapped text (matches drawWrappedText logic)
