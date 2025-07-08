@@ -39,10 +39,11 @@
   display: flex;
   /* border: 1px solid #e0e0e0; Optional: Add a border around the group if desired */
   border-radius: 8px;
-  overflow: hidden; /* Ensures buttons with borders don't show double lines */
+  /* overflow: hidden; Ensures buttons with borders don't show double lines */
 }
 
 .alignment-button {
+  position: relative;
   background-color: transparent;
   border: 1px solid #e0e0e0; /* Light border for separation */
   padding: 0 0; /* Adjust padding as needed for icon size */
@@ -55,14 +56,35 @@
   border-radius: 8px;
 }
 
-.alignment-button:not(:first-child) {
-    border: #000; /* Remove left border for subsequent buttons to create a single line */
+.alignment-button .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  /* top: "20px"; */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #222;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000; 
+}
+
+/* Show on hover */
+.alignment-button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .alignment-button img {
   width: 14px; /* Adjust icon size */
   height: 14px; /* Adjust icon size */
   filter: brightness(0.8); /* Make icons a bit grey by default */
+  -webkit-user-drag: none;
 }
 
 .alignment-button:hover {

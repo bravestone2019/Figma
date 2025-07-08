@@ -2,7 +2,7 @@ import "./LeftPanel.css";
 import { useState, useRef, useEffect } from "react";
 import Back from "../../../assets/back.png";
 import Down from "../../../assets/down.png";
-import Minimize from "../../../assets/LeftPanel/layout.png";
+import Minimize from "../../../assets/LeftPanel/Toggle.png";
 
 const LeftPanel = ({
   collapsed,
@@ -187,7 +187,6 @@ const LeftPanel = ({
                         key={shape.id || i}
                         className={selectedShapes && selectedShapes.includes(shape.id) ? "selected" : ""}
                         onClick={() => setSelectedShapes([shape.id])}
-                        style={{ cursor: "pointer" }}
                       >
                         {renamingId === shape.id ? (
                           <form onSubmit={handleRenameSubmit} style={{ display: 'inline' }}>

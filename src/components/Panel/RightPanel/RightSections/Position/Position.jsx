@@ -2,6 +2,7 @@ import "../../RightPanel.css";
 import { useRef } from "react";
 import degrees from "../../../../../assets/RightPanel/degrees.png";
 import horizontal from "../../../../../assets/RightPanel/horizontal-flip.png";
+import vertical from "../../../../../assets/RightPanel/vertical.png";
 import Angle from "../../../../../assets/RightPanel/angle.png";
 import { useState, useEffect } from "react";
 
@@ -26,8 +27,8 @@ const Position = ({
     rectRotation = 0;
   if (selectedRect) {
     if (selectedRect.type === "line") {
-      rectX = ((selectedRect.x1 + selectedRect.x2) / 2).toFixed(0);
-      rectY = ((selectedRect.y1 + selectedRect.y2) / 2).toFixed(0);
+      rectX = (selectedRect.x1 + selectedRect.x2) / 2;
+      rectY = (selectedRect.y1 + selectedRect.y2) / 2;
       rectRotation = selectedRect.rotation || 0;
     } else {
       rectX = selectedRect.x;
@@ -52,11 +53,27 @@ const Position = ({
 
   // Sync local state with rectangle value when selection or rectangle changes
   useEffect(() => {
-    setInputX(rectX !== "" ? parseFloat(rectX).toFixed(2) : "");
-  }, [rectX, selectedShapeId]);
+    if (rectX !== "") {
+      setInputX(
+        rectRotation !== 0
+          ? parseFloat(rectX).toFixed(2)
+          : parseInt(rectX).toString()
+      );
+    } else {
+      setInputX("");
+    }
+  }, [rectX, rectRotation, selectedShapeId]);
   useEffect(() => {
-    setInputY(rectY !== "" ? parseFloat(rectY).toFixed(2) : "");
-  }, [rectY, selectedShapeId]);
+    if (rectY !== "") {
+      setInputY(
+        rectRotation !== 0
+          ? parseFloat(rectY).toFixed(2)
+          : parseInt(rectY).toString()
+      );
+    } else {
+      setInputY("");
+    }
+  }, [rectY, rectRotation, selectedShapeId]);
   useEffect(() => {
     setInputRotation(rectRotation);
   }, [rectRotation, selectedShapeId]);
@@ -104,14 +121,13 @@ const Position = ({
       setDrawnRectangles(updatedRectangles);
     }
   };
-  const handleRotationChange = (e) => {
-    setInputRotation(e.target.value);
+  const handleRotationChange = (value) => {
+    setInputRotation(value);
     if (!selectedRect) return;
-    const newRotation = parseFloat(e.target.value);
+    const newRotation = parseFloat(value);
     if (!isNaN(newRotation)) {
       let updatedRectangles;
       if (selectedRect.type === "line") {
-        // Rotate both endpoints around center
         const cx = (selectedRect.x1 + selectedRect.x2) / 2;
         const cy = (selectedRect.y1 + selectedRect.y2) / 2;
         const angle =
@@ -158,12 +174,12 @@ const Position = ({
           display: "grid",
           alignItems: "center",
           justifyContent: "flex-start",
-          marginLeft: "20px",
+          marginLeft: "15px",
         }}
       >
         <div
           className="pos-box"
-          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
+          style={{ position: "relative", padding: " 1px 22px 2px 20px" }}
           onClick={() => focusInput(xInputRef)}
         >
           <span
@@ -184,10 +200,15 @@ const Position = ({
             onChange={handleXChange}
             ref={xInputRef}
           />
+          <span className="tooltip">X-position</span>
         </div>
         <div
           className="pos-box"
-          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
+          style={{
+            position: "relative",
+            padding: " 1px 4px 2px 20px",
+            marginRight: "-20px",
+          }}
           onClick={() => focusInput(yInputRef)}
         >
           <span
@@ -208,72 +229,74 @@ const Position = ({
             onChange={handleYChange}
             ref={yInputRef}
           />
+          <span className="tooltip">Y-position</span>
         </div>
         <div
           className="pos-box"
-          style={{ position: "relative", padding: " 2px 4px 2px 30px" }}
+          style={{ position: "relative", padding: " 1px 4px 2px 30px" }}
           onClick={() => focusInput(angleInputRef)}
         >
           <img
             src={Angle}
             alt={Angle}
             style={{
-              width: 13,
+              width: 12,
               height: 10,
               position: "absolute",
               left: "10px",
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: "11px",
               color: "#666",
             }}
           />
           <input
             type="number"
             value={inputRotation}
-            onChange={handleRotationChange}
+            onChange={(e) => handleRotationChange(e.target.value)}
             ref={angleInputRef}
+            style={{
+              transform: "translateX(-15%)",
+              paddingRight: "18px",
+            }}
           />
+          <span
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%) ",
+              fontSize: "13px",
+              color: "#666",
+              pointerEvents: "none",
+            }}
+          >
+            °
+          </span>
+          <span className="tooltip">Rotation</span>
         </div>
         <div
           className="pos-box-button"
-          style={{ display: "flex", gap: "10px" }}
+          style={{
+            marginRight: "-22px",
+          }}
         >
           <button
-            style={{
-              background: "none",
-              border: "none",
-              padding: 0,
-              borderRight: "2px solid #fff",
-            }}
+            className="icon-button"
           >
-            <img
-              src={degrees}
-              alt={degrees}
-              style={{ width: 13, height: 12, marginRight: "8px" }}
-            />
+            <img src={degrees} alt="Rotate" />
+            <span className="tooltip">Rotate 90° Right</span>
           </button>
           <button
-            style={{
-              background: "none",
-              border: "none",
-              padding: 0,
-              borderRight: "2px solid #fff",
-              marginRight: "5px",
-            }}
+            className="icon-button"
           >
-            <img
-              src={horizontal}
-              alt={horizontal}
-              style={{ width: 13, height: 12, marginRight: "8px" }}
-            />
+            <img src={vertical} alt="Vertical Flip" />
+            <span className="tooltip">Flip Vertical</span>
           </button>
-          <button style={{ background: "none", border: "none", padding: 0 }}>
-            <img
-              src={Angle}
-              alt={Angle}
-              style={{ width: 12, height: 10, marginLeft: "-5px" }}
-            />
+          <button
+            className="icon-button"
+          >
+            <img src={horizontal} alt="Horizontal Flip" />
+            <span className="tooltip">Flip Horizontal</span>
           </button>
         </div>
       </div>

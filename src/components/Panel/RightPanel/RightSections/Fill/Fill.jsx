@@ -1,8 +1,11 @@
 import "../../RightPanel.css";
 import "../Effects/Effects.css";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import MiniColorPicker from "./color/MiniColorPicker"; 
-import ColorPanel from "./color/color"; 
+import MiniColorPicker from "./color/MiniColorPicker";
+import ColorPanel from "./color/color";
+
+const DEFAULT_COLOR = "#D9D9D9";
+const DEFAULT_OPACITY = 100;
 
 const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -16,15 +19,15 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     isSingle && (shapeType === "rectangle" || shapeType === "text");
 
   const getInitialColor = useCallback(() => {
-    if (!isFillable) return "#D9D9D9"; // Default grey if no fillable shape selected
-    if (shapeType === "rectangle") return shape.backgroundColor || "#D9D9D9";
+    if (!isFillable) return DEFAULT_COLOR;
+    if (shapeType === "rectangle") return shape.backgroundColor || DEFAULT_COLOR;
     if (shapeType === "text") return shape.color || "#000000";
-    return "#D9D9D9";
+    return DEFAULT_COLOR;
   }, [isFillable, shapeType, shape]);
 
   const getInitialOpacity = useCallback(() => {
-    if (!isFillable) return 100;
-    return shape.opacity !== undefined ? Math.round(shape.opacity * 100) : 100;
+    if (!isFillable) return DEFAULT_OPACITY;
+    return shape.opacity !== undefined ? Math.round(shape.opacity * 100) : DEFAULT_OPACITY;
   }, [isFillable, shape]);
 
   const [isFillOpen, setIsFillOpen] = useState(false);
@@ -34,18 +37,38 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const [color, setColor] = useState(getInitialColor());
   const [opacity, setOpacity] = useState(getInitialOpacity());
 
-  // Update color and opacity when selected shape changes
+  // Reset to default when panel is minimized
+  useEffect(() => {
+    if (!isFillOpen) {
+      setColor(DEFAULT_COLOR);
+      setOpacity(DEFAULT_OPACITY);
+
+      if (isFillable) {
+        const shapeIdx = drawnRectangles.findIndex(
+          (s) => s.id === selectedShapes[0]
+        );
+        if (shapeIdx !== -1) {
+          const updatedShape = { ...drawnRectangles[shapeIdx] };
+          if (shapeType === "rectangle") updatedShape.backgroundColor = DEFAULT_COLOR;
+          if (shapeType === "text") updatedShape.color = DEFAULT_COLOR;
+          updatedShape.opacity = DEFAULT_OPACITY / 100;
+
+          const newRects = [...drawnRectangles];
+          newRects[shapeIdx] = updatedShape;
+          setDrawnRectangles(newRects);
+        }
+      }
+    }
+  }, [isFillOpen, isFillable, selectedShapes, drawnRectangles, setDrawnRectangles, shapeType]);
+
   useEffect(() => {
     setColor(getInitialColor());
     setOpacity(getInitialOpacity());
   }, [getInitialColor, getInitialOpacity, selectedShapes]);
 
-  // Create a combined color object for MiniColorPicker including opacity
   const currentFullColor = useMemo(() => {
     const hexToRgb = (hex) => {
-      let r = 0,
-        g = 0,
-        b = 0;
+      let r = 0, g = 0, b = 0;
       if (hex.length === 4) {
         r = parseInt(hex[1] + hex[1], 16);
         g = parseInt(hex[2] + hex[2], 16);
@@ -60,20 +83,18 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     return { ...hexToRgb(color), a: opacity / 100 };
   }, [color, opacity]);
 
-  // Positioning logic
   useEffect(() => {
     if (colorPanel && PanelInputRef.current) {
       const rect = PanelInputRef.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + window.scrollY - 350,
-        left: rect.left + window.scrollX - 250 - 40,
+        left: rect.left + window.scrollX - 290,
       });
     } else if (!colorPanel) {
       setCoords(null);
     }
   }, [colorPanel]);
 
-  // Outside click to close
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -95,7 +116,6 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
       const hexColor = typeof newColor === "string" ? newColor : newColor.hex;
       setColor(hexColor);
 
-      // Update opacity if provided by the color picker (e.g., from alpha slider)
       if (newColor.rgb?.a !== undefined) {
         setOpacity(Math.round(newColor.rgb.a * 100));
       }
@@ -162,7 +182,11 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
 
       {isFillOpen && (
         <div className="position-grid">
-          <div className="pos-box-fill" ref={PanelInputRef}style={{ background: "#ffffff", border: "2px solid #e0e0e0"}}>
+          <div
+            className="pos-box-fill"
+            ref={PanelInputRef}
+            style={{ background: "#ffffff", border: "2px solid #e0e0e0" }}
+          >
             <button
               style={{
                 width: "20px",
@@ -191,7 +215,6 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   color={currentFullColor}
                   onChange={handleColorUpdate}
                 />
-                {/* Optional Opacity Slider */}
               </ColorPanel>
             )}
 
@@ -230,9 +253,11 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   value={opacity}
                   min={0}
                   max={100}
-                  onChange={(e) => handleOpacityUpdate(Number(e.target.value))}
+                  onChange={(e) =>
+                    handleOpacityUpdate(Number(e.target.value))
+                  }
                   style={{ width: "40px", textAlign: "center" }}
-                  disabled={!isFillable}  
+                  disabled={!isFillable}
                 />
                 <div>%</div>
               </div>

@@ -4,7 +4,24 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import ColorPanel from "./strokePanel";
 import StrokeBorder from "./strokeBorder";
 import MiniColorPicker from "../Fill/color/MiniColorPicker";
-import Down from "../../../../../assets/RightPanel/stack.png";
+import All from "../../../../../assets/RightPanel/border.png";
+import Left from "../../../../../assets/RightPanel/border_left.png";
+import Right from "../../../../../assets/RightPanel/border_right.png";
+import Bottom from "../../../../../assets/RightPanel/bottom_border.png";
+import Top from "../../../../../assets/RightPanel/top_border.png";
+import Weight from "../../../../../assets/RightPanel/weight.png";
+
+const DEFAULT_STROKE_COLOR = "#000000";
+const DEFAULT_STROKE_OPACITY = 100;
+const DEFAULT_STROKE_WIDTH = 1;
+
+const borderIcons = {
+  all: All,
+  top: Top,
+  bottom: Bottom,
+  left: Left,
+  right: Right,
+};
 
 const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -116,6 +133,42 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
       });
     }
   }, [showBorderPanel]);
+
+  useEffect(() => {
+    if (!isStrokeOpen) {
+      setColor(DEFAULT_STROKE_COLOR);
+      setOpacity(DEFAULT_STROKE_OPACITY);
+      setStrokeWidth(DEFAULT_STROKE_WIDTH);
+
+      if (isStrokeable) {
+        const shapeIdx = drawnRectangles.findIndex(
+          (s) => s.id === selectedShapes[0]
+        );
+        if (shapeIdx !== -1) {
+          const newShape = { ...drawnRectangles[shapeIdx] };
+
+          if (shapeType === "rectangle" || shapeType === "image")
+            newShape.borderColor = DEFAULT_STROKE_COLOR;
+          if (shapeType === "text") newShape.strokeColor = DEFAULT_STROKE_COLOR;
+          if (shapeType === "line") newShape.color = DEFAULT_STROKE_COLOR;
+
+          newShape.strokeOpacity = DEFAULT_STROKE_OPACITY / 100;
+          newShape.strokeWidth = DEFAULT_STROKE_WIDTH;
+
+          const newRects = [...drawnRectangles];
+          newRects[shapeIdx] = newShape;
+          setDrawnRectangles(newRects);
+        }
+      }
+    }
+  }, [
+    isStrokeOpen,
+    isStrokeable,
+    selectedShapes,
+    drawnRectangles,
+    setDrawnRectangles,
+    shapeType,
+  ]);
 
   const handleColorUpdate = useCallback(
     (newColor) => {
@@ -351,13 +404,13 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   marginLeft: "-38px",
                   background: "transparent",
                   border: "2px solid #e0e0e0",
-                  padding: "12px 12px",
+                  padding: "11px 12px",
                 }}
               >
                 <img
-                  src={Down}
-                  alt="Down"
-                  style={{ width: "15px", height: "18px" }}
+                  src={Weight}
+                  alt={Weight}
+                  style={{ width: "12px", height: "12px" }}
                 />
                 <input
                   type="number"
@@ -372,6 +425,7 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   }}
                   disabled={!isStrokeable}
                 />
+                <span className="tooltip" style={{ bottom : "35px"}}>Stroke weight</span>
               </div>
 
               <div
@@ -389,9 +443,9 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                 }}
               >
                 <img
-                  src={Down}
-                  alt="Down"
-                  style={{ width: "15px", height: "18px" }}
+                  src={borderIcons[selectedBorderSide]}
+                  alt={selectedBorderSide}
+                  style={{ width: "12px", height: "12px" }}
                 />
                 <input
                   type="text"
@@ -408,6 +462,7 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                     textTransform: "capitalize",
                   }}
                 />
+                <span className="tooltip" style={{ bottom : "35px"}}>Individual strokes</span>
               </div>
               {showBorderPanel && borderPanelCoords && (
                 <StrokeBorder

@@ -192,6 +192,7 @@ const TextPropertiesPanel = () => {
               dropdownRef={dropdownRef}
             />
           )}
+          <span className="tooltip">Fonts</span>
         </div>
 
         <div
@@ -237,6 +238,7 @@ const TextPropertiesPanel = () => {
               alt="Down"
               style={{ width: "10px", height: "10px" }}
             />
+            <span className="tooltip">Font weight</span>
           </div>
 
           {showFontWeightPanel && fontWeightPanelCoords && (
@@ -272,6 +274,7 @@ const TextPropertiesPanel = () => {
               alt="Down"
               style={{ width: "10px", height: "10px" }}
             />
+            <span className="tooltip">Font size</span>
           </div>
 
           {showFontSizePanel &&
@@ -302,6 +305,7 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("left")}
               >
                 <img src={AlignLeft} alt="Align Left" />
+                <span className="tooltip" style={{ bottom: "-30px"}}>Align left</span>
               </button>
               <button
                 className={`alignment-button ${
@@ -310,6 +314,7 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("center")}
               >
                 <img src={AlignCenter} alt="Align Center" />
+                <span className="tooltip" style={{ bottom: "-30px"}}>Align center</span>
               </button>
               <button
                 className={`alignment-button ${
@@ -318,6 +323,7 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("right")}
               >
                 <img src={AlignRight} alt="Align Right" />
+                <span className="tooltip" style={{ bottom: "-30px"}}>Align right</span>
               </button>
               {/* <button
               className={`alignment-button ${selectedHorizontalAlignment === "justify" ? "active" : ""}`}

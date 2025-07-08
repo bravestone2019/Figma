@@ -71,7 +71,7 @@ const RightPanel = ({
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
           />
-          <Effects />
+          {/* <Effects /> */}
           </div>
         </div>
       )}

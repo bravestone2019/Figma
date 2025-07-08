@@ -1,6 +1,11 @@
 import "../../RightPanel.css";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import corner from "../../../../../assets/RightPanel/corner.png";
+import Top from "../../../../../assets/RightPanel/top_left.png";
+import bottom from "../../../../../assets/RightPanel/top_right.png";
+import right from "../../../../../assets/RightPanel/bottom_left.png";
+import left from "../../../../../assets/RightPanel/bottom_right.png";
+import shadow from "../../../../../assets/RightPanel/opacity.png";
 
 const Appearance = ({
   selectedShapes,
@@ -8,6 +13,8 @@ const Appearance = ({
   setDrawnRectangles,
 }) => {
   const [showRadiusControls, setShowRadiusControls] = useState(false);
+  const [focusedInput, setFocusedInput] = useState(null);
+  const wrapperRef = useRef(null);
 
   // Check if exactly one shape is selected
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -19,13 +26,24 @@ const Appearance = ({
     const shape = drawnRectangles.find((s) => s.id === selectedShapes[0]);
     if (shape) {
       // shapeType = shape.type;
-      opacity = shape.opacity !== undefined ? shape.opacity : 1;
+      opacity =
+        shape.opacity !== undefined ? Math.round(shape.opacity * 100) : 100;
       if (shape.type === "rectangle") {
         borderRadius =
           shape.borderRadius !== undefined ? shape.borderRadius : 0;
       }
     }
   }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setFocusedInput(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleOpacityChange = (e) => {
     if (!isSingle) return;
@@ -34,8 +52,8 @@ const Appearance = ({
     );
     if (shapeIdx === -1) return;
     const value = parseFloat(e.target.value);
-    if (isNaN(value) || value < 0 || value > 1) return;
-    const updated = { ...drawnRectangles[shapeIdx], opacity: value };
+    if (isNaN(value) || value < 0 || value > 100) return;
+    const updated = { ...drawnRectangles[shapeIdx], opacity: value / 100 };
     const newRects = [...drawnRectangles];
     newRects[shapeIdx] = updated;
     setDrawnRectangles(newRects);
@@ -61,19 +79,26 @@ const Appearance = ({
 
       {/* Top Row: Opacity, Border Radius, Toggle Button */}
       <div
+        ref={wrapperRef}
         style={{
           display: "flex",
           alignItems: "center",
           gap: "10px",
-          marginLeft: "20px",
+          marginLeft: "14px",
           marginTop: "6px",
         }}
       >
         {/* Opacity Box */}
-        <div className="pos-box" style={{ gap: 9, padding: "2px 0" }}>
+        <div
+          className={`pos-box ${
+            focusedInput === "opacity" ? "selected-pos" : ""
+          }`}
+          style={{ padding: "1px 0" }}
+          onClick={() => setFocusedInput("opacity")}
+        >
           <img
-            src={corner}
-            alt="Opacity"
+            src={shadow}
+            alt={shadow}
             style={{ width: 11, height: 11, marginLeft: "10px" }}
           />
           <input
@@ -82,13 +107,24 @@ const Appearance = ({
             disabled={!isSingle}
             onChange={handleOpacityChange}
             min={0}
-            max={1}
-            step={0.01}
+            max={100}
+            step={1}
+            style={{ transform: "translateX(-5%)" }}
+            onFocus={() => setFocusedInput("opacity")}
+            onBlur={() => setFocusedInput(null)}
           />
+          <span style={{ transform: "translateX(-90%)" }}>%</span>
+          <span className="tooltip">Opacity</span>
         </div>
 
         {/* Border Radius Box */}
-        <div className="pos-box" style={{ gap: 10, padding: "2px 0" }}>
+        <div
+          className={`pos-box ${
+            focusedInput === "borderRadius" ? "selected-pos" : ""
+          }`}
+          style={{ gap: 10, padding: "1px 0" }}
+          onClick={() => setFocusedInput("borderRadius")}
+        >
           <img
             src={corner}
             alt="Border Radius"
@@ -99,20 +135,29 @@ const Appearance = ({
             value={borderRadius}
             min={0}
             onChange={handleCurveChange}
+            style={{ transform: "translateX(-20%)" }}
+            onFocus={() => setFocusedInput("borderRadius")}
+            onBlur={() => setFocusedInput(null)}
           />
+          <span className="tooltip">Corners radius</span>
         </div>
 
         {/* Toggle Advanced Corner Controls */}
         <button
           className="reset-size-btn"
-          style={{ width: "36px", height: "24px", marginRight: 6 }}
+          style={{
+            width: "20px",
+            height: "18px",
+            transform: "translateX(-10%)",
+          }}
           onClick={() => setShowRadiusControls(!showRadiusControls)}
         >
           <img
             src={corner}
             alt="Toggle Corners"
-            style={{ width: 18, height: 13 }}
+            style={{ width: 18, height: 16, marginBottom: 2 }}
           />
+          <span className="tooltip">Individual corners</span>
         </button>
       </div>
 
@@ -124,7 +169,7 @@ const Appearance = ({
             gridTemplateColumns: "1fr 1fr",
             gap: "10px",
             marginTop: "12px",
-            marginLeft: "25px",
+            marginLeft: "29px",
             width: "60%",
           }}
         >
@@ -138,11 +183,24 @@ const Appearance = ({
             }}
           >
             <img
-              src={corner}
+              src={Top}
               alt="Border Radius"
-              style={{ width: 14, height: 12, marginLeft: "10px" }}
+              style={{
+                width: 14,
+                height: 12,
+                marginLeft: "8px",
+                transform: "translateY(-15%)",
+              }}
             />
-            <input placeholder="0" type="number" min={0} />
+            <input
+              placeholder="0"
+              type="number"
+              min={0}
+              style={{ transform: "translateX(-5%)" }}
+            />
+            <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
+              Top left corner radius
+            </span>
           </div>
           <div
             className="pos-box"
@@ -154,28 +212,24 @@ const Appearance = ({
             }}
           >
             <img
-              src={corner}
+              src={bottom}
               alt="Border Radius"
-              style={{ width: 14, height: 12, marginLeft: "10px" }}
+              style={{
+                width: 14,
+                height: 12,
+                marginLeft: "8px",
+                transform: "translateY(-15%)",
+              }}
             />
-            <input placeholder="0" type="number" min={0} />
-          </div>
-
-          <div
-            className="pos-box"
-            style={{
-              padding: "2px 2px",
-              fontSize: "10px",
-              height: "20px",
-              width: "90%",
-            }}
-          >
-            <img
-              src={corner}
-              alt="Border Radius"
-              style={{ width: 14, height: 12, marginLeft: "10px" }}
+            <input
+              placeholder="0"
+              type="number"
+              min={0}
+              style={{ transform: "translateX(-5%)" }}
             />
-            <input placeholder="0" type="number" min={0} />
+            <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
+              Top right corner radius
+            </span>
           </div>
           <div
             className="pos-box"
@@ -187,11 +241,53 @@ const Appearance = ({
             }}
           >
             <img
-              src={corner}
+              src={right}
               alt="Border Radius"
-              style={{ width: 14, height: 12, marginLeft: "10px" }}
+              style={{
+                width: 14,
+                height: 12,
+                marginLeft: "8px",
+                transform: "translateY(15%)",
+              }}
             />
-            <input placeholder="0" type="number" min={0} />
+            <input
+              placeholder="0"
+              type="number"
+              min={0}
+              style={{ transform: "translateX(-5%)" }}
+            />
+            <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
+              Bottom left corner radius
+            </span>
+          </div>
+          <div
+            className="pos-box"
+            style={{
+              padding: "2px 2px",
+              fontSize: "10px",
+              height: "20px",
+              width: "90%",
+            }}
+          >
+            <img
+              src={left}
+              alt="Border Radius"
+              style={{
+                width: 14,
+                height: 12,
+                marginLeft: "8px",
+                transform: "translateY(15%)",
+              }}
+            />
+            <input
+              placeholder="0"
+              type="number"
+              min={0}
+              style={{ transform: "translateX(-5%)" }}
+            />
+            <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
+              Bottom right corner radius
+            </span>
           </div>
         </div>
       )}

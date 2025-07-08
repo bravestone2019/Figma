@@ -1,5 +1,17 @@
-// BorderPanel.jsx
 import { createPortal } from "react-dom";
+import All from "../../../../../assets/RightPanel/border.png";
+import Left from "../../../../../assets/RightPanel/border_left.png";
+import Right from "../../../../../assets/RightPanel/border_right.png";
+import Bottom from "../../../../../assets/RightPanel/bottom_border.png";
+import Top from "../../../../../assets/RightPanel/top_border.png";
+
+const borderIcons = {
+  all: All,
+  top: Top,
+  bottom: Bottom,
+  left: Left,
+  right: Right,
+};
 
 const borderOptions = [
   { label: "All", key: "all" },
@@ -26,14 +38,13 @@ const BorderPanel = ({
         position: "absolute",
         top,
         left,
-        width: "100px",
+        width: "110px",
         backgroundColor: "#000000",
         color: "#fff",
-        border: "1px solid #ccc",
-        borderRadius: "15px",
+        borderRadius: "14px",
         zIndex: 9999,
         padding: "8px 0",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)"
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
       }}
       onClick={handleClick}
     >
@@ -45,19 +56,25 @@ const BorderPanel = ({
             onClose();
           }}
           style={{
-            padding: "8px 16px",
+            padding: "4px 8px",
             display: "flex",
             alignItems: "center",
             gap: "8px",
             borderRadius: "8px",
-            margin: "0 10px 0 10px",
+            margin: "0 8px",
             backgroundColor:
               selectedKey === option.key ? "#189eff" : "transparent",
-            color: selectedKey === option.key ? "#fff" : "#ccc",
+            color: selectedKey === option.key ? "#fff" : "#ccc"
           }}
         >
-          {/* Replace below emoji with real icon if needed */}
-            <span style={{ textTransform: "capitalize" }} >{option.label}</span>
+          <img
+            src={borderIcons[option.key]}
+            alt={option.label}
+            style={{ width: "14px", height: "14px", filter: "brightness(0) invert(1)" }}
+          />
+          <span style={{ textTransform: "capitalize" }}>
+            {option.label}
+          </span>
         </div>
       ))}
     </div>,
