@@ -6,6 +6,7 @@ import Effects from "./RightSections/Effects/Effects";
 import Position from "./RightSections/Position/Position";
 import Appearance from "./RightSections/Appearance/Appearance";
 import TextPropertiesPanel from "./RightSections/Tyopography/Tyopography";
+import { usePanelState } from "./usePanelState";
 
 const RightPanel = ({
   collapsed,
@@ -14,15 +15,25 @@ const RightPanel = ({
   drawnRectangles,
   setDrawnRectangles,
 }) => {
-  // const zoomPercent = Math.round((scale || 1) * 100); scale
+  const selectedShapeId = selectedShapes && selectedShapes.length === 1 ? selectedShapes[0] : null;
+  // Find the selected shape object
+  const selectedShape = selectedShapeId ? drawnRectangles.find(s => s.id === selectedShapeId) : null;
+
+  // Only pass drawnRectangles to usePanelState for text shapes
+  const panelState = selectedShape && selectedShape.type === "text"
+    ? usePanelState(selectedShapeId, drawnRectangles)
+    : usePanelState(selectedShapeId);
+
+  const {
+    isFillOpen, setFillOpen,
+    isStrokeOpen, setStrokeOpen,
+    isTypographyOpen, setTypographyOpen
+  } = panelState;
 
   return (
     <div className={`right-panel ${collapsed ? "collapsed" : ""}`}>
       {collapsed && (
         <></>
-        // <div className="zoom-collapsed-panel">
-        //   <div className="zoom-collapsed-indicator">{zoomPercent}%</div>
-        // </div>
       )}
 
       {!collapsed && (
@@ -39,7 +50,6 @@ const RightPanel = ({
                 Design
               </div>
             </div>
-            {/* <div className="zoom-indicator">{zoomPercent}%</div> */}
           </div>
           <div className="right-header-divider" />
 
@@ -60,16 +70,29 @@ const RightPanel = ({
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
           />
-          <TextPropertiesPanel/>
+          {/* Only show Typography panel for text shapes */}
+          {selectedShape && selectedShape.type === "text" && (
+            <TextPropertiesPanel
+              selectedShapes={selectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+              isOpen={isTypographyOpen}
+              setOpen={setTypographyOpen}
+            />
+          )}
           <Fill 
             selectedShapes={selectedShapes}
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
+            isOpen={isFillOpen}
+            setOpen={setFillOpen}
           />
           <Stroke 
             selectedShapes={selectedShapes}
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
+            isOpen={isStrokeOpen}
+            setOpen={setStrokeOpen}
           />
           <Effects />
           </div>

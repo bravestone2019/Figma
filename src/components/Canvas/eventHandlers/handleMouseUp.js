@@ -220,6 +220,9 @@ const handleMouseUp = (
           text: "",
           fontSize: 16,
           color: "#000000",
+          fontFamily: "Arial",
+          fontWeight: "Regular",
+          textAlign: "left",
         });
         setTextBox(null);
         if (setActiveTool) setActiveTool("Move");

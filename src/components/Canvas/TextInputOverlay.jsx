@@ -21,6 +21,7 @@ const TextInputOverlay = ({
   textInput,
   setTextInput,
   setDrawnRectangles,
+  setSelectedShapes, // <-- Add this prop
   scale,
   position,
   redrawAllShapes,
@@ -30,18 +31,26 @@ const TextInputOverlay = ({
   // Handle text input completion
   const completeTextInput = () => {
     if (textInput?.text?.trim()) {
+      const newId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`; // Unique ID
       setDrawnRectangles((prev) => {
         const name = getNextShapeName("text", prev);
+        const newShape = {
+          id: newId,
+          type: "text",
+          name,
+          ...textInput,
+          fillColor: textInput.fillColor || "#000000", // default black
+          strokeWidth: textInput.strokeWidth || 1, // default 1
+          locked: false,
+        };
         return [
           ...prev,
-          {
-            type: "text",
-            name,
-            ...textInput,
-            locked: false,
-          },
+          newShape,
         ];
       });
+      if (setSelectedShapes) {
+        setSelectedShapes([newId]); // Select the new text shape
+      }
     }
     setTextInput(null);
   };
@@ -129,7 +138,7 @@ const TextInputOverlay = ({
           outline: "none",
           resize: "none",
           background: "transparent",
-          fontFamily: "Arial",
+          fontFamily: textInput.fontFamily || "Arial",
           lineHeight: "1.2",
           padding: "4px",
           pointerEvents: "auto",

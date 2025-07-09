@@ -22,24 +22,24 @@ const fonts = [
   "Playfair Display",
 ];
 
-const TextPropertiesPanel = () => {
+const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangles, isOpen, setOpen }) => {
   const [showFontPanel, setShowFontPanel] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFont, setSelectedFont] = useState("Josefin Sans");
+  const [selectedFont, setSelectedFont] = useState("Arial");
   const fontInputRef = useRef(null);
   const dropdownRef = useRef(null);
   const [panelCoords, setPanelCoords] = useState(null);
 
   // NEW STATE FOR FONT WEIGHT DROPDOWN
   const [showFontWeightPanel, setShowFontWeightPanel] = useState(false);
-  const [selectedFontWeight, setSelectedFontWeight] = useState("SemiBold"); // Default
+  const [selectedFontWeight, setSelectedFontWeight] = useState("Regular"); // Default
   const fontWeightInputRef = useRef(null);
   const fontWeightDropdownRef = useRef(null);
   const [fontWeightPanelCoords, setFontWeightPanelCoords] = useState(null);
 
   // NEW STATE FOR FONT SIZE DROPDOWN
   const [showFontSizePanel, setShowFontSizePanel] = useState(false);
-  const [selectedFontSize, setSelectedFontSize] = useState(10); // Default to 100
+  const [selectedFontSize, setSelectedFontSize] = useState(16); // Default to 16
   const fontSizeInputRef = useRef(null); // Ref for the "100" input box
   const fontSizeDropdownRef = useRef(null); // Ref for the FontSizeDropdown itself
   const [fontSizePanelCoords, setFontSizePanelCoords] = useState(null);
@@ -47,8 +47,64 @@ const TextPropertiesPanel = () => {
   // NEW STATE FOR ALIGNMENT
   const [selectedHorizontalAlignment, setSelectedHorizontalAlignment] =
     useState("left"); // Default
-  // const [selectedVerticalAlignment, setSelectedVerticalAlignment] =
-  // useState("top"); // Default
+
+  // Check if exactly one text shape is selected
+  const isSingleTextSelected = selectedShapes && selectedShapes.length === 1;
+  let selectedTextShape = null;
+  
+  if (isSingleTextSelected) {
+    selectedTextShape = drawnRectangles.find((s) => s.id === selectedShapes[0]);
+    if (selectedTextShape && selectedTextShape.type !== "text") {
+      selectedTextShape = null; // Not a text shape
+    }
+  }
+
+  // Update local state when selected text shape changes
+  useEffect(() => {
+    if (selectedTextShape) {
+      setSelectedFont(selectedTextShape.fontFamily || "Arial");
+      setSelectedFontSize(selectedTextShape.fontSize || 16);
+      setSelectedFontWeight(selectedTextShape.fontWeight || "Regular");
+      setSelectedHorizontalAlignment(selectedTextShape.textAlign || "left");
+    }
+  }, [selectedTextShape]);
+
+  // Function to update and store changes to the selected text shape(s)
+  const storeTextShapeChanges = (updates) => {
+    if (!selectedShapes || selectedShapes.length === 0) return;
+    setDrawnRectangles((prev) =>
+      prev.map((shape) => {
+        if (selectedShapes.includes(shape.id) && shape.type === "text") {
+          return { ...shape, ...updates };
+        }
+        return shape;
+      })
+    );
+  };
+
+  // Handle font family change
+  const handleFontChange = (newFont) => {
+    setSelectedFont(newFont);
+    storeTextShapeChanges({ fontFamily: newFont });
+  };
+
+  // Handle font size change
+  const handleFontSizeChange = (newSize) => {
+    setSelectedFontSize(newSize);
+    storeTextShapeChanges({ fontSize: newSize });
+  };
+
+  // Handle font weight change
+  const handleFontWeightChange = (newWeight) => {
+    setSelectedFontWeight(newWeight);
+    storeTextShapeChanges({ fontWeight: newWeight });
+  };
+
+  // Handle text alignment change
+  const handleAlignmentChange = (newAlignment) => {
+    setSelectedHorizontalAlignment(newAlignment);
+    storeTextShapeChanges({ textAlign: newAlignment });
+  };
 
   const filteredFonts = fonts.filter((font) =>
     font.toLowerCase().includes(searchTerm.toLowerCase())
@@ -139,52 +195,82 @@ const TextPropertiesPanel = () => {
     }
   }, [selectedFont]);
 
+
+  // Don't render if no text shape is selected
+  if (!isSingleTextSelected || !selectedTextShape) {
+    return (
+      <>
+        <div className="right-section-title">Typography</div>
+        <div style={{ 
+          margin: "20px", 
+          color: "#666", 
+          fontSize: "12px",
+          fontStyle: "italic"
+        }}>
+          Select a text element to edit typography
+        </div>
+        <div className="section-divider" />
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="right-section-title">Typography</div>
-      <div style={{ marginBottom: "-10px" }}>
-        <div
-          className="pos-box"
-          ref={fontInputRef}
-          style={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "none",
-            border: "2px solid #e0e0e0",
-            width: "70%",
-            height: "auto",
-            padding: "3px 10px",
-            margin: "10px 0 25px 22px",
-            gap: "8px",
-          }}
-          onClick={() => setShowFontPanel(!showFontPanel)}
+      <div
+        className="right-section-title clickable"
+        onClick={() => setOpen(!isOpen)}
+      >
+        Typography
+        <button
+          className="expand-collapse-btn"
+          onClick={() => setOpen(!isOpen)}
+          aria-label={isOpen ? "Collapse Typography" : "Expand Typography"}
         >
-          <input
-            type="text"
-            value={selectedFont}
-            readOnly
+          {isOpen ? "−" : "+"}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="position-grid">
+          {/* Font Family Dropdown Trigger */}
+          <div
+            className="pos-box"
+            ref={fontInputRef}
             style={{
-              flex: 1,
-              border: "none",
+              width: "95%",
+              height: "10%",
+              gap: "25px",
+              marginLeft: "-14px",
               background: "transparent",
-              width: "100%",
-              fontFamily: selectedFont, 
+              border: "2px solid #e0e0e0",
+              padding: "12px 12px",
             }}
-          />
-          <img
-            src={Down}
-            alt={Down}
-            style={{ width: "10px", height: "10px" }}
-          />
+            onClick={() => setShowFontPanel(!showFontPanel)}
+          >
+            <input
+              type="text"
+              value={selectedFont}
+              readOnly
+              style={{
+                flex: 1,
+                border: "none",
+                background: "transparent",
+                width: "100%",
+              }}
+            />
+            <img
+              src={Down}
+              alt="Down"
+              style={{ width: "10px", height: "10px" }}
+            />
+          </div>
 
           {showFontPanel && panelCoords && (
             <Fonts
               top={panelCoords.top}
               left={panelCoords.left}
               onClose={() => setShowFontPanel(false)}
-              onSelect={setSelectedFont}
+              onSelect={handleFontChange}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               filteredFonts={filteredFonts}
@@ -192,20 +278,7 @@ const TextPropertiesPanel = () => {
               dropdownRef={dropdownRef}
             />
           )}
-        </div>
 
-        <div
-          className="position-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "8px",
-            width: "75%",
-            height: "75%",
-            marginLeft: "35px",
-            marginTop: "-18px",
-          }}
-        >
           {/* Font Weight Dropdown Trigger */}
           <div
             className="pos-box"
@@ -244,7 +317,7 @@ const TextPropertiesPanel = () => {
               top={fontWeightPanelCoords.top}
               left={fontWeightPanelCoords.left}
               onClose={() => setShowFontWeightPanel(false)}
-              onSelect={setSelectedFontWeight}
+              onSelect={handleFontWeightChange}
               selectedWeight={selectedFontWeight}
               dropdownRef={fontWeightDropdownRef} // Pass new ref
             />
@@ -265,7 +338,7 @@ const TextPropertiesPanel = () => {
             <input
               type="number"
               value={selectedFontSize} // Display selected size
-              onChange={(e) => setSelectedFontSize(Number(e.target.value))}
+              onChange={(e) => handleFontSizeChange(Number(e.target.value))}
             />
             <img
               src={Down}
@@ -280,7 +353,7 @@ const TextPropertiesPanel = () => {
                 top={fontSizePanelCoords.top}
                 left={fontSizePanelCoords.left}
                 onClose={() => setShowFontSizePanel(false)}
-                onSelect={setSelectedFontSize}
+                onSelect={handleFontSizeChange}
                 selectedSize={selectedFontSize}
                 dropdownRef={fontSizeDropdownRef}
               />
@@ -299,7 +372,7 @@ const TextPropertiesPanel = () => {
                 className={`alignment-button ${
                   selectedHorizontalAlignment === "left" ? "active" : ""
                 }`}
-                onClick={() => setSelectedHorizontalAlignment("left")}
+                onClick={() => handleAlignmentChange("left")}
               >
                 <img src={AlignLeft} alt="Align Left" />
               </button>
@@ -307,7 +380,7 @@ const TextPropertiesPanel = () => {
                 className={`alignment-button ${
                   selectedHorizontalAlignment === "center" ? "active" : ""
                 }`}
-                onClick={() => setSelectedHorizontalAlignment("center")}
+                onClick={() => handleAlignmentChange("center")}
               >
                 <img src={AlignCenter} alt="Align Center" />
               </button>
@@ -315,20 +388,14 @@ const TextPropertiesPanel = () => {
                 className={`alignment-button ${
                   selectedHorizontalAlignment === "right" ? "active" : ""
                 }`}
-                onClick={() => setSelectedHorizontalAlignment("right")}
+                onClick={() => handleAlignmentChange("right")}
               >
                 <img src={AlignRight} alt="Align Right" />
               </button>
-              {/* <button
-              className={`alignment-button ${selectedHorizontalAlignment === "justify" ? "active" : ""}`}
-              onClick={() => setSelectedHorizontalAlignment("justify")}
-            >
-              <img src={Justify} alt="Justify" />
-            </button> */}
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Thin grey line divider */}
       <div className="section-divider" />

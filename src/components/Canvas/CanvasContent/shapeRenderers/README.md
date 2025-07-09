@@ -144,6 +144,9 @@ Each shape renderer expects specific properties on the shape object:
   text: string,
   color: string,
   fontSize: number,
+  fontFamily: string,
+  fontWeight: string,
+  textAlign: string,
   opacity: number,
   locked: boolean
 }

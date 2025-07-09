@@ -147,7 +147,7 @@ const ColorPanel = ({
         {/* Hex Input */}
         <input
           type="text"
-          value={(color || "#000000").replace("#", "").toUpperCase()} // Display current hex color
+          value={/^#([0-9A-Fa-f]{3}){1,2}$/.test(color) ? color.toUpperCase() : '#000000'}
           onChange={handleHexInputChange}
           style={{
             width: "80px",

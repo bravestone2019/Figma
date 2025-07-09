@@ -1,5 +1,7 @@
 import { CustomPicker } from "react-color";
-import { Saturation, Hue, Alpha } from "react-color/lib/components/common";
+import Saturation from "react-color/lib/components/common/Saturation";
+import Hue from "react-color/lib/components/common/Hue";
+import Alpha from "react-color/lib/components/common/Alpha";
 
 const MiniPicker = ({ hsl, hsv, rgb, onChange }) => {
   return (

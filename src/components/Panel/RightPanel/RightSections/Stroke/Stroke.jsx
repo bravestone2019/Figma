@@ -6,7 +6,7 @@ import StrokeBorder from "./strokeBorder";
 import MiniColorPicker from "../Fill/color/MiniColorPicker";
 import Down from "../../../../../assets/RightPanel/stack.png";
 
-const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
+const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles, isOpen, setOpen }) => {
   const isSingle = selectedShapes && selectedShapes.length === 1;
   let shape = null;
   let shapeType = "";
@@ -34,16 +34,13 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
       : 100;
   }, [isStrokeable, shape]);
 
-  const [isStrokeOpen, setIsStrokeOpen] = useState(false);
   const [colorPanelOpen, setColorPanelOpen] = useState(false);
   const [coords, setCoords] = useState(null);
   const panelInputRef = useRef(null);
   const [color, setColor] = useState(getInitialColor());
   const [opacity, setOpacity] = useState(getInitialOpacity());
 
-  const [strokeWidth, setStrokeWidth] = useState(
-    isStrokeable && shape?.strokeWidth !== undefined ? shape.strokeWidth : 1
-  );
+  const [strokeWidth, setStrokeWidth] = useState(1);
 
   const [showBorderPanel, setShowBorderPanel] = useState(false);
   const [selectedBorderSide, setSelectedBorderSide] = useState("all");
@@ -184,18 +181,25 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     if (isNaN(newWidth) || newWidth < 1) newWidth = 1;
     setStrokeWidth(newWidth);
 
-    if (!isStrokeable) return;
-    const shapeIdx = drawnRectangles.findIndex(
-      (s) => s.id === selectedShapes[0]
-    );
-    if (shapeIdx === -1) return;
-
-    const updated = [...drawnRectangles];
-    updated[shapeIdx] = {
-      ...updated[shapeIdx],
-      strokeWidth: newWidth,
-    };
-    setDrawnRectangles(updated);
+    // Only update shapes if a strokeable shape is selected
+    if (isStrokeable) {
+      const shapeIdx = drawnRectangles.findIndex(
+        (s) => s.id === selectedShapes[0]
+      );
+      if (shapeIdx !== -1) {
+        const updated = [...drawnRectangles];
+        const shape = updated[shapeIdx];
+        if (shape.type === "rectangle" || shape.type === "image") {
+          shape.borderWidth = newWidth;
+        } else if (shape.type === "line") {
+          shape.width = newWidth;
+        } else if (shape.type === "text") {
+          shape.strokeWidth = newWidth;
+        }
+        updated[shapeIdx] = { ...shape };
+        setDrawnRectangles(updated);
+      }
+    }
   };
 
   const currentFullColor = useMemo(() => {
@@ -221,19 +225,19 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     <>
       <div
         className="right-section-title clickable"
-        onClick={() => setIsStrokeOpen(!isStrokeOpen)}
+        onClick={() => setOpen(!isOpen)}
       >
         Stroke
         <button
           className="expand-collapse-btn"
-          onClick={() => setIsStrokeOpen(!isStrokeOpen)}
-          aria-label={isStrokeOpen ? "Collapse Stroke" : "Expand Stroke"}
+          onClick={() => setOpen(!isOpen)}
+          aria-label={isOpen ? "Collapse Stroke" : "Expand Stroke"}
         >
-          {isStrokeOpen ? "−" : "+"}
+          {isOpen ? "−" : "+"}
         </button>
       </div>
 
-      {isStrokeOpen && (
+      {isOpen && (
         <div className="position-grid">
           <div style={{ marginBottom: "-10px" }}>
             <div
@@ -347,17 +351,20 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                 style={{
                   width: "100%",
                   height: "10%",
-                  gap: "25px",
+                  gap: "8px",
                   marginLeft: "-38px",
                   background: "transparent",
                   border: "2px solid #e0e0e0",
                   padding: "12px 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
                 }}
               >
                 <img
                   src={Down}
                   alt="Down"
-                  style={{ width: "15px", height: "18px" }}
+                  style={{ width: "15px", height: "18px", marginRight: "8px" }}
                 />
                 <input
                   type="number"
@@ -365,13 +372,18 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   value={strokeWidth}
                   onChange={handleStrokeWidthChange}
                   style={{
-                    flex: 1,
-                    border: "none",
-                    background: "transparent",
-                    width: "100%",
+                    width: "50px",
+                    fontSize: "12px",
+                    color: "#333",
+                    textAlign: "center",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    background: "#fff",
+                    outline: "none",
                   }}
-                  disabled={!isStrokeable}
+                  placeholder="1"
                 />
+                <span style={{ marginLeft: "4px", fontSize: "12px", color: "#888" }}>px</span>
               </div>
 
               <div
@@ -386,12 +398,14 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   border: "2px solid #e0e0e0",
                   padding: "12px 12px",
                   position: "relative",
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
                 <img
                   src={Down}
                   alt="Down"
-                  style={{ width: "15px", height: "18px" }}
+                  style={{ width: "15px", height: "18px", marginRight: "8px" }}
                 />
                 <input
                   type="text"
@@ -425,7 +439,7 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
       )}
 
       {/* Thin Grey Divider */}
-      {!isStrokeOpen ? (
+      {!isOpen ? (
         <div className="section-divider" style={{ marginTop: "1px" }} />
       ) : (
         <div className="section-divider" />

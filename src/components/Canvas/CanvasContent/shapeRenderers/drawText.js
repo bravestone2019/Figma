@@ -3,6 +3,32 @@
 
 import { applyShapeStyling } from './shapeStyling.js';
 
+// Function to convert font weight names to CSS font-weight values
+function getFontWeightValue(weightName) {
+  const weightMap = {
+    "Thin": 100,
+    "ExtraLight": 200,
+    "Light": 300,
+    "Regular": 400,
+    "Medium": 500,
+    "SemiBold": 600,
+    "Bold": 700,
+    "Thin Italic": 100,
+    "ExtraLight Italic": 200,
+    "Light Italic": 300,
+    "Italic": 400,
+    "Medium Italic": 500,
+    "SemiBold Italic": 600,
+    "Bold Italic": 700,
+  };
+  return weightMap[weightName] || 400;
+}
+
+// Function to check if font weight includes italic
+function isItalic(weightName) {
+  return weightName && weightName.includes("Italic");
+}
+
 export function drawText(ctx, shape, options = {}) {
   const { 
     isHovered = false, 
@@ -20,16 +46,32 @@ export function drawText(ctx, shape, options = {}) {
   ctx.translate(-centerX, -centerY);
   
   // Set up text styling
-  ctx.font = `${shape.fontSize || 16}px Arial`;
+  const fontWeight = getFontWeightValue(shape.fontWeight);
+  const fontStyle = isItalic(shape.fontWeight) ? "italic" : "normal";
+  ctx.font = `${fontStyle} ${fontWeight} ${shape.fontSize || 16}px ${shape.fontFamily || "Arial"}`;
   ctx.fillStyle = shape.color;
   ctx.globalAlpha = shape.opacity;
+  ctx.textAlign = shape.textAlign || "left";
   
   // Draw wrapped text (fill)
   const lineHeight = (shape.fontSize || 16) * 1.2;
   const lines = getWrappedLines(ctx, shape.text, shape.width);
   let currentY = shape.y + (shape.fontSize || 16);
+  
+  // Calculate text position based on alignment
+  const getTextX = (line) => {
+    if (shape.textAlign === "center") {
+      return shape.x + shape.width / 2;
+    } else if (shape.textAlign === "right") {
+      return shape.x + shape.width;
+    } else {
+      return shape.x; // left alignment
+    }
+  };
+  
   lines.forEach(line => {
-    ctx.fillText(line, shape.x, currentY);
+    const textX = getTextX(line);
+    ctx.fillText(line, textX, currentY);
     currentY += lineHeight;
   });
 
@@ -39,10 +81,12 @@ export function drawText(ctx, shape, options = {}) {
     ctx.strokeStyle = shape.strokeColor;
     ctx.lineWidth = shape.strokeWidth && shape.strokeWidth > 0 ? shape.strokeWidth : 1;
     ctx.globalAlpha = shape.opacity;
-    ctx.font = `${shape.fontSize || 16}px Arial`;
+    ctx.font = `${fontStyle} ${fontWeight} ${shape.fontSize || 16}px ${shape.fontFamily || "Arial"}`;
+    ctx.textAlign = shape.textAlign || "left";
     currentY = shape.y + (shape.fontSize || 16);
     lines.forEach(line => {
-      ctx.strokeText(line, shape.x, currentY);
+      const textX = getTextX(line);
+      ctx.strokeText(line, textX, currentY);
       currentY += lineHeight;
     });
     ctx.restore();

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import MiniColorPicker from "./color/MiniColorPicker"; 
 import ColorPanel from "./color/color"; 
 
-const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
+const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles, isOpen, setOpen }) => {
   const isSingle = selectedShapes && selectedShapes.length === 1;
   let shape = null;
   let shapeType = "";
@@ -15,10 +15,31 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const isFillable =
     isSingle && (shapeType === "rectangle" || shapeType === "text");
 
+  // Helper to convert rgb/rgba string to hex
+  function parseColorToHex(colorStr) {
+    if (!colorStr) return '#D9D9D9';
+    if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(colorStr)) {
+      return colorStr.toUpperCase();
+    }
+    // Match rgb or rgba
+    const match = colorStr.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+      const r = parseInt(match[1], 10);
+      const g = parseInt(match[2], 10);
+      const b = parseInt(match[3], 10);
+      const toHex = (c) => {
+        const hex = c.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      };
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+    }
+    return '#D9D9D9';
+  }
+
   const getInitialColor = useCallback(() => {
     if (!isFillable) return "#D9D9D9"; // Default grey if no fillable shape selected
-    if (shapeType === "rectangle") return shape.backgroundColor || "#D9D9D9";
-    if (shapeType === "text") return shape.color || "#000000";
+    if (shapeType === "rectangle") return parseColorToHex(shape.backgroundColor) || "#D9D9D9";
+    if (shapeType === "text") return parseColorToHex(shape.color) || "#000000";
     return "#D9D9D9";
   }, [isFillable, shapeType, shape]);
 
@@ -27,7 +48,6 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     return shape.opacity !== undefined ? Math.round(shape.opacity * 100) : 100;
   }, [isFillable, shape]);
 
-  const [isFillOpen, setIsFillOpen] = useState(false);
   const [colorPanel, setColorPanel] = useState(false);
   const [coords, setCoords] = useState(null);
   const PanelInputRef = useRef(null);
@@ -90,9 +110,25 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [colorPanel]);
 
+  // Helper to convert rgb/rgba to hex
+  function rgbToHex({ r, g, b }) {
+    const toHex = (c) => {
+      const hex = c.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+  }
+
   const handleColorUpdate = useCallback(
     (newColor) => {
-      const hexColor = typeof newColor === "string" ? newColor : newColor.hex;
+      let hexColor = '#000000';
+      if (typeof newColor === 'string' && /^#([0-9A-Fa-f]{3}){1,2}$/.test(newColor)) {
+        hexColor = newColor.toUpperCase();
+      } else if (newColor.hex && /^#([0-9A-Fa-f]{3}){1,2}$/.test(newColor.hex)) {
+        hexColor = newColor.hex.toUpperCase();
+      } else if (newColor.rgb) {
+        hexColor = rgbToHex(newColor.rgb);
+      }
       setColor(hexColor);
 
       // Update opacity if provided by the color picker (e.g., from alpha slider)
@@ -148,19 +184,19 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     <>
       <div
         className="right-section-title clickable"
-        onClick={() => setIsFillOpen(!isFillOpen)}
+        onClick={() => setOpen(!isOpen)}
       >
         Fill{" "}
         <button
           className="expand-collapse-btn"
-          onClick={() => setIsFillOpen(!isFillOpen)}
-          aria-label={isFillOpen ? "Collapse Fill" : "Expand Fill"}
+          onClick={() => setOpen(!isOpen)}
+          aria-label={isOpen ? "Collapse Fill" : "Expand Fill"}
         >
-          {isFillOpen ? "−" : "+"}
+          {isOpen ? "−" : "+"}
         </button>
       </div>
 
-      {isFillOpen && (
+      {isOpen && (
         <div className="position-grid">
           <div className="pos-box-fill" ref={PanelInputRef}style={{ background: "#ffffff", border: "2px solid #e0e0e0"}}>
             <button
@@ -205,10 +241,16 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
             >
               <input
                 type="text"
-                value={(color || "#000000").replace("#", "").toUpperCase()}
-                onChange={(e) => setColor("#" + e.target.value)}
+                value={color.startsWith('#') ? color.substring(1).toUpperCase() : color.toUpperCase()}
+                onChange={(e) => {
+                  let val = e.target.value.trim();
+                  // Only allow valid hex codes (3 or 6 hex digits, no #)
+                  if (/^([0-9A-Fa-f]{3}){1,2}$/.test(val)) {
+                    setColor('#' + val.toUpperCase());
+                  }
+                }}
                 style={{
-                  width: "50px",
+                  width: "70px",
                   padding: "2px 5px",
                   fontSize: "12px",
                   textAlign: "center",
@@ -242,7 +284,7 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
       )}
 
       {/* Thin Grey Divider */}
-      {!isFillOpen ? (
+      {!isOpen ? (
         <div className="section-divider" style={{ marginTop: "1px" }} />
       ) : (
         <div className="section-divider" />

@@ -198,6 +198,7 @@ const Canvas = ({
         textInput={textInput}
         setTextInput={setTextInput}
         setDrawnRectangles={setDrawnRectangles}
+        setSelectedShapes={setSelectedShapes} // Pass this prop
         scale={scale}
         position={position}
         redrawAllShapes={canvasDrawingRef}
