@@ -98,12 +98,13 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     <>
       <div className="right-section-title">Layout</div>
       <div
-        className="position-grid"
+        // className="position-grid"
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-start",
-          marginLeft: "15px",
+          marginLeft: "10px",
+          gap: 10
         }}
         ref={wrapperRef}
       >
@@ -141,6 +142,7 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
           />
           <span className="tooltip">Width</span>
         </div>
+
         <div
           className={`pos-box ${
             focusedInput === "height" ? "selected-pos" : ""
@@ -178,6 +180,11 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         <button
           className={`reset-size-btn ${isLocked ? "selected" : ""}`}
           onClick={() => setIsLocked((prev) => !prev)}
+          style={{
+            width: "20px",
+            height: "18px",
+            transform: "translateX(-10%)",
+          }}
         >
           <img
             src={Ratio}

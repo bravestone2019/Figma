@@ -1,4 +1,5 @@
 import "../../RightPanel.css";
+import "../Layout/Layout.css"
 import { useState, useEffect, useRef } from "react";
 import corner from "../../../../../assets/RightPanel/corner.png";
 import Top from "../../../../../assets/RightPanel/top_left.png";
@@ -15,6 +16,8 @@ const Appearance = ({
   const [showRadiusControls, setShowRadiusControls] = useState(false);
   const [focusedInput, setFocusedInput] = useState(null);
   const wrapperRef = useRef(null);
+  const [isLocked, setIsLocked] = useState(false);
+
 
   // Check if exactly one shape is selected
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -144,13 +147,16 @@ const Appearance = ({
 
         {/* Toggle Advanced Corner Controls */}
         <button
-          className="reset-size-btn"
+          className={`reset-size-btn ${isLocked ? "selected" : ""}`}
           style={{
             width: "20px",
             height: "18px",
             transform: "translateX(-10%)",
           }}
-          onClick={() => setShowRadiusControls(!showRadiusControls)}
+          onClick={() => {
+            setIsLocked(!isLocked);
+            setShowRadiusControls(!showRadiusControls);
+          }}
         >
           <img
             src={corner}

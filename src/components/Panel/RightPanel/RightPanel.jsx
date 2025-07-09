@@ -71,7 +71,8 @@ const RightPanel = ({
             drawnRectangles={drawnRectangles}
             setDrawnRectangles={setDrawnRectangles}
           />
-          {/* <Effects /> */}
+          <Effects />
+          <div style={{padding: 20}}></div>
           </div>
         </div>
       )}

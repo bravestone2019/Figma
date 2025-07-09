@@ -45,7 +45,7 @@
 .alignment-button {
   position: relative;
   background-color: transparent;
-  border: 1px solid #e0e0e0; /* Light border for separation */
+  border: 1px solid transparent ; /* Light border for separation */
   padding: 0 0; /* Adjust padding as needed for icon size */
   display: flex;
   justify-content: center;
@@ -115,7 +115,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
 }
 
 .typography-input-group .pos-box input {

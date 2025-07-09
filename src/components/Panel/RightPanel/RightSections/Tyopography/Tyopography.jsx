@@ -152,7 +152,7 @@ const TextPropertiesPanel = () => {
             alignItems: "center",
             justifyContent: "space-between",
             background: "none",
-            border: "2px solid #e0e0e0",
+            border: "1px solid #e0e0e0",
             width: "70%",
             height: "auto",
             padding: "3px 10px",
@@ -170,7 +170,7 @@ const TextPropertiesPanel = () => {
               border: "none",
               background: "transparent",
               width: "100%",
-              fontFamily: selectedFont, 
+              fontFamily: selectedFont,
             }}
           />
           <img
@@ -217,7 +217,7 @@ const TextPropertiesPanel = () => {
               gap: "25px",
               marginLeft: "-14px",
               background: "transparent",
-              border: "2px solid #e0e0e0",
+              border: "1px solid #e0e0e0",
               padding: "12px 12px",
             }}
             onClick={() => setShowFontWeightPanel(!showFontWeightPanel)}
@@ -259,7 +259,7 @@ const TextPropertiesPanel = () => {
               width: "60%",
               height: "10%",
               marginLeft: "8px",
-              border: "2px solid #e0e0e0",
+              border: "1px solid #e0e0e0",
               padding: "12px 12px",
             }}
             onClick={() => setShowFontSizePanel(!showFontSizePanel)}
@@ -305,7 +305,9 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("left")}
               >
                 <img src={AlignLeft} alt="Align Left" />
-                <span className="tooltip" style={{ bottom: "-30px"}}>Align left</span>
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align left
+                </span>
               </button>
               <button
                 className={`alignment-button ${
@@ -314,7 +316,9 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("center")}
               >
                 <img src={AlignCenter} alt="Align Center" />
-                <span className="tooltip" style={{ bottom: "-30px"}}>Align center</span>
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align center
+                </span>
               </button>
               <button
                 className={`alignment-button ${
@@ -323,7 +327,9 @@ const TextPropertiesPanel = () => {
                 onClick={() => setSelectedHorizontalAlignment("right")}
               >
                 <img src={AlignRight} alt="Align Right" />
-                <span className="tooltip" style={{ bottom: "-30px"}}>Align right</span>
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align right
+                </span>
               </button>
               {/* <button
               className={`alignment-button ${selectedHorizontalAlignment === "justify" ? "active" : ""}`}

@@ -1,8 +1,11 @@
 import "../../RightPanel.css";
 import "../Effects/Effects.css";
+import "../Layout/Layout.css";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import MiniColorPicker from "./color/MiniColorPicker";
 import ColorPanel from "./color/color";
+import Hide from "../../../../../assets/RightPanel/hide.png";
+import Show from "../../../../../assets/RightPanel/show.png";
 
 const DEFAULT_COLOR = "#D9D9D9";
 const DEFAULT_OPACITY = 100;
@@ -20,14 +23,17 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
 
   const getInitialColor = useCallback(() => {
     if (!isFillable) return DEFAULT_COLOR;
-    if (shapeType === "rectangle") return shape.backgroundColor || DEFAULT_COLOR;
+    if (shapeType === "rectangle")
+      return shape.backgroundColor || DEFAULT_COLOR;
     if (shapeType === "text") return shape.color || "#000000";
     return DEFAULT_COLOR;
   }, [isFillable, shapeType, shape]);
 
   const getInitialOpacity = useCallback(() => {
     if (!isFillable) return DEFAULT_OPACITY;
-    return shape.opacity !== undefined ? Math.round(shape.opacity * 100) : DEFAULT_OPACITY;
+    return shape.opacity !== undefined
+      ? Math.round(shape.opacity * 100)
+      : DEFAULT_OPACITY;
   }, [isFillable, shape]);
 
   const [isFillOpen, setIsFillOpen] = useState(false);
@@ -36,6 +42,7 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const PanelInputRef = useRef(null);
   const [color, setColor] = useState(getInitialColor());
   const [opacity, setOpacity] = useState(getInitialOpacity());
+  const [isShown, setIsShown] = useState(true); // true = show icon, false = hide icon
 
   // Reset to default when panel is minimized
   useEffect(() => {
@@ -49,7 +56,8 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         );
         if (shapeIdx !== -1) {
           const updatedShape = { ...drawnRectangles[shapeIdx] };
-          if (shapeType === "rectangle") updatedShape.backgroundColor = DEFAULT_COLOR;
+          if (shapeType === "rectangle")
+            updatedShape.backgroundColor = DEFAULT_COLOR;
           if (shapeType === "text") updatedShape.color = DEFAULT_COLOR;
           updatedShape.opacity = DEFAULT_OPACITY / 100;
 
@@ -59,7 +67,14 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         }
       }
     }
-  }, [isFillOpen, isFillable, selectedShapes, drawnRectangles, setDrawnRectangles, shapeType]);
+  }, [
+    isFillOpen,
+    isFillable,
+    selectedShapes,
+    drawnRectangles,
+    setDrawnRectangles,
+    shapeType,
+  ]);
 
   useEffect(() => {
     setColor(getInitialColor());
@@ -68,7 +83,9 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
 
   const currentFullColor = useMemo(() => {
     const hexToRgb = (hex) => {
-      let r = 0, g = 0, b = 0;
+      let r = 0,
+        g = 0,
+        b = 0;
       if (hex.length === 4) {
         r = parseInt(hex[1] + hex[1], 16);
         g = parseInt(hex[2] + hex[2], 16);
@@ -174,25 +191,35 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         <button
           className="expand-collapse-btn"
           onClick={() => setIsFillOpen(!isFillOpen)}
-          aria-label={isFillOpen ? "Collapse Fill" : "Expand Fill"}
         >
           {isFillOpen ? "−" : "+"}
+          <span className="tooltip"
+          style={{ left: "82%" }}>
+            {isFillOpen ? "Remove Fill" : "Add Fill"}
+          </span>
         </button>
       </div>
 
       {isFillOpen && (
-        <div className="position-grid">
+        <div
+          className="position-grid"
+          style={{ alignItems: "center", marginLeft: 20 }}
+        >
           <div
             className="pos-box-fill"
             ref={PanelInputRef}
-            style={{ background: "#ffffff", border: "2px solid #e0e0e0" }}
+            style={{
+              background: "#ffffff",
+              border: "2px solid #e0e0e0",
+              flex: 1,
+            }}
           >
             <button
               style={{
-                width: "20px",
-                height: "20px",
-                border: "1.5px solid #ddd",
-                borderRadius: "6px",
+                width: "18px",
+                height: "18px",
+                border: "1px solid #ddd",
+                borderRadius: "5px",
                 background: color,
                 display: "inline-block",
                 padding: 0,
@@ -253,9 +280,7 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   value={opacity}
                   min={0}
                   max={100}
-                  onChange={(e) =>
-                    handleOpacityUpdate(Number(e.target.value))
-                  }
+                  onChange={(e) => handleOpacityUpdate(Number(e.target.value))}
                   style={{ width: "40px", textAlign: "center" }}
                   disabled={!isFillable}
                 />
@@ -263,6 +288,27 @@ const Fill = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
               </div>
             </div>
           </div>
+
+          <button
+            className="reset-size-btn"
+            onClick={() => setIsShown((prev) => !prev)}
+            style={{
+              width: "33px",
+              height: "15px",
+              transform: "translateX(55%)",
+              marginBottom: "-2px",
+              marginLeft: "1px",
+            }}
+          >
+            <img
+              src={isShown ? Show : Hide}
+              alt={isShown ? "Show" : "Hide"}
+              style={{ width: 15, height: 15, marginBottom: 2 }}
+            />
+            <span className="tooltip" style={{ left: 2}}>
+              {isShown ? "Show Fill" : "Hide Fill"}
+            </span>
+          </button>
         </div>
       )}
 

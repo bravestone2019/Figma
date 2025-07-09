@@ -10,6 +10,8 @@ import Right from "../../../../../assets/RightPanel/border_right.png";
 import Bottom from "../../../../../assets/RightPanel/bottom_border.png";
 import Top from "../../../../../assets/RightPanel/top_border.png";
 import Weight from "../../../../../assets/RightPanel/weight.png";
+import Hide from "../../../../../assets/RightPanel/hide.png";
+import Show from "../../../../../assets/RightPanel/show.png";
 
 const DEFAULT_STROKE_COLOR = "#000000";
 const DEFAULT_STROKE_OPACITY = 100;
@@ -67,6 +69,7 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const borderRef = useRef(null);
   const borderDropdownRef = useRef(null);
   const [borderPanelCoords, setBorderPanelCoords] = useState(null);
+  const [isShown, setIsShown] = useState(true); // true = show icon, false = hide icon
 
   useEffect(() => {
     setColor(getInitialColor());
@@ -276,18 +279,23 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         className="right-section-title clickable"
         onClick={() => setIsStrokeOpen(!isStrokeOpen)}
       >
-        Stroke
+        Stroke{" "}
         <button
           className="expand-collapse-btn"
           onClick={() => setIsStrokeOpen(!isStrokeOpen)}
-          aria-label={isStrokeOpen ? "Collapse Stroke" : "Expand Stroke"}
         >
           {isStrokeOpen ? "−" : "+"}
+          <span className="tooltip" style={{ left: "80%" }}>
+            {isStrokeOpen ? "Remove Stroke" : "Add Stroke"}
+          </span>
         </button>
       </div>
 
       {isStrokeOpen && (
-        <div className="position-grid">
+        <div
+          className="position-grid"
+          style={{ alignItems: "center", marginLeft: 20 }}
+        >
           <div style={{ marginBottom: "-10px" }}>
             <div
               className="pos-box-fill"
@@ -304,6 +312,7 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                 padding: "6px 10px",
                 margin: "5px 0 20px -5px",
                 gap: "8px",
+                flex: 1,
               }}
             >
               <button
@@ -425,7 +434,9 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                   }}
                   disabled={!isStrokeable}
                 />
-                <span className="tooltip" style={{ bottom : "35px"}}>Stroke weight</span>
+                <span className="tooltip" style={{ bottom: "35px" }}>
+                  Stroke weight
+                </span>
               </div>
 
               <div
@@ -462,7 +473,9 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
                     textTransform: "capitalize",
                   }}
                 />
-                <span className="tooltip" style={{ bottom : "35px"}}>Individual strokes</span>
+                <span className="tooltip" style={{ bottom: "35px" }}>
+                  Individual strokes
+                </span>
               </div>
               {showBorderPanel && borderPanelCoords && (
                 <StrokeBorder
@@ -476,6 +489,27 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
               )}
             </div>
           </div>
+
+          <button
+            className="reset-size-btn"
+            onClick={() => setIsShown((prev) => !prev)}
+            style={{
+              width: "33px",
+              height: "15px",
+              transform: "translateX(55%)",
+              marginBottom: "40px",
+              marginLeft: "-5px",
+            }}
+          >
+            <img
+              src={isShown ? Show : Hide}
+              alt={isShown ? "Show" : "Hide"}
+              style={{ width: 15, height: 15, marginBottom: 2 }}
+            />
+            <span className="tooltip" style={{ left: "-5px" }}>
+              {isShown ? "Show stroke" : "Hide stroke"}
+            </span>
+          </button>
         </div>
       )}
 
