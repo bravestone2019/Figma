@@ -210,7 +210,7 @@ const TextPropertiesPanel = () => {
               marginLeft: "-15px",
               background: "transparent",
               border: "1px solid #e0e0e0",
-              padding: "2px 3px",
+              padding: "2px 6px",
               height: "24px",
               display: "flex",
               alignItems: "center",
@@ -234,7 +234,7 @@ const TextPropertiesPanel = () => {
             <img
               src={Down}
               alt="Down"
-              style={{ width: "10px", height: "10px", marginRight: "5px" }}
+              style={{ width: "10px", height: "10px", marginRight: "8px" }}
             />
             <span className="tooltip">Font weight</span>
           </div>
