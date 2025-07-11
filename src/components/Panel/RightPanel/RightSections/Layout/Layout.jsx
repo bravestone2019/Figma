@@ -2,6 +2,8 @@ import "./Layout.css";
 import { useState, useRef, useEffect } from "react";
 import "../../RightPanel.css";
 import Ratio from "../../../../../assets/RightPanel/increase.png";
+import RatioLock from "../../../../../assets/RightPanel/ratioLock.png";
+
 
 const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const [isLocked, setIsLocked] = useState(false);
@@ -9,7 +11,6 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
   const widthInputRef = useRef(null);
   const heightInputRef = useRef(null);
   const wrapperRef = useRef(null);
-
 
   // Only show controls if exactly one shape is selected
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -50,7 +51,6 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     document.removeEventListener("mousedown", handleClickOutside);
   };
 }, []);
-
 
   const handleChange = (e, prop) => {
     if (!isSingle) return;
@@ -98,7 +98,6 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
     <>
       <div className="right-section-title">Layout</div>
       <div
-        // className="position-grid"
         style={{
           display: "flex",
           alignItems: "center",
@@ -108,6 +107,7 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
         }}
         ref={wrapperRef}
       >
+        {/* width */}
         <div
           className={`pos-box ${
             focusedInput === "width" ? "selected-pos" : ""
@@ -124,7 +124,7 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
               left: "10px",
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: "11px",
+              fontSize: "10px",
               color: "#666",
             }}
           >
@@ -136,13 +136,13 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
             disabled={!isSingle || shapeType === "triangle"}
             onChange={(e) => handleChange(e, "width")}
             min={1}
-            style={{ transform: "translateX(-20%)" }}
+            style={{ transform: "translateX(-20%)", fontSize: "11px" }}
             onFocus={() => setFocusedInput("width")}
             onBlur={() => setFocusedInput(null)}
           />
           <span className="tooltip">Width</span>
         </div>
-
+        {/* height */}
         <div
           className={`pos-box ${
             focusedInput === "height" ? "selected-pos" : ""
@@ -171,7 +171,7 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
             disabled={!isSingle || shapeType === "triangle"}
             onChange={(e) => handleChange(e, "height")}
             min={1}
-            style={{ transform: "translateX(-20%)" }}
+            style={{ transform: "translateX(-25%)", fontSize: "11px" }}
             onFocus={() => setFocusedInput("height")}
             onBlur={() => setFocusedInput(null)}
           />
@@ -187,7 +187,8 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
           }}
         >
           <img
-            src={Ratio}
+            // src={Ratio}
+            src={isLocked ? RatioLock : Ratio}
             alt={Ratio}
             style={{ width: 13, height: 12, marginBottom: 2 }}
           />

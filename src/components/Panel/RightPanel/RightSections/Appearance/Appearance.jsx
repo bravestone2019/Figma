@@ -1,5 +1,5 @@
 import "../../RightPanel.css";
-import "../Layout/Layout.css"
+import "../Layout/Layout.css";
 import { useState, useEffect, useRef } from "react";
 import corner from "../../../../../assets/RightPanel/corner.png";
 import Top from "../../../../../assets/RightPanel/top_left.png";
@@ -7,6 +7,7 @@ import bottom from "../../../../../assets/RightPanel/top_right.png";
 import right from "../../../../../assets/RightPanel/bottom_left.png";
 import left from "../../../../../assets/RightPanel/bottom_right.png";
 import shadow from "../../../../../assets/RightPanel/opacity.png";
+import whiteIcon from "../../../../../assets/RightPanel/activeIcon.png"
 
 const Appearance = ({
   selectedShapes,
@@ -17,7 +18,6 @@ const Appearance = ({
   const [focusedInput, setFocusedInput] = useState(null);
   const wrapperRef = useRef(null);
   const [isLocked, setIsLocked] = useState(false);
-
 
   // Check if exactly one shape is selected
   const isSingle = selectedShapes && selectedShapes.length === 1;
@@ -112,11 +112,23 @@ const Appearance = ({
             min={0}
             max={100}
             step={1}
-            style={{ transform: "translateX(-5%)" }}
+            style={{ transform: "translateX(-5%)", fontSize: "11px" }}
             onFocus={() => setFocusedInput("opacity")}
             onBlur={() => setFocusedInput(null)}
           />
-          <span style={{ transform: "translateX(-90%)" }}>%</span>
+          <span
+            style={{
+              position: "absolute",
+              right: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#999",
+              pointerEvents: "none",
+            }}
+          >
+            %
+          </span>
+          {/* <span style={{ transform: "translateX(-90%)" }}>%</span> */}
           <span className="tooltip">Opacity</span>
         </div>
 
@@ -138,7 +150,7 @@ const Appearance = ({
             value={borderRadius}
             min={0}
             onChange={handleCurveChange}
-            style={{ transform: "translateX(-20%)" }}
+            style={{ transform: "translateX(-20%)", fontSize: "11px" }}
             onFocus={() => setFocusedInput("borderRadius")}
             onBlur={() => setFocusedInput(null)}
           />
@@ -159,7 +171,7 @@ const Appearance = ({
           }}
         >
           <img
-            src={corner}
+            src={isLocked ? whiteIcon : corner}
             alt="Toggle Corners"
             style={{ width: 18, height: 16, marginBottom: 2 }}
           />
@@ -176,7 +188,6 @@ const Appearance = ({
             gap: "10px",
             marginTop: "12px",
             marginLeft: "29px",
-            width: "60%",
           }}
         >
           <div
@@ -185,7 +196,8 @@ const Appearance = ({
               padding: "2px 2px",
               fontSize: "10px",
               height: "20px",
-              width: "90%",
+              marginLeft: -15,
+              marginRight: 25
             }}
           >
             <img
@@ -194,15 +206,14 @@ const Appearance = ({
               style={{
                 width: 14,
                 height: 12,
-                marginLeft: "8px",
+                marginLeft: "6px",
                 transform: "translateY(-15%)",
               }}
             />
             <input
-              placeholder="0"
               type="number"
               min={0}
-              style={{ transform: "translateX(-5%)" }}
+              style={{ transform: "translateX(-5%)", fontSize: "11px" }}
             />
             <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
               Top left corner radius
@@ -214,7 +225,8 @@ const Appearance = ({
               padding: "2px 2px",
               fontSize: "10px",
               height: "20px",
-              width: "90%",
+              marginRight: 30,
+              marginLeft: -25,
             }}
           >
             <img
@@ -228,10 +240,9 @@ const Appearance = ({
               }}
             />
             <input
-              placeholder="0"
               type="number"
               min={0}
-              style={{ transform: "translateX(-5%)" }}
+              style={{ transform: "translateX(-5%)", fontSize: "11px" }}
             />
             <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
               Top right corner radius
@@ -243,7 +254,8 @@ const Appearance = ({
               padding: "2px 2px",
               fontSize: "10px",
               height: "20px",
-              width: "90%",
+              marginLeft: -15,
+              marginRight: 25
             }}
           >
             <img
@@ -257,10 +269,9 @@ const Appearance = ({
               }}
             />
             <input
-              placeholder="0"
               type="number"
               min={0}
-              style={{ transform: "translateX(-5%)" }}
+              style={{ transform: "translateX(-5%)", fontSize: "11px" }}
             />
             <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
               Bottom left corner radius
@@ -272,7 +283,8 @@ const Appearance = ({
               padding: "2px 2px",
               fontSize: "10px",
               height: "20px",
-              width: "90%",
+              marginRight: 30,
+              marginLeft: -25,
             }}
           >
             <img
@@ -286,10 +298,9 @@ const Appearance = ({
               }}
             />
             <input
-              placeholder="0"
               type="number"
               min={0}
-              style={{ transform: "translateX(-5%)" }}
+              style={{ transform: "translateX(-5%)", fontSize: "11px" }}
             />
             <span className="tooltip" style={{ left: "-30px", bottom: "35px" }}>
               Bottom right corner radius

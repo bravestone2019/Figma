@@ -44,7 +44,5 @@
 }
 
 .reset-size-btn.selected {
-  background-color: #3ca5ef91; /* light blue background */
-  /* border: 1px solid #2196f3; */
-  /* border-radius: 10px; */
+  background-color: rgba(24, 159, 255, 0.15); 
 }

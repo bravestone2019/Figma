@@ -1,9 +1,9 @@
 import { createPortal } from "react-dom";
-import All from "../../../../../assets/RightPanel/border.png";
-import Left from "../../../../../assets/RightPanel/border_left.png";
-import Right from "../../../../../assets/RightPanel/border_right.png";
-import Bottom from "../../../../../assets/RightPanel/bottom_border.png";
-import Top from "../../../../../assets/RightPanel/top_border.png";
+import All from "../../../../../../assets/RightPanel/border.png";
+import Left from "../../../../../../assets/RightPanel/border_left.png";
+import Right from "../../../../../../assets/RightPanel/border_right.png";
+import Bottom from "../../../../../../assets/RightPanel/bottom_border.png";
+import Top from "../../../../../../assets/RightPanel/top_border.png";
 
 const borderIcons = {
   all: All,

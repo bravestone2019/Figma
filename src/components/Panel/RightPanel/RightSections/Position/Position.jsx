@@ -124,8 +124,12 @@ const Position = ({
   const handleRotationChange = (value) => {
     setInputRotation(value);
     if (!selectedRect) return;
-    const newRotation = parseFloat(value);
+    let newRotation = parseFloat(value);
     if (!isNaN(newRotation)) {
+      // Normalize to between -179 and 180
+      if (newRotation > 180) newRotation -= 360;
+      if (newRotation <= -180) newRotation += 360;
+
       let updatedRectangles;
       if (selectedRect.type === "line") {
         const cx = (selectedRect.x1 + selectedRect.x2) / 2;
@@ -168,18 +172,25 @@ const Position = ({
   return (
     <>
       <div className="right-section-title">Position</div>
+
       <div
-        className="position-grid"
         style={{
           display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
           alignItems: "center",
           justifyContent: "flex-start",
-          marginLeft: "15px",
+          marginLeft: "10px",
+          gap: 10,
         }}
       >
+        {/* X-Position */}
         <div
           className="pos-box"
-          style={{ position: "relative", padding: " 1px 22px 2px 20px" }}
+          style={{
+            position: "relative",
+            padding: " 1px 10px 2px 30px",
+            marginRight: 15,
+          }}
           onClick={() => focusInput(xInputRef)}
         >
           <span
@@ -188,8 +199,9 @@ const Position = ({
               left: "10px",
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: "11px",
+              fontSize: "10px",
               color: "#666",
+              background: "none",
             }}
           >
             X
@@ -199,15 +211,18 @@ const Position = ({
             value={inputX}
             onChange={handleXChange}
             ref={xInputRef}
+            style={{ transform: "translateX(-25%)", fontSize: "11px" }}
           />
           <span className="tooltip">X-position</span>
         </div>
+        {/* Y-Position */}
         <div
           className="pos-box"
           style={{
             position: "relative",
-            padding: " 1px 4px 2px 20px",
-            marginRight: "-20px",
+            padding: "1px 10px 2px 30px",
+            marginRight: 28,
+            marginLeft: -15,
           }}
           onClick={() => focusInput(yInputRef)}
         >
@@ -217,8 +232,9 @@ const Position = ({
               left: "10px",
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: "11px",
+              fontSize: "10px",
               color: "#666",
+              background: "none",
             }}
           >
             Y
@@ -228,25 +244,33 @@ const Position = ({
             value={inputY}
             onChange={handleYChange}
             ref={yInputRef}
+            style={{ transform: "translateX(-25%)", fontSize: "11px" }}
           />
           <span className="tooltip">Y-position</span>
         </div>
+        {/* Rotation-Position */}
         <div
           className="pos-box"
-          style={{ position: "relative", padding: " 1px 4px 2px 30px" }}
+          style={{
+            position: "relative",
+            padding: "1px 15px 2px 30px",
+            marginRight: 15,
+          }}
           onClick={() => focusInput(angleInputRef)}
         >
           <img
             src={Angle}
-            alt={Angle}
+            alt="angle"
+            className="angle-icon"
             style={{
-              width: 12,
+              width: 10,
               height: 10,
               position: "absolute",
               left: "10px",
               top: "50%",
               transform: "translateY(-50%)",
               color: "#666",
+              background: "none",
             }}
           />
           <input
@@ -254,54 +278,61 @@ const Position = ({
             value={inputRotation}
             onChange={(e) => handleRotationChange(e.target.value)}
             ref={angleInputRef}
-            style={{
-              transform: "translateX(-15%)",
-              paddingRight: "18px",
-            }}
+            style={{ transform: "translateX(-20%)", fontSize: "11px" }}
           />
           <span
             style={{
               position: "absolute",
-              right: "10px",
+              right: "8px",
               top: "50%",
-              transform: "translateY(-50%) ",
-              fontSize: "13px",
-              color: "#666",
+              transform: "translateY(-50%)",
+              color: "#999",
               pointerEvents: "none",
             }}
           >
             °
           </span>
+          {/* <span className="degree-symbol">°</span> */}
           <span className="tooltip">Rotation</span>
         </div>
+
         <div
-          className="pos-box-button"
+          className="pos-box-button icon-group"
           style={{
-            marginRight: "-22px",
+            // position: "relative",
+            // padding: "1px 10px 2px 30px",
+            display: "inline-flex",
+            justifyContent: "flex-start",
+            padding: "4px 10px",
+            gap: "10px",
+            marginRight: 28,
+            marginLeft: -15,
           }}
         >
-          <button
-            className="icon-button"
-          >
-            <img src={degrees} alt="Rotate" />
+          <button className="icon-button">
+            <img src={degrees} alt="Rotate" style={{ marginBottom: "-1px" }} />
             <span className="tooltip">Rotate 90° Right</span>
           </button>
-          <button
-            className="icon-button"
-          >
-            <img src={vertical} alt="Vertical Flip" />
+          <button className="icon-button">
+            <img
+              src={vertical}
+              alt="Vertical Flip"
+              style={{ marginBottom: "-1px" }}
+            />
             <span className="tooltip">Flip Vertical</span>
           </button>
-          <button
-            className="icon-button"
-          >
-            <img src={horizontal} alt="Horizontal Flip" />
+          <button className="icon-button">
+            <img
+              src={horizontal}
+              alt="Horizontal Flip"
+              style={{ marginBottom: "-1px" }}
+            />
             <span className="tooltip">Flip Horizontal</span>
           </button>
         </div>
       </div>
 
-      {/* Thin grey line divider */}
+      {/* Thin grey divider */}
       <div className="section-divider" />
     </>
   );

@@ -14,17 +14,15 @@ const RightPanel = ({
   drawnRectangles,
   setDrawnRectangles,
 }) => {
-  // const zoomPercent = Math.round((scale || 1) * 100); scale
+  // const selectedShapeId =
+  //   selectedShapes && selectedShapes.length === 1 ? selectedShapes[0] : null;
+  // // Find the selected shape object
+  // const selectedShape = selectedShapeId
+  //   ? drawnRectangles.find((s) => s.id === selectedShapeId)
+  //   : null;
 
   return (
     <div className={`right-panel ${collapsed ? "collapsed" : ""}`}>
-      {collapsed && (
-        <></>
-        // <div className="zoom-collapsed-panel">
-        //   <div className="zoom-collapsed-indicator">{zoomPercent}%</div>
-        // </div>
-      )}
-
       {!collapsed && (
         <div className="right-panel-content">
           <div className="right-panel-header">
@@ -39,40 +37,42 @@ const RightPanel = ({
                 Design
               </div>
             </div>
-            {/* <div className="zoom-indicator">{zoomPercent}%</div> */}
           </div>
           <div className="right-header-divider" />
 
           <div className="right-panel-scrollable">
-            <Position 
-            selectedShapes={selectedShapes}
-            setSelectedShapes={setSelectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <Layout 
-            selectedShapes={selectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <Appearance 
-            selectedShapes={selectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <TextPropertiesPanel/>
-          <Fill 
-            selectedShapes={selectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <Stroke 
-            selectedShapes={selectedShapes}
-            drawnRectangles={drawnRectangles}
-            setDrawnRectangles={setDrawnRectangles}
-          />
-          <Effects />
-          <div style={{padding: 20}}></div>
+            <Position
+              selectedShapes={selectedShapes}
+              setSelectedShapes={setSelectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            <Layout
+              selectedShapes={selectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            <Appearance
+              selectedShapes={selectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            {/* {selectedShape && selectedShape.type === "text" && ( */}
+              <TextPropertiesPanel />
+            {/* )} */}
+
+            <Fill
+              selectedShapes={selectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            <Stroke
+              selectedShapes={selectedShapes}
+              drawnRectangles={drawnRectangles}
+              setDrawnRectangles={setDrawnRectangles}
+            />
+            <Effects />
+            <div style={{ padding: 20 }}></div>
           </div>
         </div>
       )}

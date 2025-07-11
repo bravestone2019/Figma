@@ -156,6 +156,8 @@ const FontDropdown = ({
               onClose();
             }}
             style={{
+              fontSize: "13px",
+              fontWeight: "bold",
               padding: "6px 10px",
               borderRadius: "4px",
               background: font === selectedFont ? "#f0f0f0" : "transparent",

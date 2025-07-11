@@ -3,18 +3,18 @@ import { createPortal } from "react-dom";
 // Font weights array for the new dropdown
 const fontWeights = [
   { label: "Thin", weight: 100 },
-  { label: "ExtraLight", weight: 200 },
+  { label: "Extra Light", weight: 200 },
   { label: "Light", weight: 300 },
   { label: "Regular", weight: 400 },
   { label: "Medium", weight: 500 },
-  { label: "SemiBold", weight: 600 },
+  { label: "Semi Bold", weight: 600 },
   { label: "Bold", weight: 700 },
   { label: "Thin Italic", weight: 100, italic: true },
-  { label: "ExtraLight Italic", weight: 200, italic: true },
+  { label: "Extra Light Italic", weight: 200, italic: true },
   { label: "Light Italic", weight: 300, italic: true },
   { label: "Italic", weight: 400, italic: true },
   { label: "Medium Italic", weight: 500, italic: true },
-  { label: "SemiBold Italic", weight: 600, italic: true },
+  { label: "Semi Bold Italic", weight: 600, italic: true },
   { label: "Bold Italic", weight: 700, italic: true },
 ];
 
@@ -53,40 +53,43 @@ const FontWeightDropdown = ({
       <div
         className="font-list-scrollable-area"
         style={{
-        //   maxHeight: "500px",
+          //   maxHeight: "500px",
           overflowY: "auto",
           fontSize: "14px",
           padding: " 0 8px 0",
         }}
       >
-      {fontWeights.map((weight, idx) => (
-        <div
-          key={idx}
-          onClick={() => {
-            onSelect(weight.label);
-            onClose();
-          }}
-          style={{
-            padding: "6px 15px", // Padding for individual items
-            background: weight.label === selectedWeight ? "#189eff" : "transparent", // Highlight selected
-            display: "flex",
-            alignItems: "center",
-            gap: "8px", // Space for checkmark if you add it
-            borderRadius: "10px",
-            // Optional: Add hover effect for better UX
-            "&:hover": {
-              background: weight.label === selectedWeight ? "#f0f0f0" : "#f5f5f5",
-            },
-          }}
-        >
-          {/* Add a checkmark if needed, like Figma */}
-          {/* {weight === selectedWeight && (
+        {fontWeights.map((weight, idx) => (
+          <div
+            key={idx}
+            onClick={() => {
+              onSelect(weight.label);
+              onClose();
+            }}
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              padding: "6px 15px",
+              background:
+                weight.label === selectedWeight ? "#189eff" : "transparent", // Highlight selected
+              display: "flex",
+              alignItems: "center",
+              gap: "8px", // Space for checkmark if you add it
+              borderRadius: "10px",
+              // Optional: Add hover effect for better UX
+              "&:hover": {
+                background:
+                  weight.label === selectedWeight ? "#f0f0f0" : "#f5f5f5",
+              },
+            }}
+          >
+            {/* Add a checkmark if needed, like Figma */}
+            {/* {weight === selectedWeight && (
             <span style={{ fontSize: "14px", marginRight: "5px" }}>✓</span>
           )} */}
-          {weight.label}
-        </div>
-        
-      ))}
+            {weight.label}
+          </div>
+        ))}
       </div>
     </div>,
     document.body

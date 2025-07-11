@@ -32,7 +32,7 @@ const TextPropertiesPanel = () => {
 
   // NEW STATE FOR FONT WEIGHT DROPDOWN
   const [showFontWeightPanel, setShowFontWeightPanel] = useState(false);
-  const [selectedFontWeight, setSelectedFontWeight] = useState("SemiBold"); // Default
+  const [selectedFontWeight, setSelectedFontWeight] = useState("Semi Bold"); // Default
   const fontWeightInputRef = useRef(null);
   const fontWeightDropdownRef = useRef(null);
   const [fontWeightPanelCoords, setFontWeightPanelCoords] = useState(null);
@@ -45,10 +45,8 @@ const TextPropertiesPanel = () => {
   const [fontSizePanelCoords, setFontSizePanelCoords] = useState(null);
 
   // NEW STATE FOR ALIGNMENT
-  const [selectedHorizontalAlignment, setSelectedHorizontalAlignment] =
-    useState("left"); // Default
-  // const [selectedVerticalAlignment, setSelectedVerticalAlignment] =
-  // useState("top"); // Default
+  // const [selectedHorizontalAlignment, setSelectedHorizontalAlignment] =
+  //   useState("left"); // Default
 
   const filteredFonts = fonts.filter((font) =>
     font.toLowerCase().includes(searchTerm.toLowerCase())
@@ -143,6 +141,7 @@ const TextPropertiesPanel = () => {
     <>
       <div className="right-section-title">Typography</div>
       <div style={{ marginBottom: "-10px" }}>
+        {/* Font Selector */}
         <div
           className="pos-box"
           ref={fontInputRef}
@@ -153,10 +152,8 @@ const TextPropertiesPanel = () => {
             justifyContent: "space-between",
             background: "none",
             border: "1px solid #e0e0e0",
-            width: "70%",
-            height: "auto",
-            padding: "3px 10px",
-            margin: "10px 0 25px 22px",
+            padding: "2px 10px",
+            margin: "10px 40px 25px 15px",
             gap: "8px",
           }}
           onClick={() => setShowFontPanel(!showFontPanel)}
@@ -196,14 +193,12 @@ const TextPropertiesPanel = () => {
         </div>
 
         <div
-          className="position-grid"
+          // className="position-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "8px",
-            width: "75%",
-            height: "75%",
-            marginLeft: "35px",
+            // gap: "8px",
+            marginLeft: "30px",
             marginTop: "-18px",
           }}
         >
@@ -212,21 +207,24 @@ const TextPropertiesPanel = () => {
             className="pos-box"
             ref={fontWeightInputRef}
             style={{
-              width: "95%",
-              height: "10%",
-              gap: "25px",
-              marginLeft: "-14px",
+              marginLeft: "-15px",
               background: "transparent",
               border: "1px solid #e0e0e0",
-              padding: "12px 12px",
+              padding: "2px 3px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
             }}
             onClick={() => setShowFontWeightPanel(!showFontWeightPanel)}
           >
             <input
               type="text"
-              value={selectedFontWeight} // Display selected weight
+              value={selectedFontWeight}
               readOnly
               style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
                 flex: 1,
                 border: "none",
                 background: "transparent",
@@ -236,7 +234,7 @@ const TextPropertiesPanel = () => {
             <img
               src={Down}
               alt="Down"
-              style={{ width: "10px", height: "10px" }}
+              style={{ width: "10px", height: "10px", marginRight: "5px" }}
             />
             <span className="tooltip">Font weight</span>
           </div>
@@ -252,15 +250,20 @@ const TextPropertiesPanel = () => {
             />
           )}
 
+          {/* Font Size Panel */}
           <div
             className="pos-box"
             ref={fontSizeInputRef}
             style={{
-              width: "60%",
-              height: "10%",
-              marginLeft: "8px",
+              marginLeft: "10px",
+              marginRight: "40px",
+              marginBottom: "10px",
               border: "1px solid #e0e0e0",
-              padding: "12px 12px",
+              padding: "2px 6px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
             onClick={() => setShowFontSizePanel(!showFontSizePanel)}
           >
@@ -268,15 +271,21 @@ const TextPropertiesPanel = () => {
               type="number"
               value={selectedFontSize} // Display selected size
               onChange={(e) => setSelectedFontSize(Number(e.target.value))}
+              style={{
+                border: "none",
+                outline: "none",
+                fontSize: "12px",
+                background: "transparent",
+                 width: "25px",  
+              }}
             />
             <img
               src={Down}
               alt="Down"
-              style={{ width: "10px", height: "10px" }}
+              style={{ width: "10px", height: "10px", marginRight: "2px" }}
             />
             <span className="tooltip">Font size</span>
           </div>
-
           {showFontSizePanel &&
             fontSizePanelCoords && ( // Conditionally render
               <FontSize
@@ -289,12 +298,14 @@ const TextPropertiesPanel = () => {
               />
             )}
 
-          <div
+          {/* Text Alignment */}
+          {/* <div
             className="alignment-panel"
             style={{
-              marginTop: "-22px",
+              marginTop: "10px",
               marginLeft: "45px",
               marginRight: "-54px",
+              marginBottom: 5
             }}
           >
             <div className="alignment-group">
@@ -331,14 +342,8 @@ const TextPropertiesPanel = () => {
                   Align right
                 </span>
               </button>
-              {/* <button
-              className={`alignment-button ${selectedHorizontalAlignment === "justify" ? "active" : ""}`}
-              onClick={() => setSelectedHorizontalAlignment("justify")}
-            >
-              <img src={Justify} alt="Justify" />
-            </button> */}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

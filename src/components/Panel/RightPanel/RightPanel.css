@@ -10,6 +10,7 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
   /* overflow-y: hidden; */
+  /* overflow: visible; */
 }
 
 .right-panel.collapsed {
@@ -22,9 +23,8 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100%;
-  /* padding: 0 0 0 15px; */
   box-sizing: border-box;
+  min-height: 0;
 }
 
 .right-panel-header {
@@ -39,7 +39,7 @@
 }
 
 .right-section-header {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: bold;
   cursor: default;
   padding: 0 0 12px 10px;
@@ -49,19 +49,13 @@
   position: relative;
   height: 1px;
   background-color: #e0e0e0;
-  /* force full width ignoring parent padding */
-  /* margin-left: -20px; */
-  /* margin-right: -18px; */
 }
 
 .section-divider {
   height: 1px;
   background: #e0e0e0;
-  /* margin: 20px -18px;
-  margin-top: 18px 0 -18px; */
-  width: calc(100% + 20px); /* Extend beyond padding */
-  margin-left: -18px; /* Align with full panel left edge */
-  margin-right: 0;
+  margin-left: -20px;
+  margin-right: -40px;
   margin-top: 20px;
   margin-bottom: 0;
 }
@@ -95,12 +89,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  padding: 7px 12px;
+  /* f5f5f5 */
+  background-color: #ededed;
+  border-radius: 8px;
+  padding: 7px 8px;
   font-weight: bold;
   font-size: 12px;
-  gap: 2px;
+  gap: 4px;
   transition: box-shadow 0.2s, border 0.2s;
   border: 1px solid transparent;
   user-select: none;
@@ -154,7 +149,6 @@
   /* border-radius: 6px; */
 }
 
-
 .pos-box input {
   margin-left: 8px;
   width: 40px;
@@ -184,37 +178,52 @@
 
 .pos-box-button {
   flex: 1;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  padding: 4px 10px;
+  /* f5f5f5 */
+  background-color: #ededed;
+  border-radius: 8px;
+  padding: 7px 8px;
   font-weight: bold;
   font-size: 12px;
-  gap: 9px;
+  gap: 4px;
   transition: box-shadow 0.2s, border 0.2s;
   border: 1px solid transparent;
   user-select: none;
 }
 
+.icon-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px
+}
+
 .icon-button {
-  background: none;
+  /* height: 30px; */
+  /* min-width: 30px; */
+  background: transparent;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   padding: 4px;
   border-radius: 5px;
-  transition: background-color 0.2s ease;
+  /* transition: background-color 0.2s ease; */
+  transition: all 0.2s ease;
+
 }
 
 .icon-button img {
   width: 12px;
   height: 12px;
-  display: block;
+  /* display: block; */
 }
 
 .icon-button:hover {
-  background-color: #ababab;
+  background-color: #e0e0e0;
 }
 
 /* Tooltip styling inside icon-button */
@@ -249,11 +258,11 @@
   background-color: #ededed;
   border-radius: 10px;
   /* padding: 8px 15px 8px; */
-  padding: 7px 10px;
-  width: 100%;
+  padding: 7px 9px;
+  /* width: 100%; */
   font-weight: bold;
   font-size: 12px;
-  gap: 2px;
+  gap: 3px;
   transition: box-shadow 0.2s, border 0.2s;
 }
 
@@ -308,12 +317,16 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+/* Scroll on the right */
 .right-panel-scrollable {
-  overflow-y: auto;
+  overflow-y: scroll !important;
   overflow-x: hidden;
   flex-grow: 1;
-  /* padding-right: 8px; */
   padding-left: 15px;
+  height: 100%;
+  min-height: 0;
+  scrollbar-gutter: stable;
+  box-sizing: content-box;
 }
 
 .right-panel-scrollable::-webkit-scrollbar {
@@ -333,34 +346,4 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: rgba(0, 0, 0, 0.3); /* Slightly darker on hover */
 }
 
-.zoom-indicator {
-  font-size: 12px;
-  font-weight: bold;
-  margin-left: 40%;
-  padding: 10px;
-  background: white;
-  border-radius: 8px;
-  user-select: none;
-}
 
-.zoom-indicator:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
-.zoom-collapsed-panel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  /* background: rgba(128, 128, 128, 0.8); */
-}
-
-.zoom-collapsed-indicator {
-  background-color: #eee;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #333;
-}
