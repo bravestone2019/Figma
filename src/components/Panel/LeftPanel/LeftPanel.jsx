@@ -3,89 +3,97 @@ import { useState, useRef, useEffect } from "react";
 import Back from "../../../assets/back.png";
 import Down from "../../../assets/down.png";
 import Minimize from "../../../assets/LeftPanel/layout.png";
+import { v4 as uuidv4 } from 'uuid';
+import LayerList from './LayerList.jsx';
+import PageList from './PageList.jsx';
+import useShapeShortcuts from './useShapeShortcuts.js';
+import usePageShortcuts from './usePageShortcuts.js';
+import useScrollCollapse from './useScrollCollapse.js';
+import useRenameState from './useRenameState.js';
+import useDragState from './useDragState.js';
+import usePanelState from './usePanelState.js';
 
 const LeftPanel = ({
   collapsed,
   toggleCollapsed,
+  pages,
+  setPages,
+  activePageId,
+  setActivePageId,
   drawnRectangles,
   selectedShapes,
   setSelectedShapes,
   setDrawnRectangles,
   setActiveTool,
+  collection,
+  setCollection,
+  collections, // now from props
+  setCollections, // now from props
 }) => {
-  const titleRef = useRef(null);
-  const scrollRef = useRef(null);
-  const scrollPosition = useRef(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [assetsCollapsed, setAssetsCollapsed] = useState(false);
-  const [renamingId, setRenamingId] = useState(null);
-  const [renameValue, setRenameValue] = useState("");
-  const renameInputRef = useRef(null);
-
-  // Consolidated effect for scroll handling and state (isScrolled)
-  useEffect(() => {
-    const node = scrollRef.current;
-
-    // Logic for restoring scroll position after expansion
-    if (node && !assetsCollapsed) {
-      // When assets section is *not* collapsed (i.e., expanding or already open)
-      const handleTransitionEnd = () => {
-        const computedMaxHeight = window.getComputedStyle(node).maxHeight;
-
-        // Check if the transition ended with a non-zero max-height (i.e., it's now open)
-        // and if a previous scroll position exists.
-        if (computedMaxHeight !== "0px" && scrollPosition.current > 0) {
-          node.scrollTo({
-            top: scrollPosition.current,
-            behavior: "instant", // Use "instant" for immediate jump after expand animation
-          });
-        }
-        node.removeEventListener("transitionend", handleTransitionEnd);
-      };
-
-      // If the assets section is *just* becoming uncollapsed (from being collapsed)
-      // or if it's already open and we need to ensure the scroll position on first render
-      const currentMaxHeight = window.getComputedStyle(node).maxHeight;
-      if (currentMaxHeight === "0px") {
-        // If it was collapsed and is now opening
-        node.addEventListener("transitionend", handleTransitionEnd);
-      } else if (scrollPosition.current > 0) {
-        // If it's already open and we have a scroll to restore
-        node.scrollTo({
-          top: scrollPosition.current,
-          behavior: "instant",
-        });
-      }
-
-      // Logic for `isScrolled` (header shadow)
-      const handleScroll = () => {
-        setIsScrolled(node.scrollTop > 0);
-      };
-      node.addEventListener("scroll", handleScroll);
-      // Initial check on mount/update
-      handleScroll();
-
-      return () => {
-        node.removeEventListener("scroll", handleScroll);
-        // Ensure transitionend listener is removed if the component unmounts
-        node.removeEventListener("transitionend", handleTransitionEnd);
-      };
-    } else if (node && assetsCollapsed) {
-      // When assets section is collapsed, remove scroll listener to avoid unnecessary checks
-      // (the isScrolled state becomes irrelevant for a collapsed section)
-      const handleScroll = () => {
-        setIsScrolled(node.scrollTop > 0);
-      };
-      node.removeEventListener("scroll", handleScroll); // Ensure removal if it was added
+  const {
+    isScrolled,
+    assetsCollapsed,
+    handleAssetsCollapse,
+    scrollRef,
+    titleRef,
+  } = useScrollCollapse();
+  // Replace individual state declarations with grouped hooks
+  const {
+    renamingId,
+    setRenamingId,
+    renamingPageId,
+    setRenamingPageId,
+    renameValue,
+    setRenameValue,
+    renameInputRef,
+  } = useRenameState();
+  const {
+    draggedShapeId,
+    setDraggedShapeId,
+    isCollectionDragOver,
+    setIsCollectionDragOver,
+  } = useDragState();
+  const {
+    openGroups,
+    setOpenGroups,
+    collectionOpen,
+    setCollectionOpen,
+  } = usePanelState();
+  // Page actions
+  const handleAddPage = () => {
+    const newId = `page-${Date.now()}`;
+    const newName = `Page ${pages.length + 1}`;
+    setPages([
+      ...pages,
+      {
+        id: newId,
+        name: newName,
+        drawnRectangles: [],
+        selectedShapes: [],
+      },
+    ]);
+    setActivePageId(newId);
+  };
+  const handleSelectPage = (id) => setActivePageId(id);
+  const handleRenamePage = (id) => {
+    const newName = prompt('Rename page:', pages.find(p => p.id === id)?.name || '');
+    if (newName && newName.trim()) {
+      setPages(pages => pages.map(p => p.id === id ? { ...p, name: newName.trim() } : p));
     }
-  }, [assetsCollapsed]); // Dependency: run when assetsCollapsed changes
-
-  // Save scroll position before collapsing
-  const handleAssetsCollapse = () => {
-    if (scrollRef.current && !assetsCollapsed) {
-      scrollPosition.current = scrollRef.current.scrollTop;
+  };
+  const handleDeletePage = (id) => {
+    if (pages.length === 1) return; // Prevent deleting last page
+    const newPages = pages.filter(p => p.id !== id);
+    setPages(newPages);
+    if (activePageId === id) {
+      // Switch to first page if active is deleted
+      setActivePageId(newPages[0].id);
     }
-    setAssetsCollapsed(!assetsCollapsed);
+    // Reset renaming state if the deleted page was being renamed
+    if (renamingPageId === id) {
+      setRenamingPageId(null);
+      setRenameValue("");
+    }
   };
 
   // Focus input when entering rename mode
@@ -96,45 +104,117 @@ const LeftPanel = ({
     }
   }, [renamingId]);
 
-  // Keyboard shortcut: Shift+R to rename selected shape
+  // Inline page rename handlers
+  const startRenamePage = (id, name) => {
+    setRenamingPageId(id);
+    setRenameValue(name);
+  };
+  const handleRenameInputChange = (e) => setRenameValue(e.target.value);
+  const handleRenameInputBlur = () => {
+    if (renamingPageId && renameValue.trim()) {
+      setPages(pages => pages.map(p => p.id === renamingPageId ? { ...p, name: renameValue.trim() } : p));
+    }
+    setRenamingPageId(null);
+    setRenameValue("");
+  };
+  const handleRenameInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleRenameInputBlur();
+    } else if (e.key === 'Escape') {
+      setRenamingPageId(null);
+      setRenameValue("");
+    }
+  };
+
+  const handleUngroup = (groupId) => {
+    setDrawnRectangles(prev => {
+      // Find the group
+      const group = prev.find(s => s.id === groupId && s.type === 'group');
+      if (!group || !Array.isArray(group.children)) return prev;
+      // Remove the group and add its children to the top level
+      const withoutGroup = prev.filter(s => s.id !== groupId);
+      // Remove children from any other group (if needed)
+      const childIds = new Set(group.children);
+      const updated = withoutGroup.map(s =>
+        s.type === 'group' && Array.isArray(s.children)
+          ? { ...s, children: s.children.filter(id => !childIds.has(id)) }
+          : s
+      );
+      // Add children to top level (preserve their order)
+      const children = group.children.map(id => prev.find(s => s.id === id)).filter(Boolean);
+      return [...updated, ...children];
+    });
+    // Remove the group from collection if present
+    setCollection(prev => prev.filter(id => id !== groupId));
+    // Deselect the group and select its children
+    setSelectedShapes(() => {
+      const group = drawnRectangles.find(s => s.id === groupId && s.type === 'group');
+      return group && Array.isArray(group.children) ? [...group.children] : [];
+    });
+  };
+
+  useShapeShortcuts({
+    selectedShapes,
+    drawnRectangles,
+    setRenamingId,
+    setRenameValue,
+    setActiveTool,
+    renamingId,
+    setCollection,
+    handleUngroup,
+    renamingPageId,
+  });
+  usePageShortcuts({
+    activePageId,
+    pages,
+    startRenamePage,
+    renamingId,
+  });
+
+  // Keyboard shortcut: Ctrl+G to add selected shapes to collection
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.shiftKey && (e.key === "R" || e.key === "r")) {
-        if (selectedShapes && selectedShapes.length === 1) {
-          const shapeId = selectedShapes[0];
-          const shape = drawnRectangles.find((s) => s.id === shapeId);
-          if (shape) {
-            setRenamingId(shapeId);
-            setRenameValue(shape.name || "");
-            e.preventDefault();
-          }
+      if (e.ctrlKey && (e.key === 'G' || e.key === 'g')) {
+        if (selectedShapes && selectedShapes.length > 0) {
+          setCollection(prev => {
+            // Add only new IDs
+            const newIds = selectedShapes.filter(id => !prev.includes(id));
+            const updated = [...prev, ...newIds];
+            console.log('Collection:', updated);
+            return updated;
+          });
         }
-      }
-      // Escape to cancel rename
-      if (renamingId && e.key === "Escape") {
-        setRenamingId(null);
-        if (setActiveTool) setActiveTool("Move");
+        e.preventDefault();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedShapes, drawnRectangles, renamingId, setActiveTool]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedShapes]);
 
-  // Handle rename submit
-  const handleRenameSubmit = (e) => {
-    e.preventDefault();
-    if (renameValue.trim() && renamingId) {
-      setDrawnRectangles((prev) =>
-        prev.map((shape) =>
-          shape.id === renamingId
-            ? { ...shape, name: renameValue.trim() }
-            : shape
-        )
-      );
-    }
-    setRenamingId(null);
-    if (setActiveTool) setActiveTool("Move");
-  };
+  // Keyboard shortcut: Ctrl+Shift+G to ungroup selected group or un-collect selected collection items
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'G' || e.key === 'g')) {
+        if (selectedShapes && selectedShapes.length > 0) {
+          let didUngroup = false;
+          selectedShapes.forEach(id => {
+            const shape = drawnRectangles.find(s => s.id === id);
+            if (shape && shape.type === 'group') {
+              handleUngroup(shape.id);
+              didUngroup = true;
+            }
+          });
+          // If no group was ungrouped, un-collect selected collection items
+          if (!didUngroup) {
+            setCollection(prev => prev.filter(id => !selectedShapes.includes(id)));
+          }
+        }
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedShapes, drawnRectangles]);
 
   return (
     <div className={`left-panel ${collapsed ? "collapsed" : ""}`}>
@@ -152,60 +232,60 @@ const LeftPanel = ({
                 <span>Files</span>
               </div>
               <div className="left-header-divider" />
-              <div
-                className={`left-section-title ${isScrolled ? "scrolled" : ""} 
+            </div>
+            {/* Pages Section (now below Files) */}
+            <PageList
+              pages={pages}
+              activePageId={activePageId}
+              setPages={setPages}
+              setActivePageId={setActivePageId}
+            />
+            {/* End Pages Section */}
+            <hr className="leftpanel-divider" />
+            <div
+              className={`left-section-title ${isScrolled ? "scrolled" : ""} 
                         ${assetsCollapsed ? "collapsed" : ""}`}
-                ref={titleRef}
-                onClick={handleAssetsCollapse}
-                style={{ display: "flex", alignItems: "center", gap: "3px" }}
-              >
-                <div className="layers-header">
-                  <img
-                    className="arrow-icon"
-                    src={assetsCollapsed ? Back : Down}
-                    alt={assetsCollapsed ? "Expand" : "Collapse"}
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      marginLeft: "-16px",
-                      marginTop: "-2px",
-                      transition: "transform 0.2s ease",
-                    }}
-                  />
-                  <span>Layers</span>
-                </div>
+              ref={titleRef}
+              onClick={handleAssetsCollapse}
+              style={{ display: "flex", alignItems: "center", gap: "3px" }}
+            >
+              <div className="layers-header">
+                <img
+                  className="arrow-icon"
+                  src={assetsCollapsed ? Back : Down}
+                  alt={assetsCollapsed ? "Expand" : "Collapse"}
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    marginLeft: "-16px",
+                    marginTop: "-2px",
+                    transition: "transform 0.2s ease",
+                  }}
+                />
+                <span>Layers</span>
               </div>
             </div>
 
             {/* Scrolls only this part */}
             {!assetsCollapsed && (
               <div className={`assets-scroll ${assetsCollapsed ? "hidden" : ""}`} ref={scrollRef}>
-                <ul className="assets-list">
-                  {drawnRectangles && drawnRectangles.length > 0 && (
-                    drawnRectangles.map((shape, i) => (
-                      <li
-                        key={shape.id || i}
-                        className={selectedShapes && selectedShapes.includes(shape.id) ? "selected" : ""}
-                        onClick={() => setSelectedShapes([shape.id])}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {renamingId === shape.id ? (
-                          <form onSubmit={handleRenameSubmit} style={{ display: 'inline' }}>
-                            <input
-                              ref={renameInputRef}
-                              value={renameValue}
-                              onChange={e => setRenameValue(e.target.value)}
-                              onBlur={handleRenameSubmit}
-                              style={{ width: '90%', fontSize: 'inherit' }}
-                              maxLength={32}
-                            />
-                          </form>
-                        ) : shape.name}
-                      </li>
-                    ))
-                  )}
-                  <div style={{ height: "35px" }} />
-                </ul>
+                <LayerList
+                  drawnRectangles={drawnRectangles}
+                  selectedShapes={selectedShapes}
+                  setSelectedShapes={setSelectedShapes}
+                  setDrawnRectangles={setDrawnRectangles}
+                  setActiveTool={setActiveTool}
+                  collection={collection} // keep old prop for now
+                  setCollection={setCollection} // keep old prop for now
+                  collections={collections} // new prop for future
+                  setCollections={setCollections} // new prop for future
+                  handleUngroup={handleUngroup}
+                  renamingId={renamingId}
+                  setRenamingId={setRenamingId}
+                  renameValue={renameValue}
+                  setRenameValue={setRenameValue}
+                  renameInputRef={renameInputRef}
+                />
               </div>
             )}
           </div>

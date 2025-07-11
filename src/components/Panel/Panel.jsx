@@ -5,15 +5,31 @@ import Minimize from "../../assets/LeftPanel/layout.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
-const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRectangles, setActiveTool }) => {
+const Panel = ({
+  pages,
+  setPages,
+  activePageId,
+  setActivePageId,
+  selectedShapes,
+  setSelectedShapes,
+  drawnRectangles,
+  setDrawnRectangles,
+  setActiveTool,
+  collection,
+  setCollection
+}) => {
   const [collapsed, setCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(275);
   const [rightPanelWidth, setRightPanelWidth] = useState(275);
   const isDraggingLeft = useRef(false);
   const isDraggingRight = useRef(false);
 
+  // Global collections state
+  const [collections, setCollections] = useState([
+    { id: 'col-1', name: 'Collection 1', shapeIds: [] }
+  ]);
+
   const togglePanel = () => {
-    // setCollapsed((prev) => !prev);
     setCollapsed(!collapsed);
   };
 
@@ -68,14 +84,22 @@ const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRec
             className="panel-container left"
             style={{ width: `${leftPanelWidth}px` }}
           >
-            <LeftPanel 
-              collapsed={collapsed} 
+            <LeftPanel
+              collapsed={collapsed}
               toggleCollapsed={togglePanel}
+              pages={pages}
+              setPages={setPages}
+              activePageId={activePageId}
+              setActivePageId={setActivePageId}
               drawnRectangles={drawnRectangles}
               selectedShapes={selectedShapes}
               setSelectedShapes={setSelectedShapes}
               setDrawnRectangles={setDrawnRectangles}
               setActiveTool={setActiveTool}
+              collection={collection}
+              setCollection={setCollection}
+              collections={collections}
+              setCollections={setCollections}
             />
             <div className="resize-handle-left" onMouseDown={handleMouseDownLeft} />
           </div>
@@ -85,11 +109,11 @@ const Panel = ({ selectedShapes, setSelectedShapes, drawnRectangles, setDrawnRec
             style={{ width: `${rightPanelWidth}px` }}
           >
             <div className="resize-handle-right" onMouseDown={handleMouseDownRight} />
-            <RightPanel 
+            <RightPanel
               collapsed={collapsed}
-              selectedShapes={selectedShapes}
+              selectedShapes={selectedShapes || []}
               setSelectedShapes={setSelectedShapes}
-              drawnRectangles={drawnRectangles}
+              drawnRectangles={drawnRectangles || []}
               setDrawnRectangles={setDrawnRectangles}
             />
           </div>

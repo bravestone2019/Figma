@@ -84,16 +84,16 @@ const handleMouseMove = (
       if (movingShape) {
         setDrawnRectangles((prev) =>
           prev.map((shape, idx) => {
-            if (movingShape.multi && selectedShapes.includes(idx)) {
+            if (movingShape.multi && selectedShapes.includes(shape.id)) {
               const dx = mouseX - movingShape.mouseStart.x;
               const dy = mouseY - movingShape.mouseStart.y;
               if (shape.type === "rectangle" || shape.type === "text" || shape.type === "circle") {
-                const orig = movingShape.originalPositions[idx];
+                const orig = movingShape.originalPositions[shape.id];
                 if (orig) {
                   return { ...shape, x: orig.x + dx, y: orig.y + dy };
                 }
               } else if (shape.type === "line") {
-                const orig = movingShape.originalPositions[idx];
+                const orig = movingShape.originalPositions[shape.id];
                 if (orig) {
                   return {
                     ...shape,
@@ -104,7 +104,7 @@ const handleMouseMove = (
                   };
                 }
               } else if (shape.type === "triangle") {
-                const orig = movingShape.originalPositions[idx];
+                const orig = movingShape.originalPositions[shape.id];
                 if (orig) {
                   return {
                     ...shape,
@@ -117,7 +117,7 @@ const handleMouseMove = (
                   };
                 }
               } else if (shape.type === "image") {
-                const orig = movingShape.originalPositions[idx];
+                const orig = movingShape.originalPositions[shape.id];
                 if (orig) {
                   return { ...shape, x: orig.x + dx, y: orig.y + dy };
                 }
