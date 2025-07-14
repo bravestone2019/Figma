@@ -24,10 +24,10 @@ export function drawShapeBorder(ctx, shape, isHovered, isLocked, scale, activeTo
   } else {
     // Use correct stroke color and width for each shape type
     if (shape.type === "rectangle" || shape.type === "image") {
-      ctx.strokeStyle = shape.borderColor || "#000";
+      ctx.strokeStyle = shape.borderColor || "transparent";
       ctx.lineWidth = (shape.borderWidth || 1) / scale;
     } else if (shape.type === "text") {
-      ctx.strokeStyle = shape.strokeColor || "#000";
+      ctx.strokeStyle = shape.strokeColor || "transparent";
       ctx.lineWidth = (shape.strokeWidth || 1) / scale;
     } else {
       ctx.strokeStyle = "transparent";

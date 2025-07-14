@@ -178,8 +178,10 @@ const LayerList = ({
                 value={renameValue}
                 onChange={e => setRenameValue(e.target.value)}
                 onBlur={handleRenameSubmit}
+                onKeyDown={e => { e.stopPropagation(); }} // Prevent global shortcuts while editing
                 style={{ width: '90%', fontSize: 'inherit' }}
                 maxLength={32}
+                onFocus={() => console.log('Shape rename input focused for', shape.id)}
               />
             </form>
           ) : shape.name}
@@ -299,6 +301,10 @@ const LayerList = ({
     if (!selectedShapes || !selectedShapes.includes(shapeId)) {
       setSelectedShapes([shapeId]);
     }
+    // Auto-scroll the right-clicked shape into view
+    if (layerRefs.current[shapeId] && layerRefs.current[shapeId].current) {
+      layerRefs.current[shapeId].current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
   };
 
   // Update selection logic: selecting a collection deselects shapes, selecting a shape deselects collection
@@ -332,17 +338,25 @@ const LayerList = ({
 
   // Handle rename from context menu
   const handleContextMenuRename = () => {
+    console.log('handleContextMenuRename called', contextMenu);
     if (contextMenu.type === 'shape' && contextMenu.shapeId) {
-      setRenamingId(contextMenu.shapeId);
-      setRenameValue(getShapeById(contextMenu.shapeId)?.name || '');
+      setTimeout(() => {
+        setRenamingId(contextMenu.shapeId);
+        setRenameValue(getShapeById(contextMenu.shapeId)?.name || '');
+      }, 0);
       setTimeout(() => setContextMenu(c => ({ ...c, visible: false })), 0);
+      console.log('Set renamingId for shape', contextMenu.shapeId);
     } else if (contextMenu.type === 'collection' && contextMenu.collectionId) {
-      setRenamingCollectionId(contextMenu.collectionId);
-      const col = collections.find(c => c.id === contextMenu.collectionId);
-      setCollectionRenameValue(col ? col.name : '');
+      setTimeout(() => {
+        setRenamingCollectionId(contextMenu.collectionId);
+        const col = collections.find(c => c.id === contextMenu.collectionId);
+        setCollectionRenameValue(col ? col.name : '');
+      }, 0);
       setTimeout(() => setContextMenu(c => ({ ...c, visible: false })), 0);
+      console.log('Set renamingCollectionId for collection', contextMenu.collectionId);
     } else {
       setContextMenu(c => ({ ...c, visible: false }));
+      console.log('Context menu closed without rename');
     }
   };
 
@@ -444,7 +458,7 @@ const LayerList = ({
         <div
           style={{
             position: 'fixed',
-            top: contextMenu.y,
+            top: contextMenu.y - 48, // Move menu above the cursor (48px is menu height, adjust as needed)
             left: contextMenu.x,
             background: '#222',
             color: '#fff',
@@ -512,9 +526,10 @@ const LayerList = ({
                   value={collectionRenameValue}
                   onChange={e => setCollectionRenameValue(e.target.value)}
                   onBlur={() => handleCollectionRenameSubmit(col.id)}
-                  onKeyDown={e => handleCollectionRenameInputKeyDown(e, col.id)}
+                  onKeyDown={e => { e.stopPropagation(); handleCollectionRenameInputKeyDown(e, col.id); }} // Prevent global shortcuts while editing
                   style={{ fontSize: 'inherit', width: 120, marginLeft: 2 }}
                   maxLength={32}
+                  onFocus={() => console.log('Collection rename input focused for', col.id)}
                 />
               ) : col.name}
             </div>
@@ -544,7 +559,21 @@ const LayerList = ({
                     onDragEnd={handleShapeDragEnd}
                   >
                     <span className="collected-diamond">◆</span>
-                    <span>{shape.name}</span>
+                    <span>
+                      {renamingId === shape.id ? (
+                        <form onSubmit={handleRenameSubmit} style={{ display: 'inline' }}>
+                          <input
+                            ref={renameInputRef}
+                            value={renameValue}
+                            onChange={e => setRenameValue(e.target.value)}
+                            onBlur={handleRenameSubmit}
+                            onKeyDown={e => { e.stopPropagation(); }}
+                            style={{ width: '90%', fontSize: 'inherit' }}
+                            maxLength={32}
+                          />
+                        </form>
+                      ) : shape.name}
+                    </span>
                   </li>
                 ))}
               </ul>

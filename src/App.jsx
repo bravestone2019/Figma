@@ -15,6 +15,8 @@ function App() {
         name: 'Page 1',
         drawnRectangles: [],
         selectedShapes: [],
+        backgroundColor: '#FFFFFF', // Default background color
+        backgroundOpacity: 100, // Add default opacity
       },
     ]
   );
@@ -31,6 +33,28 @@ function App() {
 
   // Find the active page, fallback to first page or empty object
   const activePage = pages.find((p) => p.id === activePageId) || pages[0] || {};
+
+  // Setter for background color of the active page
+  const setBackgroundColor = (color) => {
+    setPages((prevPages) =>
+      prevPages.map((page) =>
+        page.id === activePageId
+          ? { ...page, backgroundColor: color }
+          : page
+      )
+    );
+  };
+
+  // Setter for background opacity of the active page
+  const setBackgroundOpacity = (opacity) => {
+    setPages((prevPages) =>
+      prevPages.map((page) =>
+        page.id === activePageId
+          ? { ...page, backgroundOpacity: opacity }
+          : page
+      )
+    );
+  };
 
   // Setters for drawnRectangles and selectedShapes for the active page
   const setDrawnRectangles = (newRectsOrFn) => {
@@ -78,6 +102,10 @@ function App() {
         setActiveTool={setActiveTool}
         collection={collection}
         setCollection={setCollection}
+        backgroundColor={activePage.backgroundColor || '#FFFFFF'}
+        setBackgroundColor={setBackgroundColor}
+        backgroundOpacity={activePage.backgroundOpacity ?? 100}
+        setBackgroundOpacity={setBackgroundOpacity}
       />
       <Canvas
         activeTool={activeTool}
@@ -90,6 +118,8 @@ function App() {
         setDrawnRectangles={setDrawnRectangles}
         selectedShapes={activePage.selectedShapes || []}
         setSelectedShapes={setSelectedShapes}
+        backgroundColor={activePage.backgroundColor || '#FFFFFF'}
+        backgroundOpacity={activePage.backgroundOpacity ?? 100}
       />
       <Tool
         activeTool={activeTool}

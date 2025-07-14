@@ -5,6 +5,7 @@ const ColorPanel = ({
   top,
   left,
   setColorPickerOpen,
+  setPanelCoords, // NEW: setter for position
   children, // optional: for injecting color pickers or controls inside
   color,
   opacity,
@@ -29,16 +30,14 @@ const ColorPanel = ({
 
   // Drag Handlers
   const handleDragging = useCallback((e) => {
-    if (!dragData.current || !panelRef.current) return;
-
+    if (!dragData.current) return;
     const { startX, startY, origTop, origLeft } = dragData.current;
-
     const newTop = origTop + (e.clientY - startY);
     const newLeft = origLeft + (e.clientX - startX);
-
-    panelRef.current.style.top = `${newTop}px`;
-    panelRef.current.style.left = `${newLeft}px`;
-  }, []);
+    if (setPanelCoords) {
+      setPanelCoords({ top: newTop, left: newLeft });
+    }
+  }, [setPanelCoords]);
 
   const handleDragEnd = useCallback(() => {
     dragData.current = null;
@@ -106,7 +105,7 @@ const ColorPanel = ({
             marginTop: "6px",
           }}
         >
-          Stroke
+          Page
         </span>
         <button
           style={{
@@ -147,7 +146,7 @@ const ColorPanel = ({
         {/* Hex Input */}
         <input
           type="text"
-          value={(color || "#000000").replace("#", "").toUpperCase()} // Display current hex color
+          value={/^#([0-9A-Fa-f]{3}){1,2}$/.test(color) ? color.toUpperCase() : '#000000'}
           onChange={handleHexInputChange}
           style={{
             width: "80px",

@@ -2,8 +2,8 @@ import "./LeftPanel.css";
 import { useState, useRef, useEffect } from "react";
 import Back from "../../../assets/back.png";
 import Down from "../../../assets/down.png";
-import Minimize from "../../../assets/LeftPanel/layout.png";
-import { v4 as uuidv4 } from 'uuid';
+import Minimize from "../../../assets/LeftPanel/Toggle.png";
+// import { v4 as uuidv4 } from 'uuid';
 import LayerList from './LayerList.jsx';
 import PageList from './PageList.jsx';
 import useShapeShortcuts from './useShapeShortcuts.js';
@@ -37,6 +37,7 @@ const LeftPanel = ({
     scrollRef,
     titleRef,
   } = useScrollCollapse();
+  const [scrollHeight, setScrollHeight] = useState(0);
   // Replace individual state declarations with grouped hooks
   const {
     renamingId,
@@ -216,6 +217,25 @@ const LeftPanel = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedShapes, drawnRectangles]);
 
+  useEffect(() => {
+    function updateScrollHeight() {
+      const panel = document.querySelector('.left-panel-content');
+      const header = document.querySelector('.left-panel-header');
+      const section = document.querySelector('.left-section-title');
+      if (panel && header && section) {
+        const panelRect = panel.getBoundingClientRect();
+        const headerRect = header.getBoundingClientRect();
+        const sectionRect = section.getBoundingClientRect();
+        // Calculate available height for the scroll area
+        const available = panelRect.height - headerRect.height - sectionRect.height - 32; // 32 for paddings/margins
+        setScrollHeight(available > 0 ? available : 200); // fallback to 200px min
+      }
+    }
+    updateScrollHeight();
+    window.addEventListener('resize', updateScrollHeight);
+    return () => window.removeEventListener('resize', updateScrollHeight);
+  }, []);
+
   return (
     <div className={`left-panel ${collapsed ? "collapsed" : ""}`}>
       {!collapsed && (
@@ -268,7 +288,11 @@ const LeftPanel = ({
 
             {/* Scrolls only this part */}
             {!assetsCollapsed && (
-              <div className={`assets-scroll ${assetsCollapsed ? "hidden" : ""}`} ref={scrollRef}>
+              <div
+                className={`assets-scroll ${assetsCollapsed ? "hidden" : ""}`}
+                ref={scrollRef}
+                // Removed style={{ height: scrollHeight ? `${scrollHeight}px` : undefined }}
+              >
                 <LayerList
                   drawnRectangles={drawnRectangles}
                   selectedShapes={selectedShapes}

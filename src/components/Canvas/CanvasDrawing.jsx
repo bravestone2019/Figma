@@ -18,6 +18,8 @@ const CanvasDrawing = forwardRef(({
   selectionBox,
   selectedShapes,
   textInput,
+  backgroundColor,
+  backgroundOpacity,
 }, ref) => {
 
   // Main drawing function
@@ -38,8 +40,10 @@ const CanvasDrawing = forwardRef(({
       drawingImage,
       textBox,
       selectionBox,
+      backgroundColor,
+      backgroundOpacity,
     });
-  }, [canvasRef, position, scale, drawnRectangles, activeTool, hoveredShape, textInput, selectedShapes, drawingRectangle, drawingLine, drawingCircle, drawingTriangle, drawingImage, textBox, selectionBox]);
+  }, [canvasRef, position, scale, drawnRectangles, activeTool, hoveredShape, textInput, selectedShapes, drawingRectangle, drawingLine, drawingCircle, drawingTriangle, drawingImage, textBox, selectionBox, backgroundColor, backgroundOpacity]);
 
   // Effect to handle initial render and updates
   useEffect(() => {

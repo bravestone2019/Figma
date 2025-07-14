@@ -20,6 +20,8 @@ const Canvas = ({
   setDrawnRectangles,
   selectedShapes,
   setSelectedShapes,
+  backgroundColor,
+  backgroundOpacity,
 }) => {
   const canvasRef = useRef(null);
   const previewRef = useRef(null);
@@ -193,6 +195,8 @@ const Canvas = ({
         selectionBox={selectionBox}
         selectedShapes={selectedShapes}
         textInput={textInput}
+        backgroundColor={backgroundColor}
+        backgroundOpacity={backgroundOpacity}
       />
       <TextInputOverlay
         textInput={textInput}

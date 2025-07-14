@@ -1,5 +1,5 @@
 #root, .App {
   height: 100vh;
   width: 100vw;
-  overflow: hidden;  /* Prevent scroll */
+  /* overflow: hidden; */ /* Prevent scroll */
 }

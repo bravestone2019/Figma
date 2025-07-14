@@ -17,10 +17,13 @@ const useShortcut = (keyCombo, callback) => {
 
       const key = event.key.toLowerCase();
       const expectedKey = keyCombo.key.toLowerCase();
-      const ctrlMatch = keyCombo.ctrl ? event.ctrlKey : !event.ctrlKey;
-      const shiftMatch = keyCombo.shift ? event.shiftKey : !event.shiftKey;
+      // Only match modifiers if specified in keyCombo; otherwise, allow any value
+      const ctrlMatch = keyCombo.ctrl === undefined ? true : keyCombo.ctrl === event.ctrlKey;
+      const shiftMatch = keyCombo.shift === undefined ? true : keyCombo.shift === event.shiftKey;
+      const altMatch = keyCombo.alt === undefined ? true : keyCombo.alt === event.altKey;
+      const metaMatch = keyCombo.meta === undefined ? true : keyCombo.meta === event.metaKey;
 
-      if (key === expectedKey && ctrlMatch && shiftMatch) {
+      if (key === expectedKey && ctrlMatch && shiftMatch && altMatch && metaMatch) {
         event.preventDefault();
         callback();
       }

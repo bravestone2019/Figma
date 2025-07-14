@@ -41,6 +41,7 @@ const TextInputOverlay = ({
           ...textInput,
           fillColor: textInput.fillColor || "#000000", // default black
           strokeWidth: textInput.strokeWidth || 1, // default 1
+          fillOpacity: 1,
           locked: false,
         };
         return [

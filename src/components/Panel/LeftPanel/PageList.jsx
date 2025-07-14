@@ -20,6 +20,17 @@ const PageList = ({
   // Keyboard shortcuts: Delete to delete, Shift+R to rename
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Prevent shortcuts when editing/renaming
+      if (
+        document.activeElement &&
+        (
+          document.activeElement.tagName === 'INPUT' ||
+          document.activeElement.tagName === 'TEXTAREA' ||
+          document.activeElement.isContentEditable
+        )
+      ) {
+        return;
+      }
       const activeIndex = pages.findIndex(p => p.id === activePageId);
       if (activeIndex === -1) return;
       // Delete key: delete active page if not renaming and more than one page
@@ -109,7 +120,7 @@ const PageList = ({
                 value={renameValue}
                 onChange={handleRenameInputChange}
                 onBlur={handleRenameInputBlur}
-                onKeyDown={handleRenameInputKeyDown}
+                onKeyDown={e => { e.stopPropagation(); handleRenameInputKeyDown(e); }} // Prevent global shortcuts while editing
                 style={{ width: '90%', fontSize: 'inherit' }}
                 maxLength={32}
               />

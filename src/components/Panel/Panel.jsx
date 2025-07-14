@@ -1,7 +1,7 @@
 import "./Panel.css";
 import { useState, useEffect, useRef } from "react";
 import Shortcut from "../Shortcut";
-import Minimize from "../../assets/LeftPanel/layout.png"
+import Minimize from "../../assets/LeftPanel/toggle.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
@@ -16,7 +16,11 @@ const Panel = ({
   setDrawnRectangles,
   setActiveTool,
   collection,
-  setCollection
+  setCollection,
+  backgroundColor,
+  setBackgroundColor,
+  backgroundOpacity,
+  setBackgroundOpacity
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(275);
@@ -115,6 +119,10 @@ const Panel = ({
               setSelectedShapes={setSelectedShapes}
               drawnRectangles={drawnRectangles || []}
               setDrawnRectangles={setDrawnRectangles}
+              backgroundColor={backgroundColor}
+              setBackgroundColor={setBackgroundColor}
+              backgroundOpacity={backgroundOpacity}
+              setBackgroundOpacity={setBackgroundOpacity}
             />
           </div>
         </>

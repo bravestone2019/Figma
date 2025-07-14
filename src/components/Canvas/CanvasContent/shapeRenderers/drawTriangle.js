@@ -18,7 +18,7 @@ export function drawTriangle(ctx, shape, options = {}) {
   
   // Draw fill
   ctx.fillStyle = shape.backgroundColor;
-  ctx.globalAlpha = shape.opacity;
+  ctx.globalAlpha = (shape.fillOpacity !== undefined ? shape.fillOpacity : 1) * (shape.opacity !== undefined ? shape.opacity : 1);
   ctx.beginPath();
   ctx.moveTo(shape.x1, shape.y1);
   ctx.lineTo(shape.x2, shape.y2);
@@ -27,6 +27,9 @@ export function drawTriangle(ctx, shape, options = {}) {
   ctx.fill();
   
   // Draw border
+  shape.borderColor = shape.borderColor || "transparent";
+  shape.borderWidth = shape.borderWidth || 1;
+  ctx.globalAlpha = shape.borderOpacity !== undefined ? shape.borderOpacity : (shape.opacity !== undefined ? shape.opacity : 1);
   drawShapeBorder(ctx, shape, isHovered, isLocked, scale, activeTool);
   ctx.stroke();
   

@@ -55,32 +55,36 @@ export function drawImage(ctx, shape, options = {}) {
   ctx.rotate((rotation * Math.PI) / 180);
   ctx.translate(-centerX, -centerY);
   ctx.globalAlpha = shape.opacity;
-  
+
+  // --- Rounded corners logic ---
+  const tl = shape.cornerRadiusTopLeft ?? shape.cornerRadius ?? 0;
+  const tr = shape.cornerRadiusTopRight ?? shape.cornerRadius ?? 0;
+  const br = shape.cornerRadiusBottomRight ?? shape.cornerRadius ?? 0;
+  const bl = shape.cornerRadiusBottomLeft ?? shape.cornerRadius ?? 0;
+  if (tl > 0 || tr > 0 || br > 0 || bl > 0) {
+    ctx.save();
+    roundedRectPath(ctx, shape.x, shape.y, shape.width, shape.height, tl, tr, br, bl);
+    ctx.clip();
+  }
+
   // Check if image is already loaded
   const cachedImage = imageCache.get(shape.src);
-  
   if (cachedImage && !cachedImage.then) {
-    // Image is loaded, draw it
     if (cachedImage) {
       ctx.drawImage(cachedImage, shape.x, shape.y, shape.width, shape.height);
     }
   } else {
-    // Image is loading or not started, draw placeholder
     drawImagePlaceholder(ctx, shape, scale);
-    
-    // Start loading if not already loading
     if (!cachedImage && !loadingImages.has(shape.src)) {
       loadImage(shape.src).then(() => {
-        // Only trigger redraw once when image loads
         if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
           canvas.redrawScheduled = true;
           setTimeout(() => {
             canvas.redrawCallback();
             canvas.redrawScheduled = false;
-          }, 16); // ~60fps
+          }, 16);
         }
       }).catch(() => {
-        // Handle error silently, placeholder will remain
         if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
           canvas.redrawScheduled = true;
           setTimeout(() => {
@@ -91,10 +95,91 @@ export function drawImage(ctx, shape, options = {}) {
       });
     }
   }
-  
-  // Draw border for selected/locked images
-  drawImageBorder(ctx, shape, isHovered, isLocked, scale, activeTool);
-  
+
+  if (tl > 0 || tr > 0 || br > 0 || bl > 0) {
+    ctx.restore(); // Restore after clipping
+  }
+
+  // --- INSIDE/OUTSIDE/CENTER STROKE LOGIC ---
+  // Draw stroke (border) with rounded corners if needed
+  const inside = shape.strokePosition === 'inside';
+  const outside = shape.strokePosition === 'outside';
+  const center = shape.strokePosition === 'center';
+  const topWidth = shape.borderTopWidth ?? shape.borderWidth ?? 0;
+  const rightWidth = shape.borderRightWidth ?? shape.borderWidth ?? 0;
+  const bottomWidth = shape.borderBottomWidth ?? shape.borderWidth ?? 0;
+  const leftWidth = shape.borderLeftWidth ?? shape.borderWidth ?? 0;
+  const allWidthsEqual = topWidth === rightWidth && rightWidth === bottomWidth && bottomWidth === leftWidth;
+  const topColor = shape.borderTopColor ?? shape.borderColor ?? "transparent";
+  const rightColor = shape.borderRightColor ?? shape.borderColor ?? "transparent";
+  const bottomColor = shape.borderBottomColor ?? shape.borderColor ?? "transparent";
+  const leftColor = shape.borderLeftColor ?? shape.borderColor ?? "transparent";
+  const allColorsEqual = topColor === rightColor && rightColor === bottomColor && bottomColor === leftColor;
+  const borderWidth = topWidth; // all equal
+  const borderColor = topColor; // all equal
+  const borderAlpha = shape.borderOpacity !== undefined ? shape.borderOpacity : 1;
+  if (allWidthsEqual && allColorsEqual && borderWidth > 0 && borderColor !== 'transparent') {
+    ctx.save();
+    ctx.globalAlpha = borderAlpha;
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = borderWidth;
+    let strokeX = shape.x;
+    let strokeY = shape.y;
+    let strokeW = shape.width;
+    let strokeH = shape.height;
+    if (inside) {
+      strokeX += borderWidth / 2;
+      strokeY += borderWidth / 2;
+      strokeW -= borderWidth;
+      strokeH -= borderWidth;
+    } else if (outside) {
+      strokeX -= borderWidth / 2;
+      strokeY -= borderWidth / 2;
+      strokeW += borderWidth;
+      strokeH += borderWidth;
+    }
+    if (tl > 0 || tr > 0 || br > 0 || bl > 0) {
+      roundedRectPath(ctx, strokeX, strokeY, strokeW, strokeH, tl, tr, br, bl);
+      ctx.stroke();
+    } else {
+      ctx.strokeRect(strokeX, strokeY, strokeW, strokeH);
+    }
+    ctx.restore();
+  } else {
+    // Per-side fallback: draw filled rectangles for each side
+    // Top border
+    if (topWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = borderAlpha;
+      ctx.fillStyle = topColor;
+      ctx.fillRect(shape.x, shape.y, shape.width, topWidth);
+      ctx.restore();
+    }
+    // Right border
+    if (rightWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = borderAlpha;
+      ctx.fillStyle = rightColor;
+      ctx.fillRect(shape.x + shape.width - rightWidth, shape.y, rightWidth, shape.height);
+      ctx.restore();
+    }
+    // Bottom border
+    if (bottomWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = borderAlpha;
+      ctx.fillStyle = bottomColor;
+      ctx.fillRect(shape.x, shape.y + shape.height - bottomWidth, shape.width, bottomWidth);
+      ctx.restore();
+    }
+    // Left border
+    if (leftWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = borderAlpha;
+      ctx.fillStyle = leftColor;
+      ctx.fillRect(shape.x, shape.y, leftWidth, shape.height);
+      ctx.restore();
+    }
+  }
   ctx.restore();
 }
 
@@ -136,4 +221,24 @@ function drawImageBorder(ctx, shape, isHovered, isLocked, scale, activeTool) {
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
     }
   }
+} 
+
+// Helper for rounded rectangle path
+function roundedRectPath(ctx, x, y, width, height, tl, tr, br, bl) {
+  const maxR = Math.min(width, height) / 2;
+  tl = Math.max(0, Math.min(tl, maxR));
+  tr = Math.max(0, Math.min(tr, maxR));
+  br = Math.max(0, Math.min(br, maxR));
+  bl = Math.max(0, Math.min(bl, maxR));
+  ctx.beginPath();
+  ctx.moveTo(x + tl, y);
+  ctx.lineTo(x + width - tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + tr);
+  ctx.lineTo(x + width, y + height - br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - br, y + height);
+  ctx.lineTo(x + bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - bl);
+  ctx.lineTo(x, y + tl);
+  ctx.quadraticCurveTo(x, y, x + tl, y);
+  ctx.closePath();
 } 

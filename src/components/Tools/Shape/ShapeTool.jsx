@@ -59,7 +59,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
 
   //  Keyboard shortcuts for shape tools
   // Rectangle: R
-  Shortcut({ key: "r" }, () => {
+  Shortcut({ key: "r", ctrl: false, shift: false, alt: false, meta: false }, () => {
     handleToolClick("Rectangle");
   });
 

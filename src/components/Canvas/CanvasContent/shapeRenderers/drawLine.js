@@ -30,7 +30,9 @@ export function drawLine(ctx, shape, options = {}) {
   ctx.save();
   // No need to rotate context, just use rotated points
   applyShapeStyling(ctx, shape, isHovered, isLocked, scale, activeTool);
-  ctx.globalAlpha = shape.opacity;
+  ctx.globalAlpha = shape.strokeOpacity !== undefined ? shape.strokeOpacity : (shape.opacity !== undefined ? shape.opacity : 1);
+  ctx.strokeStyle = shape.color || "transparent";
+  ctx.lineWidth = (shape.width || 1) / scale;
   ctx.beginPath();
   ctx.moveTo(p1.x, p1.y);
   ctx.lineTo(p2.x, p2.y);

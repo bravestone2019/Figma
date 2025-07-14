@@ -1,441 +1,148 @@
+
 import "../../RightPanel.css";
 import "../Effects/Effects.css";
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import ColorPanel from "./strokePanel";
-import StrokeBorder from "./strokeBorder";
-import MiniColorPicker from "../Fill/color/MiniColorPicker";
-import Down from "../../../../../assets/RightPanel/stack.png";
+import { useEffect } from "react";
 
-const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles, isOpen, setOpen }) => {
-  const isSingle = selectedShapes && selectedShapes.length === 1;
-  let shape = null;
-  let shapeType = "";
-  if (isSingle) {
-    shape = drawnRectangles.find((s) => s.id === selectedShapes[0]);
-    if (shape) shapeType = shape.type;
-  }
+// Import refactored modules
+import { STROKE_DEFAULTS } from './constants';
+import { isUniformBorder } from './utils';
+import { 
+  useStrokeState, 
+  useStrokeSync, 
+  usePanelPositioning, 
+  useStrokeHandlers 
+} from './hooks';
+import { 
+  StrokeHeader, 
+  ColorPicker, 
+  StrokeToggle, 
+  StrokeControls 
+} from './components';
 
-  const isStrokeable =
-    isSingle && ["rectangle", "text", "image", "line"].includes(shapeType);
+const Stroke = ({
+  selectedShapes,
+  drawnRectangles,
+  setDrawnRectangles,
+  isOpen,
+  setOpen,
+}) => {
+  // Use custom hooks for state management
+  const state = useStrokeState(selectedShapes, drawnRectangles);
+  
+  const setters = {
+    setColor: state.setColor,
+    setOpacity: state.setOpacity,
+    setStrokeWidth: state.setStrokeWidth,
+    setStrokePosition: state.setStrokePosition,
+    setIsShown: state.setIsShown,
+    setColorPanelOpen: state.setColorPanelOpen,
+    setShowBorderPanel: state.setShowBorderPanel,
+    setStrokePanelOpen: state.setStrokePanelOpen,
+    setCoords: state.setCoords,
+    setBorderPanelCoords: state.setBorderPanelCoords,
+    setStrokePanelCoords: state.setStrokePanelCoords,
+  };
 
-  const getInitialColor = useCallback(() => {
-    if (!isStrokeable) return "#000000";
-    if (shapeType === "rectangle" || shapeType === "image")
-      return shape.borderColor || "#000000";
-    if (shapeType === "text") return shape.strokeColor || "#000000";
-    if (shapeType === "line") return shape.color || "#000000";
-    return "#000000";
-  }, [isStrokeable, shapeType, shape]);
+  // Use custom hooks for handlers and effects
+  const handlers = useStrokeHandlers(state, setters, selectedShapes, drawnRectangles, setDrawnRectangles);
+  
+  // Sync UI state with shape data
+  useStrokeSync(state, setters, drawnRectangles, setDrawnRectangles);
+  
+  // Handle panel positioning
+  usePanelPositioning(state, setters);
 
-  const getInitialOpacity = useCallback(() => {
-    if (!isStrokeable) return 100;
-    return shape.strokeOpacity !== undefined
-      ? Math.round(shape.strokeOpacity * 100)
-      : 100;
-  }, [isStrokeable, shape]);
+  // Handle expand/collapse with stroke control
+  const handleExpandCollapse = () => {
+    handlers.handleExpandCollapse(isOpen, setOpen);
+  };
 
-  const [colorPanelOpen, setColorPanelOpen] = useState(false);
-  const [coords, setCoords] = useState(null);
-  const panelInputRef = useRef(null);
-  const [color, setColor] = useState(getInitialColor());
-  const [opacity, setOpacity] = useState(getInitialOpacity());
-
-  const [strokeWidth, setStrokeWidth] = useState(1);
-
-  const [showBorderPanel, setShowBorderPanel] = useState(false);
-  const [selectedBorderSide, setSelectedBorderSide] = useState("all");
-  const borderRef = useRef(null);
-  const borderDropdownRef = useRef(null);
-  const [borderPanelCoords, setBorderPanelCoords] = useState(null);
-
-  useEffect(() => {
-    setColor(getInitialColor());
-    setOpacity(getInitialOpacity());
-  }, [getInitialColor, getInitialOpacity, selectedShapes]);
-
-  useEffect(() => {
-    if (colorPanelOpen && panelInputRef.current) {
-      const rect = panelInputRef.current.getBoundingClientRect();
-      setCoords({
-        top: rect.bottom + window.scrollY - 350,
-        left: rect.left + window.scrollX - 250 - 40,
-      });
-    } else if (!colorPanelOpen) {
-      setCoords(null);
-    }
-  }, [colorPanelOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        colorPanelOpen &&
-        panelInputRef.current &&
-        !panelInputRef.current.contains(e.target) &&
-        !document.getElementById("floating-color-picker")?.contains(e.target)
-      ) {
-        setColorPanelOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [colorPanelOpen]);
-
-  // Sync strokeWidth when selection changes
-  useEffect(() => {
-    if (isStrokeable && shape?.strokeWidth !== undefined) {
-      setStrokeWidth(shape.strokeWidth);
-    }
-  }, [isStrokeable, shape]);
-
-  // On click outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        showBorderPanel &&
-        borderRef.current &&
-        !borderRef.current.contains(e.target) &&
-        !borderDropdownRef.current?.contains(e.target)
-      ) {
-        setShowBorderPanel(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showBorderPanel]);
-
-  // Positioning
-  useEffect(() => {
-    if (showBorderPanel && borderRef.current) {
-      const rect = borderRef.current.getBoundingClientRect();
-      setBorderPanelCoords({
-        top: rect.bottom + window.scrollY - 200,
-        left: rect.left + window.scrollX - 30 - 10,
-      });
-    }
-  }, [showBorderPanel]);
-
-  const handleColorUpdate = useCallback(
-    (newColor) => {
-      const hexColor = typeof newColor === "string" ? newColor : newColor.hex;
-      setColor(hexColor);
-
-      if (newColor.rgb?.a !== undefined) {
-        setOpacity(Math.round(newColor.rgb.a * 100));
-      }
-
-      if (!isStrokeable) return;
-      const shapeIdx = drawnRectangles.findIndex(
-        (s) => s.id === selectedShapes[0]
-      );
-      if (shapeIdx === -1) return;
-
-      const newShape = { ...drawnRectangles[shapeIdx] };
-      if (shapeType === "rectangle" || shapeType === "image")
-        newShape.borderColor = hexColor;
-      if (shapeType === "text") newShape.strokeColor = hexColor;
-      if (shapeType === "line") newShape.color = hexColor;
-
-      if (newColor.rgb?.a !== undefined) {
-        newShape.strokeOpacity = newColor.rgb.a;
-      }
-
-      const newRects = [...drawnRectangles];
-      newRects[shapeIdx] = newShape;
-      setDrawnRectangles(newRects);
-    },
-    [
-      isStrokeable,
-      selectedShapes,
-      drawnRectangles,
-      setDrawnRectangles,
-      shapeType,
-    ]
-  );
-
-  const handleOpacityUpdate = useCallback(
-    (val) => {
-      let newOpacity = parseInt(val);
-      if (isNaN(newOpacity)) newOpacity = 100;
-      newOpacity = Math.max(0, Math.min(100, newOpacity));
-      setOpacity(newOpacity);
-
-      if (!isStrokeable) return;
-      const shapeIdx = drawnRectangles.findIndex(
-        (s) => s.id === selectedShapes[0]
-      );
-      if (shapeIdx === -1) return;
-
-      const newShape = {
-        ...drawnRectangles[shapeIdx],
-        opacity: newOpacity / 100,
-      };
-      const newRects = [...drawnRectangles];
-      newRects[shapeIdx] = newShape;
-      setDrawnRectangles(newRects);
-    },
-    [isStrokeable, selectedShapes, drawnRectangles, setDrawnRectangles]
-  );
-
-  const handleStrokeWidthChange = (e) => {
-    let newWidth = parseInt(e.target.value);
-    if (isNaN(newWidth) || newWidth < 1) newWidth = 1;
-    setStrokeWidth(newWidth);
-
-    // Only update shapes if a strokeable shape is selected
-    if (isStrokeable) {
-      const shapeIdx = drawnRectangles.findIndex(
-        (s) => s.id === selectedShapes[0]
-      );
+  // Handle stroke position change
+  const handlePositionChange = (pos) => {
+    state.setStrokePosition(pos);
+    // Update the shape's strokePosition property
+    if (state.isStrokeable && state.isSingle) {
+      const shapeIdx = drawnRectangles.findIndex((s) => s.id === selectedShapes[0]);
       if (shapeIdx !== -1) {
         const updated = [...drawnRectangles];
-        const shape = updated[shapeIdx];
-        if (shape.type === "rectangle" || shape.type === "image") {
-          shape.borderWidth = newWidth;
-        } else if (shape.type === "line") {
-          shape.width = newWidth;
-        } else if (shape.type === "text") {
-          shape.strokeWidth = newWidth;
-        }
-        updated[shapeIdx] = { ...shape };
+        updated[shapeIdx] = { ...updated[shapeIdx], strokePosition: pos };
         setDrawnRectangles(updated);
       }
     }
   };
 
-  const currentFullColor = useMemo(() => {
-    const hexToRgb = (hex) => {
-      let r = 0,
-        g = 0,
-        b = 0;
-      if (hex.length === 4) {
-        r = parseInt(hex[1] + hex[1], 16);
-        g = parseInt(hex[2] + hex[2], 16);
-        b = parseInt(hex[3] + hex[3], 16);
-      } else if (hex.length === 7) {
-        r = parseInt(hex.substring(1, 3), 16);
-        g = parseInt(hex.substring(3, 5), 16);
-        b = parseInt(hex.substring(5, 7), 16);
-      }
-      return { r, g, b };
-    };
-    return { ...hexToRgb(color), a: opacity / 100 };
-  }, [color, opacity]);
+  // Handle border side change
+  const handleBorderSideChange = (side) => {
+    state.setSelectedBorderSide(side);
+    handlers.handleBorderEdit(side, {});
+  };
+
+  // Handle stroke width change
+  const handleWidthChange = (e) => {
+    handlers.handleStrokeWidthChange(e);
+  };
+
+  // Check if border is uniform for stroke position control
+  const isUniformBorderShape = isUniformBorder(state.shape, state.selectedBorderSide);
 
   return (
     <>
-      <div
-        className="right-section-title clickable"
-        onClick={() => setOpen(!isOpen)}
-      >
-        Stroke
-        <button
-          className="expand-collapse-btn"
-          onClick={() => setOpen(!isOpen)}
-          aria-label={isOpen ? "Collapse Stroke" : "Expand Stroke"}
-        >
-          {isOpen ? "−" : "+"}
-        </button>
-      </div>
+      <StrokeHeader 
+        isOpen={isOpen} 
+        onExpandCollapse={handleExpandCollapse} 
+      />
 
       {isOpen && (
-        <div className="position-grid">
-          <div style={{ marginBottom: "-10px" }}>
-            <div
-              className="pos-box-fill"
-              ref={panelInputRef}
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "none",
-                border: "2px solid #e0e0e0",
-                width: "100%",
-                height: "auto",
-                padding: "6px 10px",
-                margin: "5px 0 20px -5px",
-                gap: "8px",
-              }}
-            >
-              <button
-                style={{
-                  width: "20px",
-                  height: "20px",
-                  border: "1.5px solid #ddd",
-                  borderRadius: "6px",
-                  background: color,
-                  display: "inline-block",
-                  padding: 0,
-                }}
-                aria-label="Select stroke color"
-                onClick={() => setColorPanelOpen(!colorPanelOpen)}
-                disabled={!isStrokeable}
-              />
-              {colorPanelOpen && coords && (
-                <ColorPanel
-                  top={coords.top}
-                  left={coords.left}
-                  setColorPickerOpen={setColorPanelOpen}
-                  color={color}
-                  opacity={opacity}
-                  setColor={handleColorUpdate}
-                  setOpacity={handleOpacityUpdate}
-                >
-                  <MiniColorPicker
-                    color={currentFullColor}
-                    onChange={handleColorUpdate}
-                  />
-                </ColorPanel>
-              )}
+        <>
+          {/* Top FLEX ROW */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginLeft: 15,
+              marginRight: 5,
+              gap: 8,
+            }}
+          >
+            <ColorPicker 
+              color={state.color}
+              opacity={state.opacity}
+              onColorChange={handlers.handleColorUpdate}
+              onOpacityChange={handlers.handleOpacityUpdate}
+              colorPanelOpen={state.colorPanelOpen}
+              onColorPanelToggle={() => state.setColorPanelOpen(!state.colorPanelOpen)}
+              coords={state.coords}
+              panelInputRef={state.panelInputRef}
+              disabled={!state.isStrokeable}
+            />
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  flex: 1,
-                }}
-              >
-                <input
-                  type="text"
-                  value={(color || "#000000").replace("#", "").toUpperCase()}
-                  onChange={(e) => setColor("#" + e.target.value)}
-                  style={{
-                    width: "50px",
-                    padding: "2px 5px",
-                    fontSize: "12px",
-                    textAlign: "center",
-                    color: "#333",
-                  }}
-                  disabled={!isStrokeable}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    flex: 1,
-                    marginLeft: "2px",
-                  }}
-                >
-                  <input
-                    type="number"
-                    value={opacity}
-                    min={0}
-                    max={100}
-                    onChange={(e) =>
-                      handleOpacityUpdate(Number(e.target.value))
-                    }
-                    style={{ width: "40px", textAlign: "center" }}
-                    disabled={!isStrokeable}
-                  />
-                  <div>%</div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              className="position-grid"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "20px",
-                width: "50%",
-                height: "75%",
-                marginLeft: "35px",
-                marginTop: "-15px",
-              }}
-            >
-              <div
-                className="pos-box"
-                style={{
-                  width: "100%",
-                  height: "10%",
-                  gap: "8px",
-                  marginLeft: "-38px",
-                  background: "transparent",
-                  border: "2px solid #e0e0e0",
-                  padding: "12px 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-start",
-                }}
-              >
-                <img
-                  src={Down}
-                  alt="Down"
-                  style={{ width: "15px", height: "18px", marginRight: "8px" }}
-                />
-                <input
-                  type="number"
-                  min={1}
-                  value={strokeWidth}
-                  onChange={handleStrokeWidthChange}
-                  style={{
-                    width: "50px",
-                    fontSize: "12px",
-                    color: "#333",
-                    textAlign: "center",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    background: "#fff",
-                    outline: "none",
-                  }}
-                  placeholder="1"
-                />
-                <span style={{ marginLeft: "4px", fontSize: "12px", color: "#888" }}>px</span>
-              </div>
-
-              <div
-                className="pos-box"
-                ref={borderRef}
-                onClick={() => setShowBorderPanel((prev) => !prev)}
-                style={{
-                  width: "90%",
-                  height: "10%",
-                  marginRight: "30px",
-                  background: "transparent",
-                  border: "2px solid #e0e0e0",
-                  padding: "12px 12px",
-                  position: "relative",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={Down}
-                  alt="Down"
-                  style={{ width: "15px", height: "18px", marginRight: "8px" }}
-                />
-                <input
-                  type="text"
-                  value={
-                    selectedBorderSide.charAt(0).toUpperCase() +
-                    selectedBorderSide.slice(1)
-                  }
-                  readOnly
-                  style={{
-                    flex: 1,
-                    border: "none",
-                    background: "transparent",
-                    width: "100%",
-                    textTransform: "capitalize",
-                  }}
-                />
-              </div>
-              {showBorderPanel && borderPanelCoords && (
-                <StrokeBorder
-                  top={borderPanelCoords.top}
-                  left={borderPanelCoords.left}
-                  onClose={() => setShowBorderPanel(false)}
-                  onSelect={setSelectedBorderSide}
-                  selectedKey={selectedBorderSide}
-                  dropdownRef={borderDropdownRef}
-                />
-              )}
-            </div>
+            <StrokeToggle 
+              isShown={state.isShown}
+              onToggle={handlers.handleToggleStroke}
+              disabled={!state.isStrokeable}
+            />
           </div>
-        </div>
+
+          {/* BOTTOM GRID BLOCK */}
+          <StrokeControls 
+            strokePosition={state.strokePosition}
+            strokeWidth={state.strokeWidth}
+            selectedBorderSide={state.selectedBorderSide}
+            onPositionChange={handlePositionChange}
+            onWidthChange={handleWidthChange}
+            onBorderSideChange={handleBorderSideChange}
+            isUniformBorder={isUniformBorderShape}
+            strokePanelOpen={state.strokePanelOpen}
+            strokePanelCoords={state.strokePanelCoords}
+            showBorderPanel={state.showBorderPanel}
+            borderPanelCoords={state.borderPanelCoords}
+            borderRef={state.borderRef}
+            strokeDropdownRef={state.strokeDropdownRef}
+            borderDropdownRef={state.borderDropdownRef}
+            onStrokePanelToggle={() => state.setStrokePanelOpen(!state.strokePanelOpen)}
+            onBorderPanelToggle={() => state.setShowBorderPanel(!state.showBorderPanel)}
+          />
+        </>
       )}
 
       {/* Thin Grey Divider */}
@@ -449,3 +156,4 @@ const Stroke = ({ selectedShapes, drawnRectangles, setDrawnRectangles, isOpen, s
 };
 
 export default Stroke;
+

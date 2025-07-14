@@ -14,6 +14,37 @@ import {
 import { drawPreviewShapes } from './previewRenderer';
 import { drawSelectionBox } from './boxSelection';
 
+// Add a utility to convert hex to rgba
+function hexToRgba(color, opacity) {
+  if (!color) return `rgba(217,217,217,${opacity / 100})`;
+  if (color.startsWith('rgba')) {
+    // Replace the alpha value with the new opacity
+    return color.replace(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/, (match, r, g, b) => {
+      return `rgba(${r},${g},${b},${opacity / 100})`;
+    });
+  }
+  if (color.startsWith('rgb')) {
+    // Convert rgb to rgba
+    return color.replace(/rgb\((\d+),(\d+),(\d+)\)/, (match, r, g, b) => {
+      return `rgba(${r},${g},${b},${opacity / 100})`;
+    });
+  }
+  // Otherwise, treat as hex
+  let r = 217, g = 217, b = 217;
+  if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
+    if (color.length === 7) {
+      r = parseInt(color.slice(1, 3), 16);
+      g = parseInt(color.slice(3, 5), 16);
+      b = parseInt(color.slice(5, 7), 16);
+    } else if (color.length === 4) {
+      r = parseInt(color[1] + color[1], 16);
+      g = parseInt(color[2] + color[2], 16);
+      b = parseInt(color[3] + color[3], 16);
+    }
+  }
+  return `rgba(${r},${g},${b},${opacity / 100})`;
+}
+
 export function redraw({
   canvasRef,
   position,
@@ -30,6 +61,8 @@ export function redraw({
   drawingImage,
   textBox,
   selectionBox,
+  backgroundColor = '#FFFFFF',
+  backgroundOpacity = 100,
 }) {
   const canvas = canvasRef.current;
   if (!canvas) return;
@@ -41,6 +74,8 @@ export function redraw({
   // Clear and setup transform
   ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = hexToRgba(backgroundColor, backgroundOpacity);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.translate(position.x, position.y);
   ctx.scale(scale, scale);
 

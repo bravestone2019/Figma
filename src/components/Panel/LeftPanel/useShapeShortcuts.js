@@ -1,5 +1,17 @@
 import { useEffect } from 'react';
 
+const isEditing = (event) => {
+  const el = document.activeElement;
+  const target = event && event.target;
+  const check = (elem) =>
+    elem && (
+      elem.tagName === 'INPUT' ||
+      elem.tagName === 'TEXTAREA' ||
+      elem.isContentEditable
+    );
+  return check(el) || check(target);
+};
+
 const useShapeShortcuts = ({
   selectedShapes,
   drawnRectangles,
@@ -13,6 +25,10 @@ const useShapeShortcuts = ({
 }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Prevent shortcuts when editing/renaming
+      if (isEditing(e)) {
+        return;
+      }
       // Rename: Shift+R
       if (e.shiftKey && (e.key === 'R' || e.key === 'r') && !renamingPageId) {
         if (selectedShapes && selectedShapes.length === 1) {

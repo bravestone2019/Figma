@@ -14,7 +14,9 @@ const useKeyboardShortcuts = (setActiveTool, textInput) => {
 
       // Tool shortcuts
       if (e.key.toLowerCase() === "r") {
-        setActiveTool("Rectangle");
+        if (!e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+          setActiveTool("Rectangle");
+        }
       } else if (e.key.toLowerCase() === "l") {
         setActiveTool("Line");
       } else if (e.key.toLowerCase() === "c") {

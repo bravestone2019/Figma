@@ -89,7 +89,12 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
             borderWidth: 0,
             originalWidth: tempImage.width,
             originalHeight: tempImage.height,
-            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            cornerRadius: 0, // Default for all new images
+            cornerRadiusTopLeft: 0,
+            cornerRadiusTopRight: 0,
+            cornerRadiusBottomRight: 0,
+            cornerRadiusBottomLeft: 0,
           };
           return [...prev, imageShape];
         });
@@ -126,7 +131,12 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
             borderWidth: 0,
             originalWidth: fallbackWidth,
             originalHeight: fallbackHeight,
-            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            id: `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            cornerRadius: 0, // Default for all new images
+            cornerRadiusTopLeft: 0,
+            cornerRadiusTopRight: 0,
+            cornerRadiusBottomRight: 0,
+            cornerRadiusBottomLeft: 0,
           };
           return [...prev, imageShape];
         });

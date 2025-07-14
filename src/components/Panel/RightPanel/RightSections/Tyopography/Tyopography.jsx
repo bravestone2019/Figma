@@ -59,15 +59,24 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
     }
   }
 
-  // Update local state when selected text shape changes
+  // Update local state when selected text shape changes or its properties change
   useEffect(() => {
     if (selectedTextShape) {
-      setSelectedFont(selectedTextShape.fontFamily || "Arial");
-      setSelectedFontSize(selectedTextShape.fontSize || 16);
-      setSelectedFontWeight(selectedTextShape.fontWeight || "Regular");
-      setSelectedHorizontalAlignment(selectedTextShape.textAlign || "left");
+      if (selectedFont !== (selectedTextShape.fontFamily || "Arial")) {
+        setSelectedFont(selectedTextShape.fontFamily || "Arial");
+      }
+      if (selectedFontSize !== (selectedTextShape.fontSize || 16)) {
+        setSelectedFontSize(selectedTextShape.fontSize || 16);
+      }
+      if (selectedFontWeight !== (selectedTextShape.fontWeight || "Regular")) {
+        setSelectedFontWeight(selectedTextShape.fontWeight || "Regular");
+      }
+      if (selectedHorizontalAlignment !== (selectedTextShape.textAlign || "left")) {
+        setSelectedHorizontalAlignment(selectedTextShape.textAlign || "left");
+      }
     }
-  }, [selectedTextShape]);
+    // eslint-disable-next-line
+  }, [selectedTextShape?.fontFamily, selectedTextShape?.fontSize, selectedTextShape?.fontWeight, selectedTextShape?.textAlign]);
 
   // Function to update and store changes to the selected text shape(s)
   const storeTextShapeChanges = (updates) => {
@@ -88,7 +97,7 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
     storeTextShapeChanges({ fontFamily: newFont });
   };
 
-  // Handle font size change
+  // Handle font size change (from dropdown or input)
   const handleFontSizeChange = (newSize) => {
     setSelectedFontSize(newSize);
     storeTextShapeChanges({ fontSize: newSize });
@@ -216,54 +225,42 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
 
   return (
     <>
-      <div
-        className="right-section-title clickable"
-        onClick={() => setOpen(!isOpen)}
-      >
-        Typography
-        <button
-          className="expand-collapse-btn"
-          onClick={() => setOpen(!isOpen)}
-          aria-label={isOpen ? "Collapse Typography" : "Expand Typography"}
+      <div className="right-section-title">Typography</div>
+      <div style={{ marginBottom: "-10px" }}>
+        {/* Font Selector */}
+        <div
+          className="pos-box"
+          ref={fontInputRef}
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "none",
+            border: "1px solid #e0e0e0",
+            padding: "2px 10px",
+            margin: "10px 40px 25px 15px",
+            gap: "8px",
+          }}
+          onClick={() => setShowFontPanel(!showFontPanel)}
         >
-          {isOpen ? "−" : "+"}
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className="position-grid">
-          {/* Font Family Dropdown Trigger */}
-          <div
-            className="pos-box"
-            ref={fontInputRef}
+          <input
+            type="text"
+            value={selectedFont}
+            readOnly
             style={{
-              width: "95%",
-              height: "10%",
-              gap: "25px",
-              marginLeft: "-14px",
+              flex: 1,
+              border: "none",
               background: "transparent",
-              border: "2px solid #e0e0e0",
-              padding: "12px 12px",
+              width: "100%",
+              fontFamily: selectedFont,
             }}
-            onClick={() => setShowFontPanel(!showFontPanel)}
-          >
-            <input
-              type="text"
-              value={selectedFont}
-              readOnly
-              style={{
-                flex: 1,
-                border: "none",
-                background: "transparent",
-                width: "100%",
-              }}
-            />
-            <img
-              src={Down}
-              alt="Down"
-              style={{ width: "10px", height: "10px" }}
-            />
-          </div>
+          />
+          <img
+            src={Down}
+            alt={Down}
+            style={{ width: "10px", height: "10px" }}
+          />
 
           {showFontPanel && panelCoords && (
             <Fonts
@@ -278,27 +275,42 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
               dropdownRef={dropdownRef}
             />
           )}
+          <span className="tooltip">Fonts</span>
+        </div>
 
+        <div
+          // className="position-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            // gap: "8px",
+            marginLeft: "30px",
+            marginTop: "-18px",
+          }}
+        >
           {/* Font Weight Dropdown Trigger */}
           <div
             className="pos-box"
             ref={fontWeightInputRef}
             style={{
-              width: "95%",
-              height: "10%",
-              gap: "25px",
-              marginLeft: "-14px",
+              marginLeft: "-15px",
               background: "transparent",
-              border: "2px solid #e0e0e0",
-              padding: "12px 12px",
+              border: "1px solid #e0e0e0",
+              padding: "2px 6px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
             }}
             onClick={() => setShowFontWeightPanel(!showFontWeightPanel)}
           >
             <input
               type="text"
-              value={selectedFontWeight} // Display selected weight
+              value={selectedFontWeight}
               readOnly
               style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
                 flex: 1,
                 border: "none",
                 background: "transparent",
@@ -308,8 +320,9 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
             <img
               src={Down}
               alt="Down"
-              style={{ width: "10px", height: "10px" }}
+              style={{ width: "10px", height: "10px", marginRight: "8px" }}
             />
+            <span className="tooltip">Font weight</span>
           </div>
 
           {showFontWeightPanel && fontWeightPanelCoords && (
@@ -323,15 +336,19 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
             />
           )}
 
+          {/* Font Size Panel */}
           <div
             className="pos-box"
             ref={fontSizeInputRef}
             style={{
-              width: "60%",
-              height: "10%",
-              marginLeft: "8px",
-              border: "2px solid #e0e0e0",
-              padding: "12px 12px",
+              marginLeft: "10px",
+              marginRight: "40px",
+              border: "1px solid #e0e0e0",
+              padding: "2px 6px",
+              height: "24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
             onClick={() => setShowFontSizePanel(!showFontSizePanel)}
           >
@@ -339,14 +356,21 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
               type="number"
               value={selectedFontSize} // Display selected size
               onChange={(e) => handleFontSizeChange(Number(e.target.value))}
+              style={{
+                border: "none",
+                outline: "none",
+                fontSize: "12px",
+                background: "transparent",
+                 width: "25px",  
+              }}
             />
             <img
               src={Down}
               alt="Down"
-              style={{ width: "10px", height: "10px" }}
+              style={{ width: "10px", height: "10px", marginRight: "2px" }}
             />
+            <span className="tooltip">Font size</span>
           </div>
-
           {showFontSizePanel &&
             fontSizePanelCoords && ( // Conditionally render
               <FontSize
@@ -359,12 +383,14 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
               />
             )}
 
+          {/* Text Alignment */}
           <div
             className="alignment-panel"
             style={{
-              marginTop: "-22px",
+              marginTop: "10px",
               marginLeft: "45px",
               marginRight: "-54px",
+              marginBottom: 5
             }}
           >
             <div className="alignment-group">
@@ -375,6 +401,9 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
                 onClick={() => handleAlignmentChange("left")}
               >
                 <img src={AlignLeft} alt="Align Left" />
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align left
+                </span>
               </button>
               <button
                 className={`alignment-button ${
@@ -383,6 +412,9 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
                 onClick={() => handleAlignmentChange("center")}
               >
                 <img src={AlignCenter} alt="Align Center" />
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align center
+                </span>
               </button>
               <button
                 className={`alignment-button ${
@@ -391,11 +423,14 @@ const TextPropertiesPanel = ({ selectedShapes, drawnRectangles, setDrawnRectangl
                 onClick={() => handleAlignmentChange("right")}
               >
                 <img src={AlignRight} alt="Align Right" />
+                <span className="tooltip" style={{ bottom: "-30px" }}>
+                  Align right
+                </span>
               </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Thin grey line divider */}
       <div className="section-divider" />

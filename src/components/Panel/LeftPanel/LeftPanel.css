@@ -10,6 +10,7 @@
   flex-direction: column; 
   background: #fff;
   color: #222;
+  display: flex;
 }  
 
 /* Toggle Button */
@@ -72,10 +73,10 @@
 
 .left-panel-content {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
   padding: 18px; 
-  height: 100vh;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -176,8 +177,8 @@
 }
 
 .toggle-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: block;
   position: absolute;
   padding: 8px 10px;
@@ -213,12 +214,18 @@
 /* Scroll only inside this */
 .assets-scroll {
   flex-grow: 1;
-  overflow-y: auto;
-  padding: 10px 12px 0;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto; /* Reactivate vertical scrolling */
+  padding: 0;
   margin-top: 8px;
-  max-height: calc(100vh - 200px);
-  transition: max-height 0.3s ease-out;
+  
+  /* scroll-behavior: smooth; */
+  
   min-height: 0;
+  transition: max-height 0.3s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
 .assets-scroll:hover {
@@ -244,16 +251,12 @@
 }
 
 .assets-list li {
-  display: flex;
-  align-items: center;
-  height: 32px;
-  width: 200px;
-  font-size: 15px;
-  color: #222;
-  border-radius: 10px;
-  padding: 0 10px;
-  cursor: pointer;
-  transition: background 0.15s;
+  font-size: 13px;
+  padding: 7px 0;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .assets-list li:not(.selected):hover {
   background: #e3e6ea;
@@ -276,22 +279,29 @@
   padding-left: 0;
 }
 
+/* Custom small-height scrollbar thumb for .assets-scroll */
 .assets-scroll::-webkit-scrollbar {
-  width: 6px;         /* Thin width */
+  width: 7px;
+  background: transparent;
 }
 
-.assets-scroll::-webkit-scrollbar-track {
-  background: transparent; /* or use #f0f0f0 for light gray if needed */
-}
-
+/* Make the scrollbar thumb for .assets-scroll even smaller in height */
 .assets-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2); /* subtle dark gray */
-  border-radius: 10px;
-  /* margin-bottom: 16px; */
+  background: rgba(162, 89, 247, 0.5);
+  border-radius: 6px;
+  min-height: 8px;
+  max-height: 16px;
+  border: 6px solid transparent;
+  background-clip: padding-box;
 }
 
 .assets-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.3); 
+  background: rgba(162, 89, 247, 0.8);
+}
+
+.assets-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(162, 89, 247, 0.5) transparent;
 }
 
 .assets-list > li {
@@ -376,4 +386,41 @@
   background: none;
   border: none;
   padding: 0;
+}
+
+/* Ensure .layer-list always shows the full list with no blank space or shrinking */
+.layer-list {
+  min-height: 0 !important;
+  height: auto !important;
+  flex: none !important;
+  display: block !important;
+  /* Remove any previous scroll or flex properties */
+}
+
+/* Also ensure the scroll container does not force extra height */
+.assets-scroll {
+  min-height: 0 !important;
+  height: auto !important;
+  flex: none !important;
+  display: block !important;
+}
+
+/* Keep improved scrollbar styling (already present) */
+
+.layer-list-container,
+.layer-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(162, 89, 247, 0.5) transparent;
+  overflow-y: overlay; /* Chrome/Edge only, fallback to auto if not supported */
+}
+
+/* Remove any permanent scrollbar from .layer-list */
+.layer-list {
+  overflow-y: visible !important;
+  /* Remove any scrollbar styling or scroll properties */
+  scrollbar-width: none !important;
+}
+
+.layer-list::-webkit-scrollbar {
+  display: none !important;
 }

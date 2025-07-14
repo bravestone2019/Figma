@@ -50,7 +50,7 @@ export function drawText(ctx, shape, options = {}) {
   const fontStyle = isItalic(shape.fontWeight) ? "italic" : "normal";
   ctx.font = `${fontStyle} ${fontWeight} ${shape.fontSize || 16}px ${shape.fontFamily || "Arial"}`;
   ctx.fillStyle = shape.color;
-  ctx.globalAlpha = shape.opacity;
+  ctx.globalAlpha = (shape.fillOpacity !== undefined ? shape.fillOpacity : 1) * (shape.opacity !== undefined ? shape.opacity : 1);
   ctx.textAlign = shape.textAlign || "left";
   
   // Draw wrapped text (fill)
@@ -75,18 +75,27 @@ export function drawText(ctx, shape, options = {}) {
     currentY += lineHeight;
   });
 
-  // Draw wrapped text (stroke)
-  if (shape.strokeColor) {
+  // --- INSIDE/OUTSIDE/CENTER STROKE LOGIC ---
+  if ((shape.strokeColor || "transparent") !== "transparent" && shape.strokeWidth) {
     ctx.save();
-    ctx.strokeStyle = shape.strokeColor;
-    ctx.lineWidth = shape.strokeWidth && shape.strokeWidth > 0 ? shape.strokeWidth : 1;
-    ctx.globalAlpha = shape.opacity;
+    ctx.strokeStyle = shape.strokeColor || "transparent";
+    ctx.lineWidth = shape.strokeWidth > 0 ? shape.strokeWidth : 1;
+    ctx.globalAlpha = shape.strokeOpacity !== undefined ? shape.strokeOpacity : (shape.opacity !== undefined ? shape.opacity : 1);
     ctx.font = `${fontStyle} ${fontWeight} ${shape.fontSize || 16}px ${shape.fontFamily || "Arial"}`;
     ctx.textAlign = shape.textAlign || "left";
+    let strokeOffset = 0;
+    if (shape.strokePosition === 'inside') {
+      strokeOffset = ctx.lineWidth / 2;
+    } else if (shape.strokePosition === 'outside') {
+      strokeOffset = -ctx.lineWidth / 2;
+    } // center = 0
     currentY = shape.y + (shape.fontSize || 16);
     lines.forEach(line => {
       const textX = getTextX(line);
+      ctx.save();
+      ctx.translate(0, strokeOffset);
       ctx.strokeText(line, textX, currentY);
+      ctx.restore();
       currentY += lineHeight;
     });
     ctx.restore();
