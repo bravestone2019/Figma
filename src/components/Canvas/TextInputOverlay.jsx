@@ -43,6 +43,7 @@ const TextInputOverlay = ({
           strokeWidth: textInput.strokeWidth || 1, // default 1
           fillOpacity: 1,
           locked: false,
+          role: null,
         };
         return [
           ...prev,

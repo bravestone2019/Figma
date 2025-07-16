@@ -87,6 +87,7 @@ const handleMouseUp = (
               borderRadiusTopRight: 0,
               borderRadiusBottomRight: 0,
               borderRadiusBottomLeft: 0,
+              role: null,
             },
           ];
         });
@@ -112,7 +113,8 @@ const handleMouseUp = (
               width: 2,
               opacity: 1,
               locked: false,
-              rotation: 0
+              rotation: 0,
+              role: null,
             },
           ];
         });
@@ -142,6 +144,7 @@ const handleMouseUp = (
               opacity: 1,
               fillOpacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });
@@ -177,6 +180,7 @@ const handleMouseUp = (
               opacity: 1,
               fillOpacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });
@@ -216,6 +220,7 @@ const handleMouseUp = (
               rotation: 0,
               opacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });

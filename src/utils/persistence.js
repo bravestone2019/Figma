@@ -2,9 +2,9 @@
 
 const STORAGE_KEY = 'figma-app-state';
 
-export function saveAppState(pages, activePageId, collection) {
+export function saveAppState(pages, activePageId, collection, collections, position, scale) {
   try {
-    const data = JSON.stringify({ pages, activePageId, collection });
+    const data = JSON.stringify({ pages, activePageId, collection, collections, position, scale });
     localStorage.setItem(STORAGE_KEY, data);
   } catch (e) {
     // Handle quota exceeded or serialization errors

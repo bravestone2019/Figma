@@ -20,7 +20,9 @@ const Panel = ({
   backgroundColor,
   setBackgroundColor,
   backgroundOpacity,
-  setBackgroundOpacity
+  setBackgroundOpacity,
+  collections, // <-- add this
+  setCollections, // <-- add this
 }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [leftPanelWidth, setLeftPanelWidth] = useState(275);
@@ -28,10 +30,10 @@ const Panel = ({
   const isDraggingLeft = useRef(false);
   const isDraggingRight = useRef(false);
 
-  // Global collections state
-  const [collections, setCollections] = useState([
-    { id: 'col-1', name: 'Collection 1', shapeIds: [] }
-  ]);
+  // REMOVE local collections state
+  // const [collections, setCollections] = useState([
+  //   { id: 'col-1', name: 'Collection 1', shapeIds: [] }
+  // ]);
 
   const togglePanel = () => {
     setCollapsed(!collapsed);
