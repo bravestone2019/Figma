@@ -141,6 +141,8 @@ function App() {
         position={position}
         scale={scale}
         setDrawnRectangles={setDrawnRectangles}
+        drawnRectangles={canvasShapes} // <-- pass real array
+        collections={collections} // <-- pass collections
       />
     </>
   );
