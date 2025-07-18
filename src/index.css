@@ -11,3 +11,8 @@ html, body {
   overflow: hidden;
   height: 100%;
 }
+
+::selection {
+  background: #7ab6ee;
+  color: black;
+}

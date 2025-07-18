@@ -1,4 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Rectangle from "../../../../assets/Tools/Shapes/rectangle.png";
+import Triangle from "../../../../assets/Tools/Shapes/Triangle.png";
+import Circle from "../../../../assets/Tools/Shapes/circle.png";
+import Line from "../../../../assets/Tools/Shapes/line.png";
+import Image from "../../../../assets/Tools/Shapes/image.png";
+import Text from "../../../../assets/Tools/Text.png";
 
 const LayerList = ({
   drawnRectangles,
@@ -58,16 +64,24 @@ const LayerList = ({
 
   // Helper to get icon for shape type
   const getShapeIcon = (shape) => {
-    switch (shape.type) {
-      case 'rectangle': return <span className="layer-icon">▭</span>;
-      case 'circle': return <span className="layer-icon">◯</span>;
-      case 'line': return <span className="layer-icon">/</span>;
-      case 'triangle': return <span className="layer-icon">△</span>;
-      case 'image': return <span className="layer-icon">🖼️</span>;
-      case 'text': return <span className="layer-icon">T</span>;
-      case 'group': return <span className="layer-icon">📁</span>;
-      default: return <span className="layer-icon">?</span>;
-    }
+    const iconMap = {
+      rectangle: Rectangle,
+      circle: Circle,
+      line: Line,
+      triangle: Triangle,
+      image: Image,
+      text: Text,
+      group: '/icons/group.png',
+    };
+    const src = iconMap[shape.type] || '/icons/unknown.png';
+    return (
+      <img
+        src={src}
+        alt={shape.type}
+        className="layer-icon"
+        style={{ width: 18, height: 18, marginRight: 6, verticalAlign: 'middle' }}
+      />
+    );
   };
 
   const handleRenameSubmit = (e) => {
@@ -163,7 +177,7 @@ const LayerList = ({
         className={selectedShapes && selectedShapes.includes(shape.id) ? "selected" : ""}
         onClick={e => handleLayerClick(e, shape.id, i, flatList)}
         onContextMenu={e => handleLayerContextMenu(e, shape.id)}
-        style={{ cursor: "pointer", opacity: draggedShapeId === shape.id ? 0.5 : 1 }}
+        style={{ opacity: draggedShapeId === shape.id ? 0.5 : 1 }}
         draggable
         onDragStart={() => handleShapeDragStart(shape.id)}
         onDragEnd={handleShapeDragEnd}
@@ -438,7 +452,7 @@ const LayerList = ({
           j++;
         }
         result.push(
-          <div key={"block-" + i} style={{ background: '#1976d2', borderRadius: 4, margin: '2px 0' }}>
+          <div key={"block-" + i} style={{ background: 'rgba(0, 0, 0, 0.08)', borderRadius: 4  }}>
             {flatList.slice(i, j).map((shape, idx) => renderLayerListItem(shape, i + idx, flatList, handleShapeDragStart, handleShapeDragEnd, draggedShapeId))}
           </div>
         );
@@ -470,14 +484,14 @@ const LayerList = ({
           }}
         >
           <div
-            style={{ padding: '8px 16px', cursor: 'pointer', fontWeight: 500, background: '#1976d2' }}
+            style={{ padding: '8px 16px', fontWeight: 500, background: '#1976d2' }}
             onMouseDown={handleContextMenuRename}
           >
             Rename
           </div>
           {contextMenu.type === 'shape' && (
             <div
-              style={{ padding: '8px 16px', cursor: 'pointer', fontWeight: 500 }}
+              style={{ padding: '8px 16px', fontWeight: 500 }}
               onMouseDown={handleAddToNewCollection}
             >
               Add to new collection
@@ -486,7 +500,7 @@ const LayerList = ({
         </div>
       )}
       {/* Render all collections at the top (show all non-empty collections) */}
-      {collections.filter(col => col.shapeIds.length > 0).map((col, idx) => {
+      {collections.filter(col => col.shapeIds.length > 0).map((col) => {
         const colLayers = col.shapeIds.map(id => getShapeById(id)).filter(Boolean);
         return (
           <div
@@ -540,10 +554,10 @@ const LayerList = ({
                     key={shape.id + '-shortcut-' + col.id}
                     className={selectedShapes && selectedShapes.includes(shape.id) ? 'selected' : ''}
                     style={{
-                      cursor: 'pointer',
+                      // cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      padding: '4px 12px',
+                      padding: '10px 113px',
                       borderRadius: 6,
                       opacity: draggedShapeId === shape.id ? 0.5 : 1,
                       background: selectedShapes && selectedShapes.includes(shape.id) ? '#a259f7' : undefined,

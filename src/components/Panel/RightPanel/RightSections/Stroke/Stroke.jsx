@@ -1,7 +1,6 @@
 
 import "../../RightPanel.css";
 import "../Effects/Effects.css";
-import { useEffect } from "react";
 
 // Import refactored modules
 import { STROKE_DEFAULTS } from './constants';

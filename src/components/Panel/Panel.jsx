@@ -1,7 +1,7 @@
 import "./Panel.css";
 import { useState, useEffect, useRef } from "react";
 import Shortcut from "../Shortcut";
-import Minimize from "../../assets/LeftPanel/toggle.png"
+import Maximize from "../../assets/LeftPanel/expand.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
@@ -133,9 +133,10 @@ const Panel = ({
         <div className="toggle-container">
         <div className="toggle-left">
           <img
-            src={Minimize}
-            alt={Minimize}
+            src={Maximize}
+            alt={Maximize}
             className="toggle-icon"
+            style={{ width: "16px", height: "16px" }}
             onClick={togglePanel}
           />
           </div>

@@ -1,7 +1,7 @@
 // drawLine.js
 // Handles line shape rendering with styling and state management
 
-import { applyShapeStyling, drawLineStroke } from './shapeStyling.js';
+import { applyShapeStyling } from './shapeStyling.js';
 
 export function drawLine(ctx, shape, options = {}) {
   const { 
@@ -36,7 +36,20 @@ export function drawLine(ctx, shape, options = {}) {
   ctx.beginPath();
   ctx.moveTo(p1.x, p1.y);
   ctx.lineTo(p2.x, p2.y);
-  drawLineStroke(ctx, shape, isHovered, isLocked, scale, activeTool);
+  // Removed drawLineStroke for solid lines only
   ctx.stroke();
+  // Draw solid red stroke if locked (remove any dash effect)
+  if (isLocked) {
+    ctx.save();
+    ctx.setLineDash([]); // Remove any dashed styling
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = Math.max(2 / scale, 1);
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.restore();
-} 
+}

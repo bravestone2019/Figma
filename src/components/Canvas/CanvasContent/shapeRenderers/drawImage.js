@@ -75,24 +75,27 @@ export function drawImage(ctx, shape, options = {}) {
     }
   } else {
     drawImagePlaceholder(ctx, shape, scale);
-    if (!cachedImage && !loadingImages.has(shape.src)) {
-      loadImage(shape.src).then(() => {
-        if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
-          canvas.redrawScheduled = true;
-          setTimeout(() => {
-            canvas.redrawCallback();
-            canvas.redrawScheduled = false;
-          }, 16);
-        }
-      }).catch(() => {
-        if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
-          canvas.redrawScheduled = true;
-          setTimeout(() => {
-            canvas.redrawCallback();
-            canvas.redrawScheduled = false;
-          }, 16);
-        }
-      });
+    if (shape.src && !cachedImage && !loadingImages.has(shape.src)) {
+      const loadResult = loadImage(shape.src);
+      if (loadResult && typeof loadResult.then === "function") {
+        loadResult.then(() => {
+          if (canvas && typeof canvas.redrawCallback === "function" && !canvas.redrawScheduled) {
+            canvas.redrawScheduled = true;
+            setTimeout(() => {
+              canvas.redrawCallback();
+              canvas.redrawScheduled = false;
+            }, 16);
+          }
+        }).catch(() => {
+          if (canvas && typeof canvas.redrawCallback === "function" && !canvas.redrawScheduled) {
+            canvas.redrawScheduled = true;
+            setTimeout(() => {
+              canvas.redrawCallback();
+              canvas.redrawScheduled = false;
+            }, 16);
+          }
+        });
+      }
     }
   }
 
@@ -189,11 +192,6 @@ function drawImagePlaceholder(ctx, shape, scale) {
   ctx.strokeStyle = "#ccc";
   ctx.lineWidth = 1 / scale;
   ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-  
-  ctx.fillStyle = "#666";
-  ctx.font = `${12 / scale}px Arial`;
-  ctx.textAlign = "center";
-  ctx.fillText("Loading...", shape.x + shape.width / 2, shape.y + shape.height / 2);
 }
 
 function drawImageBorder(ctx, shape, isHovered, isLocked, scale, activeTool) {
@@ -241,4 +239,4 @@ function roundedRectPath(ctx, x, y, width, height, tl, tr, br, bl) {
   ctx.lineTo(x, y + tl);
   ctx.quadraticCurveTo(x, y, x + tl, y);
   ctx.closePath();
-} 
+}

@@ -113,7 +113,7 @@ function drawTextBorder(ctx, shape, measuredHeight, isHovered, isLocked, scale, 
   applyShapeStyling(ctx, shape, isHovered, isLocked, scale, activeTool);
   // Colors remain unchanged
   if (isLocked) {
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = "transparent";
     ctx.lineWidth = 2 / scale;
     ctx.strokeRect(
       shape.x,
