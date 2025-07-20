@@ -35,6 +35,7 @@ const LayerListItem = ({
       key={shape.id + '-collected'}
       ref={renameInputRef}
       className={isSelected ? 'selected' : ''}
+      onMouseDown={e => handleLayerClick(e, shape.id, i, flatList, selectedShapes)}
       onClick={e => handleLayerClick(e, shape.id, i, flatList)}
       onContextMenu={e => handleLayerContextMenu(e, shape.id)}
       style={{

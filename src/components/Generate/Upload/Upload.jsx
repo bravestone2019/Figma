@@ -5,10 +5,9 @@ import Shortcut from  "../../Shortcut";
 import File from "../../../assets/Generate/file.png";
 import * as XLSX from "xlsx";
 
-const Upload = ({setPhotoImage, setExcelData}) => {
+const Upload = ({setPhotoImage, setExcelData, files, setFiles}) => {
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
-  const [files, setFiles] = useState([]);
 
   function handleIconClick() {
     fileInputRef.current.click();
@@ -23,11 +22,6 @@ const Upload = ({setPhotoImage, setExcelData}) => {
     setFiles( prev => [...selectedFiles, ...prev ]); // Add new files to the end of the list (oldest first)
 
     selectedFiles.forEach((file) => {
-      // If filename is all digits (e.g., 6608.jpg), treat as photoImage
-      if (/^\d+\./.test(file.name)) {
-        const url = URL.createObjectURL(file);
-        setPhotoImage(url, file.name);
-      }
       // Handle Excel file
       if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
         const reader = new FileReader();
@@ -59,10 +53,6 @@ const Upload = ({setPhotoImage, setExcelData}) => {
     const [removed] = updatedFiles.splice(index, 1);
     setFiles(updatedFiles);
 
-    // Remove photo image and reset filename if photo
-    if (/^\d+\./.test(removed.name)) {
-      setPhotoImage(null, "");
-    }
     // Remove excel data if excel file
     if (removed.name.endsWith('.xlsx') || removed.name.endsWith('.xls') || removed.name.endsWith('.csv')) {
       setExcelData([]);
@@ -71,7 +61,6 @@ const Upload = ({setPhotoImage, setExcelData}) => {
 
    const handleClear = () => {
     setFiles([]);
-    setPhotoImage(null, "");
     setExcelData([]);
   };
 

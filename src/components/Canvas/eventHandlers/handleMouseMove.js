@@ -122,10 +122,10 @@ const handleMouseMove = (
                   return { ...shape, x: orig.x + dx, y: orig.y + dy };
                 }
               }
-            } else if (idx === movingShape.index) {
-              if (shape.type === "rectangle" || shape.type === "text") {
-                return { ...shape, x: mouseX - movingShape.offsetX, y: mouseY - movingShape.offsetY };
-              } else if (shape.type === "circle") {
+            }
+            // Single shape move: use movingShape.id
+            if (!movingShape.multi && shape.id === movingShape.id) {
+              if (shape.type === "rectangle" || shape.type === "text" || shape.type === "circle") {
                 return { ...shape, x: mouseX - movingShape.offsetX, y: mouseY - movingShape.offsetY };
               } else if (shape.type === "line") {
                 const dx = mouseX - movingShape.offsetX - shape.x1;

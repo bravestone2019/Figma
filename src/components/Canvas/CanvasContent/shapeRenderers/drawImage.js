@@ -23,6 +23,8 @@ function loadImage(src) {
     img.onload = () => {
       imageCache.set(src, img); // Store the actual image, not the promise
       loadingImages.delete(src);
+      // Dispatch a global event when an image is loaded
+      window.dispatchEvent(new CustomEvent('imageLoadedForPreview'));
       resolve(img);
     };
     img.onerror = () => {
@@ -69,10 +71,18 @@ export function drawImage(ctx, shape, options = {}) {
 
   // Check if image is already loaded
   const cachedImage = imageCache.get(shape.src);
-  if (cachedImage && !cachedImage.then) {
-    if (cachedImage) {
-      ctx.drawImage(cachedImage, shape.x, shape.y, shape.width, shape.height);
-    }
+  if (cachedImage instanceof Image) {
+    // 'Contain' fit: scale image to fit inside shape, preserve aspect ratio, center it
+    const imgW = cachedImage.naturalWidth;
+    const imgH = cachedImage.naturalHeight;
+    const boxW = shape.width;
+    const boxH = shape.height;
+    const scale = Math.min(boxW / imgW, boxH / imgH);
+    const drawW = imgW * scale;
+    const drawH = imgH * scale;
+    const drawX = shape.x + (boxW - drawW) / 2;
+    const drawY = shape.y + (boxH - drawH) / 2;
+    ctx.drawImage(cachedImage, drawX, drawY, drawW, drawH);
   } else {
     drawImagePlaceholder(ctx, shape, scale);
     if (!cachedImage && !loadingImages.has(shape.src)) {

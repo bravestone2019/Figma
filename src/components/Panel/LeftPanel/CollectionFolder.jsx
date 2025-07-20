@@ -32,6 +32,7 @@ const CollectionFolder = ({
   handleCollectionDragOver,
   handleCollectionDrop,
   setCollections, // <-- add this prop
+  handleLayerClick, // <-- receive the prop
 }) => {
   // Local state for drag-over index
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -141,10 +142,7 @@ const CollectionFolder = ({
               setRenameValue={setRenameValue}
               setRenamingId={setRenamingId}
               handleRenameSubmit={handleRenameSubmit}
-              handleLayerClick={() => {
-                setSelectedShapes([shape.id]);
-                setSelectedCollectionId(null);
-              }}
+              handleLayerClick={handleLayerClick}
               handleLayerContextMenu={e => handleLayerContextMenu(e, shape.id)}
               handleShapeDragStart={() => handleShapeDragStart(shape.id, col.id)}
               handleShapeDragEnd={handleShapeDragEnd}
