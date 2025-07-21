@@ -5,10 +5,14 @@ export async function exportCardsAsPDF({ frontBackShapes, excelData, files, rows
   // Use the same card size as preview
   const cardWidth = 320;
   const cardHeight = 200;
+  const scaleFactor = 4; // Increase for higher quality
+  const hiResCardWidth = cardWidth * scaleFactor;
+  const hiResCardHeight = cardHeight * scaleFactor;
+
   async function renderPageToDataURL(rows) {
     // Sheet canvas: two cards side by side, stack rows vertically
-    const sheetWidth = 2 * cardWidth;
-    const sheetHeight = cardHeight * rows.length;
+    const sheetWidth = 2 * hiResCardWidth;
+    const sheetHeight = hiResCardHeight * rows.length;
     const canvas = document.createElement('canvas');
     canvas.width = sheetWidth;
     canvas.height = sheetHeight;
@@ -20,21 +24,22 @@ export async function exportCardsAsPDF({ frontBackShapes, excelData, files, rows
       // Draw front card
       const frontShapes = frontBackShapes.filter(s => s.side === 'front');
       const frontCard = document.createElement('canvas');
-      frontCard.width = cardWidth;
-      frontCard.height = cardHeight;
+      frontCard.width = hiResCardWidth;
+      frontCard.height = hiResCardHeight;
       const frontCtx = frontCard.getContext('2d');
-      await drawCard(frontCtx, frontShapes, row, files, cardWidth, cardHeight);
-      ctx.drawImage(frontCard, 0, i * cardHeight, cardWidth, cardHeight);
+      await drawCard(frontCtx, frontShapes, row, files, hiResCardWidth, hiResCardHeight);
+      // Draw scaled down to sheet
+      ctx.drawImage(frontCard, 0, i * hiResCardHeight, hiResCardWidth, hiResCardHeight);
       // Draw back card
       const backShapes = frontBackShapes.filter(s => s.side === 'back');
       const backCard = document.createElement('canvas');
-      backCard.width = cardWidth;
-      backCard.height = cardHeight;
+      backCard.width = hiResCardWidth;
+      backCard.height = hiResCardHeight;
       const backCtx = backCard.getContext('2d');
       backCtx.fillStyle = '#fff';
-      backCtx.fillRect(0, 0, cardWidth, cardHeight);
-      await drawCard(backCtx, backShapes, row, files, cardWidth, cardHeight);
-      ctx.drawImage(backCard, cardWidth, i * cardHeight, cardWidth, cardHeight);
+      backCtx.fillRect(0, 0, hiResCardWidth, hiResCardHeight);
+      await drawCard(backCtx, backShapes, row, files, hiResCardWidth, hiResCardHeight);
+      ctx.drawImage(backCard, hiResCardWidth, i * hiResCardHeight, hiResCardWidth, hiResCardHeight);
     }
     return canvas.toDataURL('image/png');
   }
@@ -48,9 +53,15 @@ export async function exportCardsAsPDF({ frontBackShapes, excelData, files, rows
     const dataUrl = await renderPageToDataURL(pageRows);
     const pngImageBytes = await fetch(dataUrl).then(res => res.arrayBuffer());
     const pngImage = await pdfDoc.embedPng(pngImageBytes);
-    // Use the actual pixel dimensions for the PDF page
-    const page = pdfDoc.addPage([pngImage.width, pngImage.height]);
-    page.drawImage(pngImage, { x: 0, y: 0, width: pngImage.width, height: pngImage.height });
+    // Use the original (not hi-res) pixel dimensions for the PDF page
+    const page = pdfDoc.addPage([cardWidth * 2, cardHeight * pageRows.length]);
+    // Draw the hi-res image scaled down to the PDF page size
+    page.drawImage(pngImage, {
+      x: 0,
+      y: 0,
+      width: cardWidth * 2,
+      height: cardHeight * pageRows.length,
+    });
   }
   const pdfBytes = await pdfDoc.save();
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
