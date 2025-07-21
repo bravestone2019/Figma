@@ -6,7 +6,6 @@ import ShapeTool from "./Shape/ShapeTool";
 import CreationTool from "./Creation/CreationTool";
 import TextTool from "./Text/TextTool";
 import Generate from "../Generate/Generate";
-import Upload from "../Generate/Upload/Upload";
 
 const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles, drawnRectangles, collections }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -90,11 +89,6 @@ const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles, 
         setExcelData={setExcelData} // <-- pass setExcelData
         files={files} // <-- pass files for image mapping
         setFiles={setFiles} // <-- pass setFiles for file management
-      />
-      <Upload
-        setExcelData={setExcelData}
-        files={files}
-        setFiles={setFiles}
       />
     </div>
   );

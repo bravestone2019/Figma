@@ -8,6 +8,7 @@ import useCanvasEventHandlers from "./eventHandlers/useCanvasEventHandlers";
 import isPointInShape from "./isPointInShape";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
 import { handleDeleteShapeKey } from "./deleteShapeHandler";
+import { v4 as uuidv4 } from 'uuid';
 
 const Canvas = ({
   activeTool,
@@ -39,6 +40,46 @@ const Canvas = ({
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectionBox, setSelectionBox] = useState(null);
   const [scalingHandle, setScalingHandle] = useState(null);
+  const clipboardRef = useRef([]);
+
+  // Copy selected shapes to clipboard
+  const handleCopy = () => {
+    if (!selectedShapes || selectedShapes.length === 0) return;
+    const copiedShapes = drawnRectangles.filter(shape => selectedShapes.includes(shape.id));
+    clipboardRef.current = copiedShapes.map(shape => ({ ...shape }));
+  };
+
+  // Paste shapes from clipboard with offset and new IDs
+  const handlePaste = () => {
+    if (!clipboardRef.current || clipboardRef.current.length === 0) return;
+    const OFFSET = 20;
+    const newShapes = clipboardRef.current.map(shape => {
+      const newShape = { ...shape, id: uuidv4() };
+      // Offset position for each shape type
+      if (newShape.type === 'rectangle' || newShape.type === 'image' || newShape.type === 'text') {
+        newShape.x += OFFSET;
+        newShape.y += OFFSET;
+      } else if (newShape.type === 'circle') {
+        newShape.x += OFFSET;
+        newShape.y += OFFSET;
+      } else if (newShape.type === 'line') {
+        newShape.x1 += OFFSET;
+        newShape.y1 += OFFSET;
+        newShape.x2 += OFFSET;
+        newShape.y2 += OFFSET;
+      } else if (newShape.type === 'triangle') {
+        newShape.x1 += OFFSET;
+        newShape.y1 += OFFSET;
+        newShape.x2 += OFFSET;
+        newShape.y2 += OFFSET;
+        newShape.x3 += OFFSET;
+        newShape.y3 += OFFSET;
+      }
+      return newShape;
+    });
+    setDrawnRectangles(prev => [...prev, ...newShapes]);
+    setSelectedShapes(newShapes.map(s => s.id));
+  };
 
   // Grid configuration
   const GRID_SIZE = 5; // Size of each grid cell in pixels
@@ -46,7 +87,7 @@ const Canvas = ({
   const MIN_SCALE_FOR_GRID = 2; // Minimum scale to show grid lines
 
   // Use the custom hook for keyboard shortcuts
-  useKeyboardShortcuts(setActiveTool, textInput);
+  useKeyboardShortcuts(setActiveTool, textInput, handleCopy, handlePaste);
 
   // Use the custom hook for event handlers
   const {
