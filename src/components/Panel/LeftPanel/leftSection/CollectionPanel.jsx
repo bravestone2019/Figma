@@ -1,5 +1,4 @@
-import React from 'react';
-
+import "../LeftPanel.css"
 const CollectionPanel = ({
   collection,
   setCollection,
@@ -16,7 +15,7 @@ const CollectionPanel = ({
     <div className={`collection-panel${collectionOpen ? '' : ' collapsed'}`}> 
       <div className="collection-header" onClick={() => setCollectionOpen(!collectionOpen)}>
         <span>Collection</span>
-        <span style={{ marginLeft: 8 }}>{collectionOpen ? '▼' : '▶'}</span>
+        <span>{collectionOpen ? '▼' : '▶'}</span>
       </div>
       {collectionOpen && (
         <ul
@@ -25,8 +24,8 @@ const CollectionPanel = ({
             e.preventDefault();
             setIsCollectionDragOver(true);
           }}
-          onDragLeave={e => setIsCollectionDragOver(false)}
-          onDrop={e => {
+          onDragLeave={() => setIsCollectionDragOver(false)}
+          onDrop={() => {
             setIsCollectionDragOver(false);
             if (onDropItem) onDropItem(draggedShapeId);
           }}

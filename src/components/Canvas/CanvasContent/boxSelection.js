@@ -118,7 +118,7 @@ export function drawSelectionBox(ctx, selectionBox, scale) {
   ctx.fillStyle = "rgba(33, 150, 243, 0.1)";
   ctx.strokeStyle = "#2196f3";
   ctx.lineWidth = 1 / scale;
-  ctx.setLineDash([5, 5]);
+  ctx.setLineDash([]);
   ctx.globalAlpha = 1;
   ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
   ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);

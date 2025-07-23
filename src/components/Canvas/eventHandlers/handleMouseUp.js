@@ -69,7 +69,7 @@ const handleMouseUp = (
               width: rectWidth,
               height: rectHeight,
               rotation: 0,
-              backgroundColor: "rgba(128, 128, 128, 0.2)",
+              backgroundColor: "#D9D9D9",
               borderColor: "transparent",
               borderWidth: 0,
               borderTopColor: "transparent",
@@ -87,6 +87,7 @@ const handleMouseUp = (
               borderRadiusTopRight: 0,
               borderRadiusBottomRight: 0,
               borderRadiusBottomLeft: 0,
+              role: null,
             },
           ];
         });
@@ -112,7 +113,8 @@ const handleMouseUp = (
               width: 2,
               opacity: 1,
               locked: false,
-              rotation: 0
+              rotation: 0,
+              role: null,
             },
           ];
         });
@@ -136,12 +138,13 @@ const handleMouseUp = (
               x: startX,
               y: startY,
               radius: radius,
-              backgroundColor: "rgba(128, 128, 128, 0.2)",
-              borderColor: "#808080",
+              backgroundColor: "#D9D9D9",
+              borderColor: "transparent",
               borderWidth: 1,
               opacity: 1,
               fillOpacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });
@@ -177,6 +180,7 @@ const handleMouseUp = (
               opacity: 1,
               fillOpacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });
@@ -216,6 +220,7 @@ const handleMouseUp = (
               rotation: 0,
               opacity: 1,
               locked: false,
+              role: null,
             },
           ];
         });

@@ -3,7 +3,7 @@
 
 export function applyShapeStyling(ctx, shape, isHovered, isLocked, scale, activeTool) {
   if (isLocked) {
-    ctx.setLineDash([4, 2]);
+    ctx.setLineDash([]);
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2 / scale;
   } else if (activeTool === "Move" && isHovered) {

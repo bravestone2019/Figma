@@ -237,13 +237,10 @@
   max-height: 0;
   opacity: 0;
   visibility: hidden;
+  overflow: hidden;
 }
 
-.assets-scroll.expanded {
-  max-height: 600px; /* Adjust as needed */
-  opacity: 1;
-  visibility: visible;
-}
+
 
 /* .assets-scroll.hidden {
   max-height: 0; 
@@ -433,17 +430,6 @@ div.pages-scroll-wrapper {
   background: transparent;
 }
 
-.collected-diamond {
-  /* color: #a259f7; */
-  color: #222;
-  margin-right: 4px;
-  font-size: 15px;
-  vertical-align: middle;
-  background: none;
-  border: none;
-  padding: 0;
-}
-
 .layer-list {
   min-height: 0;
   height: auto;
@@ -457,7 +443,7 @@ div.pages-scroll-wrapper {
   scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
   /* overflow-y: overlay; */
   /* overflow-y: auto; */
-  overflow-y: hidden; 
+  overflow-y: hidden;
   scrollbar-gutter: stable;
 }
 
@@ -483,4 +469,60 @@ div.pages-scroll-wrapper {
 
 .layer-list::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.layer-list-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* margin-left: 6px; */
+  padding: 8px 20px;
+  /* padding-right: 50px; */
+  border-radius: 6px;
+  margin-bottom: -4px;
+  margin-top: -8px;
+  /* margin-right: 20px; */
+  transition: background-color 0.2s ease;
+}
+
+.layer-list-content:hover {
+  background-color: #f0f0f0;
+}
+
+/* Selected state */
+.layer-list-content.selected {
+  background-color: rgba(24, 159, 255, 0.15);
+  /* color: white; */
+}
+
+/* Optional: override hover if selected */
+.layer-list-content.selected:hover {
+  background-color: rgba(24, 159, 255, 0.15);
+}
+
+.layer-item-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 10px 10px;
+    margin-bottom: -15px;
+    margin-right: -10px !important;
+  /* margin-top: -8px; */
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  gap: 6px;
+}
+
+/* Hover background */
+.layer-item-wrapper:hover {
+  background-color: #f0f0f0;
+}
+
+/* Selected background */
+.layer-item-wrapper.selected {
+  background-color:  rgba(24, 159, 255, 0.15);r
+}
+
+/* Optional: override hover if selected */
+.layer-item-wrapper.selected:hover {
+  background-color:  rgba(24, 159, 255, 0.15);
 }

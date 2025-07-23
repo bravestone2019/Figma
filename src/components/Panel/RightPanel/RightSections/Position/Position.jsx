@@ -296,37 +296,18 @@ const Position = ({
           <span className="tooltip">Rotation</span>
         </div>
 
-        <div
-          className="pos-box-button icon-group"
-          style={{
-            // position: "relative",
-            // padding: "1px 10px 2px 30px",
-            display: "inline-flex",
-            justifyContent: "flex-start",
-            padding: "4px 10px",
-            gap: "10px",
-            marginRight: 28,
-            marginLeft: -15,
-          }}
-        >
-          <button className="icon-button">
-            <img src={degrees} alt="Rotate" style={{ marginBottom: "-1px" }} />
-            <span className="tooltip">Rotate 90° Right</span>
+        {/* Icon buttons for rotation and flipping */}
+        <div className="pos-button-container">
+          <button className="pos-action-btn">
+            <img src={degrees} alt="Rotate" />
+            <span className="tooltip">Rotate</span>
           </button>
-          <button className="icon-button">
-            <img
-              src={vertical}
-              alt="Vertical Flip"
-              style={{ marginBottom: "-1px" }}
-            />
+          <button className="pos-action-btn">
+            <img src={vertical} alt="Flip Vertical" />
             <span className="tooltip">Flip Vertical</span>
           </button>
-          <button className="icon-button">
-            <img
-              src={horizontal}
-              alt="Horizontal Flip"
-              style={{ marginBottom: "-1px" }}
-            />
+          <button className="pos-action-btn">
+            <img src={horizontal} alt="Flip Horizontal" />
             <span className="tooltip">Flip Horizontal</span>
           </button>
         </div>
@@ -339,3 +320,61 @@ const Position = ({
 };
 
 export default Position;
+
+/* <div
+  className="pos-box-button icon-group"
+  style={{
+    // position: "relative",
+    // padding: "1px 10px 2px 30px",
+    display: "inline-flex",
+    justifyContent: "flex-start",
+    padding: "4px 10px",
+    gap: "10px",
+    marginRight: 28,
+    marginLeft: -15,
+  }}
+>
+  <button className="icon-button">
+    <img src={degrees} alt="Rotate" style={{ marginBottom: "-1px" }} />
+    <span className="tooltip">Rotate 90° Right</span>
+  </button>
+  <button className="icon-button">
+    <img src={vertical} alt="Vertical Flip" style={{ marginBottom: "-1px" }} />
+    <span className="tooltip">Flip Vertical</span>
+  </button>
+  <button className="icon-button">
+    <img
+      src={horizontal}
+      alt="Horizontal Flip"
+      style={{ marginBottom: "-1px" }}
+    />
+    <span className="tooltip">Flip Horizontal</span>
+  </button>
+</div>; */
+// }
+
+// <div className="pos-box-button">
+//   <button className="icon-button">
+//     <img src={degrees} alt="Rotate" />
+//     <span className="tooltip">Rotate 90° Right</span>
+//   </button>
+//   <button className="icon-button">
+//     <img src={vertical} alt="Flip Vertical" />
+//     <span className="tooltip">Flip Vertical</span>
+//   </button>
+//   <button className="icon-button">
+//     <img src={horizontal} alt="Horizontal Flip" />
+//     <span className="tooltip">Flip Horizontal</span>
+//   </button>
+// </div>
+
+{
+  /* <button className="icon-button">
+          <img src={degrees} alt="Rotate" />
+          <span className="tooltip">Rotate 90° Right</span>
+        </button>
+        <button className="icon-button">
+          <img src={degrees} alt="Rotate" />
+          <span className="tooltip">Rotate 90° Right</span>
+        </button> */
+}

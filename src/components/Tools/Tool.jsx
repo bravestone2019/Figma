@@ -7,7 +7,7 @@ import CreationTool from "./Creation/CreationTool";
 import TextTool from "./Text/TextTool";
 import Generate from "../Generate/Generate";
 
-const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles }) => {
+const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles, drawnRectangles, collections }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showTooltip, setShowTooltip] = useState(null);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
@@ -79,6 +79,8 @@ const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles }
         setIsGenerateOpen={handleGenerateOpen}
         position={position}
         scale={scale}
+        drawnRectangles={drawnRectangles} // <-- pass real array
+        collections={collections} // <-- pass collections
       />
     </div>
   );

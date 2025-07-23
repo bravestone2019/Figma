@@ -187,7 +187,6 @@ const Layout = ({ selectedShapes, drawnRectangles, setDrawnRectangles }) => {
           }}
         >
           <img
-            // src={Ratio}
             src={isLocked ? RatioLock : Ratio}
             alt={Ratio}
             style={{ width: 13, height: 12, marginBottom: 2 }}

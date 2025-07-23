@@ -39,7 +39,7 @@ const LeftPanel = ({
     titleRef,
   } = useScrollCollapse();
   const [scrollHeight, setScrollHeight] = useState(0);
-  const [isMinimized, setIsMinimized] = useState(false);
+  // const [isMinimized, setIsMinimized] = useState(false);
   // Replace individual state declarations with grouped hooks
   const {
     renamingId,

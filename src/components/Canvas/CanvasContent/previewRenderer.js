@@ -50,8 +50,8 @@ function drawRectanglePreview(ctx, drawingRectangle, scale) {
   const rectHeight = Math.abs(currentY - startY);
   
   ctx.save();
-  ctx.fillStyle = "rgba(128, 128, 128, 0.2)";
-  ctx.strokeStyle = "#808080";
+  ctx.fillStyle = "#D9D9D9";
+  ctx.strokeStyle = "transparent";
   ctx.lineWidth = 1 / scale;
   ctx.globalAlpha = 1;
   ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
@@ -78,8 +78,8 @@ function drawCirclePreview(ctx, drawingCircle, scale) {
   );
   
   ctx.save();
-  ctx.fillStyle = "rgba(128, 128, 128, 0.2)";
-  ctx.strokeStyle = "#808080";
+  ctx.fillStyle = "#D9D9D9";
+  ctx.strokeStyle = "transparent";
   ctx.lineWidth = 1 / scale;
   ctx.globalAlpha = 1;
   ctx.beginPath();
@@ -99,8 +99,8 @@ function drawTrianglePreview(ctx, drawingTriangle, scale) {
   const y3 = startY + length * Math.sin(angle + Math.PI / 3);
   
   ctx.save();
-  ctx.fillStyle = "rgba(128, 128, 128, 0.2)";
-  ctx.strokeStyle = "#808080";
+  ctx.fillStyle = "#D9D9D9";
+  ctx.strokeStyle = "transparent";
   ctx.lineWidth = 1 / scale;
   ctx.globalAlpha = 1;
   ctx.beginPath();
@@ -121,7 +121,7 @@ function drawImagePreview(ctx, drawingImage, scale) {
   const rectHeight = Math.abs(currentY - startY);
   
   ctx.save();
-  ctx.fillStyle = "rgba(100, 150, 255, 0.3)";
+  ctx.fillStyle = "#D9D9D9";
   ctx.strokeStyle = "#6496ff";
   ctx.lineWidth = 2 / scale;
   ctx.globalAlpha = 1;

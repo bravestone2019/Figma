@@ -95,6 +95,7 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
             cornerRadiusTopRight: 0,
             cornerRadiusBottomRight: 0,
             cornerRadiusBottomLeft: 0,
+            role: null,
           };
           return [...prev, imageShape];
         });
@@ -137,6 +138,7 @@ const Image = ({ activeTool, setActiveTool, setDrawnRectangles, position, scale 
             cornerRadiusTopRight: 0,
             cornerRadiusBottomRight: 0,
             cornerRadiusBottomLeft: 0,
+            role: null,
           };
           return [...prev, imageShape];
         });

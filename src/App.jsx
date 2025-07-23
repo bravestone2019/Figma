@@ -23,16 +23,28 @@ function App() {
   const [activePageId, setActivePageId] = useState(loaded?.activePageId || 'page-1');
   const [collection, setCollection] = useState(loaded?.collection || []);
   const [activeTool, setActiveTool] = useState(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState(loaded?.position || { x: 0, y: 0 });
+  const [scale, setScale] = useState(loaded?.scale || 1);
+  // Persist collections in localStorage
+  const [collections, setCollections] = useState(loaded?.collections || [
+    { id: 'col-1', name: 'Collection 1', shapeIds: [] }
+  ]);
 
-  // Save to localStorage whenever pages, activePageId, or collection changes
+  // Save to localStorage whenever pages, activePageId, collection, collections, position, or scale changes
   useEffect(() => {
-    saveAppState(pages, activePageId, collection);
-  }, [pages, activePageId, collection]);
+    saveAppState(pages, activePageId, collection, collections, position, scale);
+  }, [pages, activePageId, collection, collections, position, scale]);
 
   // Find the active page, fallback to first page or empty object
   const activePage = pages.find((p) => p.id === activePageId) || pages[0] || {};
+
+  // --- Figma-like canvas order logic ---
+  const allCollectedIds = collections.flatMap(col => col.shapeIds);
+  const collectionShapes = collections.flatMap(col =>
+    col.shapeIds.map(id => (activePage.drawnRectangles || []).find(s => s.id === id)).filter(Boolean)
+  );
+  const mainListShapes = (activePage.drawnRectangles || []).filter(s => !allCollectedIds.includes(s.id));
+  const canvasShapes = [...collectionShapes, ...mainListShapes];
 
   // Setter for background color of the active page
   const setBackgroundColor = (color) => {
@@ -106,6 +118,8 @@ function App() {
         setBackgroundColor={setBackgroundColor}
         backgroundOpacity={activePage.backgroundOpacity ?? 100}
         setBackgroundOpacity={setBackgroundOpacity}
+        collections={collections}
+        setCollections={setCollections}
       />
       <Canvas
         activeTool={activeTool}
@@ -114,7 +128,7 @@ function App() {
         setPosition={setPosition}
         scale={scale}
         setScale={setScale}
-        drawnRectangles={activePage.drawnRectangles || []}
+        drawnRectangles={canvasShapes}
         setDrawnRectangles={setDrawnRectangles}
         selectedShapes={activePage.selectedShapes || []}
         setSelectedShapes={setSelectedShapes}
@@ -127,6 +141,8 @@ function App() {
         position={position}
         scale={scale}
         setDrawnRectangles={setDrawnRectangles}
+        drawnRectangles={canvasShapes} // <-- pass real array
+        collections={collections} // <-- pass collections
       />
     </>
   );
