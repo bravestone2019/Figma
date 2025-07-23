@@ -36,9 +36,10 @@ const LayerListItem = ({
     <li
       key={shape.id + "-collected"}
       ref={renameInputRef}
-      className={isSelected ? "selected" : ""}
-      onClick={(e) => handleLayerClick(e, shape.id, i, flatList)}
-      onContextMenu={(e) => handleLayerContextMenu(e, shape.id)}
+      className={isSelected ? 'selected' : ''}
+      onMouseDown={e => handleLayerClick(e, shape.id, i, flatList, selectedShapes)}
+      onClick={e => handleLayerClick(e, shape.id, i, flatList)}
+      onContextMenu={e => handleLayerContextMenu(e, shape.id)}
       style={{
         borderRadius: 10,
         padding: "4px 0",
@@ -136,6 +137,7 @@ const LayerListItem = ({
         </div>
       )}
       {/* Z-order controls, only show if selected */}
+      
     </li>
   );
 };

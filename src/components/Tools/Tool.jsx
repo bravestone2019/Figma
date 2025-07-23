@@ -11,6 +11,10 @@ const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles, 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showTooltip, setShowTooltip] = useState(null);
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
+  // Add excelData state
+  const [excelData, setExcelData] = useState([]);
+  // Add files state for uploaded files
+  const [files, setFiles] = useState([]);
 
   // Handler to open/close Generate panel and block other tools
   const handleGenerateOpen = (open) => {
@@ -81,6 +85,10 @@ const Tool = ({ activeTool, setActiveTool, position, scale, setDrawnRectangles, 
         scale={scale}
         drawnRectangles={drawnRectangles} // <-- pass real array
         collections={collections} // <-- pass collections
+        excelData={excelData} // <-- pass excelData
+        setExcelData={setExcelData} // <-- pass setExcelData
+        files={files} // <-- pass files for image mapping
+        setFiles={setFiles} // <-- pass setFiles for file management
       />
     </div>
   );

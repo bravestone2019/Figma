@@ -436,6 +436,7 @@ div.pages-scroll-wrapper {
   flex: none;
   display: block;
   padding: 10px 10px;
+  padding-bottom: 80px;
   margin-left: -100px;
   margin-top: -18px;
   list-style: none;
@@ -477,6 +478,7 @@ div.pages-scroll-wrapper {
   gap: 10px;
   /* margin-left: 6px; */
   padding: 8px 20px;
+
   /* padding-right: 50px; */
   border-radius: 6px;
   margin-bottom: -4px;

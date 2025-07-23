@@ -12,6 +12,19 @@ import {
   drawImage,
   drawText,
 } from "../Canvas/CanvasContent/shapeRenderers";
+import { extractFrontBackShapes } from "./shapeUtils";
+import { createPortal } from 'react-dom';
+import { PDFDocument } from 'pdf-lib';
+import JsBarcode from 'jsbarcode';
+import { drawCard, loadImageAsync, roundedRectPath } from "./drawCardHelpers";
+import PrintPanel from "./PrintPanel";
+import CardPreview from "./CardPreview";
+import useImageBlobs from "./useImageBlobs";
+import useShortcut from "../Shortcut";
+import useModalState from "./useModalState";
+import { exportCardsAsPDF } from "./pdfExport";
+import PropTypes from 'prop-types';
+import GeneratePreviewCanvas from "./GeneratePreviewCanvas";
 
 const Generate = ({
   activeTool,
@@ -21,10 +34,18 @@ const Generate = ({
   setIsGenerateOpen,
   drawnRectangles, // <-- receive real array
   collections, // <-- receive collections
+  excelData, // <-- receive excelData
+  setExcelData, // <-- receive setExcelData
+  files, // <-- receive files for image mapping
+  setFiles, // <-- receive setFiles for file management
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, openGenerate, closeGenerate] = useModalState(false);
+  const [printPanelOpen, openPrintPanel, closePrintPanel] = useModalState(false);
   const canvasRef = useRef(null);
- 
+  // Dummy state to force re-render
+  const [redrawTick, setRedrawTick] = useState(0);
+  const imageBlobUrlsVersion = useImageBlobs(files);
+
   useEffect(() => {
     if (openDropdown) {
       document.body.classList.add("dropdown-open");
@@ -36,158 +57,45 @@ const Generate = ({
     };
   }, [openDropdown]);
 
-  useEffect(() => {
-    if (drawnRectangles) {
-      console.log("[Generate] Real drawnRectangles for preview:", drawnRectangles);
-    }
-  }, [drawnRectangles]);
-
-  // Register shortcut for 'g' (open generate)
-  Shortcut({ key: "g" }, () => {
-    setActiveTool("Generate");
-    setOpen(true);
-    setIsGenerateOpen(true);
-  });
-  // Register shortcut for 'escape' (close generate)
-  Shortcut({ key: "escape" }, () => {
-    if (open) {
-      setOpen(false);
-      setIsGenerateOpen(false);
-    }
-  });
+  useShortcut({ key: "g" }, () => { setActiveTool("Generate"); openGenerate(); setIsGenerateOpen(true); });
+  useShortcut({ key: "escape" }, () => { if (open) { closeGenerate(); setIsGenerateOpen(false); } });
 
   const handleOnClick = () => {
     setActiveTool("Generate");
-    setOpen(true);
+    openGenerate();
     setIsGenerateOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    closeGenerate();
     setIsGenerateOpen(false);
   };
 
   useEffect(() => {
-    if (!isGenerateOpen) setOpen(false);
+    if (!isGenerateOpen) closeGenerate();
   }, [isGenerateOpen]);
 
-  // Find front/back collections
-  const frontBackCollections = (collections || []).filter(
-    col => col.name === 'front' || col.name === 'back'
-  );
-  // Gather all shape IDs in order
-  const frontBackShapeIds = frontBackCollections.flatMap(col => col.shapeIds);
-  // Map IDs to shape objects (preserving order)
-  let frontBackShapes = frontBackShapeIds
-    .map(id => (drawnRectangles || []).find(s => s.id === id))
-    .filter(Boolean);
-
-  // Sort by zorder (ascending, lower zorder drawn first)
-  frontBackShapes = [...frontBackShapes].sort((a, b) => (a.zorder ?? 0) - (b.zorder ?? 0));
-
+  // Set up redrawCallback on the canvas DOM node
   useEffect(() => {
-    if (!open || !canvasRef.current || !frontBackShapes.length) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    // Set canvas size to match modal/client size
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.clientWidth * dpr;
-    const height = canvas.clientHeight * dpr;
-    canvas.width = width;
-    canvas.height = height;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#f7f7f9';
-    ctx.fillRect(0, 0, width, height);
-    ctx.save();
-    // Optionally scale to fit, or use 1:1
-    ctx.scale(dpr, dpr);
-    // Render each shape
-    frontBackShapes.forEach(shape => {
-      const role = shape.role || 'default';
-      const type = shape.shapeId || shape.type;
-      // Prepare shape copy for rendering
-      let renderShape = { ...shape };
-      // Placeholder: override fill/background
-      if (role === 'placeholder') {
-        if (type === 'rec' || type === 'rectangle') {
-          renderShape.backgroundColor = '#e0e0e0';
-          renderShape.fillOpacity = 1;
-          renderShape.opacity = 1;
-        } else if (type === 'img' || type === 'image') {
-          renderShape.src = '';
-          renderShape.backgroundColor = '#e0e0e0';
-          renderShape.opacity = 1;
-        } else if (type === 'text') {
-          renderShape.color = '#b0b0b0';
-          renderShape.text = 'Placeholder';
-          renderShape.opacity = 0.7;
-        } else if (type === 'line') {
-          renderShape.color = '#b0b0b0';
-          renderShape.opacity = 0.7;
-        } else if (type === 'circle') {
-          renderShape.backgroundColor = '#e0e0e0';
-          renderShape.opacity = 1;
-        } else if (type === 'triangle') {
-          renderShape.backgroundColor = '#e0e0e0';
-          renderShape.opacity = 1;
-        }
-      }
-      // Render by type
-      switch (type) {
-        case 'rec':
-        case 'rectangle':
-          drawRectangle(ctx, renderShape, { ...renderShape });
-          break;
-        case 'img':
-        case 'image':
-          // Only call drawImage if src is a non-empty string
-          if (typeof renderShape.src === 'string' && renderShape.src.trim() !== '') {
-            drawImage(ctx, renderShape, { ...renderShape, canvas });
-          } else {
-            // Draw placeholder for image
-            ctx.save();
-            ctx.fillStyle = renderShape.backgroundColor || '#e0e0e0';
-            ctx.globalAlpha = renderShape.opacity ?? 1;
-            ctx.fillRect(renderShape.x, renderShape.y, renderShape.width, renderShape.height);
-            ctx.strokeStyle = '#ccc';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(renderShape.x, renderShape.y, renderShape.width, renderShape.height);
-            ctx.fillStyle = '#666';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Placeholder', renderShape.x + renderShape.width / 2, renderShape.y + renderShape.height / 2);
-            ctx.restore();
-          }
-          break;
-        case 'line':
-          drawLine(ctx, renderShape, { ...renderShape, x1: renderShape.x1, y1: renderShape.y1, x2: renderShape.x2, y2: renderShape.y2 });
-          break;
-        case 'circle':
-          drawCircle(ctx, renderShape, { ...renderShape });
-          break;
-        case 'triangle':
-          drawTriangle(ctx, renderShape, { ...renderShape });
-          break;
-        case 'text':
-          drawText(ctx, renderShape, { ...renderShape });
-          break;
-        default:
-          break;
-      }
-    });
-    ctx.restore();
-  }, [open, frontBackShapes]);
-
-  useEffect(() => {
-    if (frontBackShapes) {
-      console.log("[Generate] Shapes for front/back collections:", frontBackShapes);
+    if (canvasRef.current) {
+      canvasRef.current.redrawCallback = () => {
+        setRedrawTick(tick => tick + 1);
+      };
     }
-  }, [frontBackShapes]);
+  }, []);
 
-  const hasFrontOrBack = frontBackShapes.length > 0;
+  // Find front/back shapes using shared utility
+  let frontBackShapes = extractFrontBackShapes(collections, drawnRectangles);
 
+
+  // Deep clone before sorting to avoid mutation
+  frontBackShapes = JSON.parse(JSON.stringify(frontBackShapes)).sort((a, b) => (a.zorder ?? 0) - (b.zorder ?? 0));
+
+  // Add export PDF handler
+  const handleExportPDF = async () => {
+    await exportCardsAsPDF({ frontBackShapes, excelData, files, rowsPerPage: 5 });
+  };
+  const hasFrontOrBack = frontBackShapes && frontBackShapes.length > 0;
   return (
     <>
       <div
@@ -202,19 +110,14 @@ const Generate = ({
           <div className="preview-modal" style={{ position: 'relative', overflow: 'hidden' }}>
             {/* Full-area preview canvas, absolutely positioned */}
             {hasFrontOrBack ? (
-              <canvas
-                id="generate-preview-canvas"
-                ref={canvasRef}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  background: '#f7f7f9',
-                  borderRadius: 12,
-                  zIndex: 1
-                }}
+              <GeneratePreviewCanvas
+                open={open}
+                frontBackShapes={frontBackShapes}
+                excelData={excelData}
+                files={files}
+                canvasRef={canvasRef}
+                imageBlobUrlsVersion={imageBlobUrlsVersion}
+                redrawTick={redrawTick}
               />
             ) : (
               <div style={{position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#888', zIndex: 2}}>
@@ -227,14 +130,32 @@ const Generate = ({
             </button>
             {/* Toolbar, above canvas, bottom center */}
             <div className="generate-container" style={{ position: 'absolute', left: '50%', bottom: 32, transform: 'translateX(-50%)', zIndex: 2 }}>
-              <Upload />
-              <Download />
+              <Upload setExcelData={setExcelData} files={files} setFiles={setFiles} />
+              <div style={{ display: 'inline-block' }} onClick={() => openPrintPanel() }>
+                <Download />
+              </div>
+              {/* Export as PDF button intentionally removed from here */}
             </div>
+            <PrintPanel open={printPanelOpen} onClose={() => closePrintPanel()} frontBackShapes={frontBackShapes} excelData={excelData} files={files} handleExportPDF={handleExportPDF} />
           </div>
         </div>
       )}
     </>
   );
+};
+
+Generate.propTypes = {
+  activeTool: PropTypes.string.isRequired,
+  setActiveTool: PropTypes.func.isRequired,
+  openDropdown: PropTypes.bool.isRequired,
+  isGenerateOpen: PropTypes.bool.isRequired,
+  setIsGenerateOpen: PropTypes.func.isRequired,
+  drawnRectangles: PropTypes.array.isRequired,
+  collections: PropTypes.array.isRequired,
+  excelData: PropTypes.array.isRequired,
+  setExcelData: PropTypes.func.isRequired,
+  files: PropTypes.array.isRequired,
+  setFiles: PropTypes.func.isRequired,
 };
 
 export default Generate;

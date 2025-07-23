@@ -549,6 +549,7 @@ const LayerList = ({
             handleCollectionDragOver={handleCollectionDragOver}
             handleCollectionDrop={handleCollectionDrop}
             setCollections={setCollections}
+            handleLayerClick={handleLayerClick} // <-- pass the handler here
             getShapeIcon={getShapeIcon}
             isCollected={true}
           />

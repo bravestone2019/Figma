@@ -150,7 +150,7 @@ const handleMouseDown = (
                 }
               });
               setMovingShape({ 
-                index: i, 
+                id: shape.id, 
                 offsetX, 
                 offsetY, 
                 multi: true, 
@@ -159,7 +159,7 @@ const handleMouseDown = (
               });
             } else {
               // Single shape move
-              setMovingShape({ index: i, offsetX, offsetY });
+              setMovingShape({ id: shape.id, offsetX, offsetY });
             }
             return;
           }

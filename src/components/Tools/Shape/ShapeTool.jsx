@@ -69,7 +69,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Circle: C
-  Shortcut({ key: "c" }, () => {
+  Shortcut({ key: "c", ctrl: false, shift: false, alt: false, meta: false }, () => {
     handleToolClick("Circle");
   });
 
