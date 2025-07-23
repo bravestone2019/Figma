@@ -1,10 +1,10 @@
-import '../../../components/Tool.css';
 import './CreationTool.css';
 import Shortcut from '../../Shortcut';
+import "../../../components/Tools/Tool.css";
 import { useState, useRef, useEffect } from "react";
-import Pen from '../../../assets/creation_Tools/pen.png';
-import Pencil from '../../../assets/creation_Tools/pencil.png';
 import DownArrow from '../../../assets/down.png';
+import Pen from '../../../assets/Tools/creation_Tools/pen.png';
+import Pencil from '../../../assets/Tools/creation_Tools/pencil.png';
 
 const creationTools = [
   { key: "Pen", label: "Pen", shortcut: "P", icon: Pen },

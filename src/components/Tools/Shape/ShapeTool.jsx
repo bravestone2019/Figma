@@ -1,25 +1,24 @@
-import '../../../components/Tool.css';
+import '../../../components/Tools/Tool.css';
 import './ShapeTool.css';
-import Image from './Image/images';
+import Image from './Image/Images';
 import Shortcut from '../../Shortcut';
 import { useState, useRef, useEffect } from "react";
-import RectangleIcon from '../../../assets/Shapes/rectangle.png';
+import RectangleIcon from '../../../assets/Tools/Shapes/rectangle.png';
 import DownArrow from '../../../assets/down.png';
-import Line from '../../../assets/Shapes/line.png';
-import Circle from '../../../assets/Shapes/circle.png';
-import Triangle from '../../../assets/Shapes/triangle.png';
-import ImageIcon from '../../../assets/Shapes/image.png';
-
+import Line from '../../../assets/Tools/Shapes/line.png';
+import Circle from '../../../assets/Tools/Shapes/circle.png';
+import Triangle from '../../../assets/Tools/Shapes/triangle.png';
+import ImageIcon from '../../../assets/Tools/Shapes/image.png';
 
 const shapeTools = [
   { key: "Rectangle", label: "Rectangle", shortcut: "R", icon: RectangleIcon },
   { key: "Line", label: "Line", shortcut: "L", icon: Line },
   { key: "Circle", label: "Circle", shortcut: "C", icon: Circle },
   { key: "Triangle", label: "Triangle", shortcut: "shift+T", icon: Triangle },
-  { key: "Image", label: "Image", shortcut: "ctrl+shift+I", icon: ImageIcon },
+  { key: "Image", label: "Image", shortcut: "ctrl+shift+k", icon: ImageIcon },
 ];
 
-const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale }) => {
+const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, showTooltip, setShowTooltip, position, scale, setDrawnRectangles }) => {
   const [selected, setSelected] = useState(shapeTools[0]); // Default to Rectangle
   const dropdownRef = useRef();
   const tooltipTimeout = useRef();
@@ -60,7 +59,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
 
   //  Keyboard shortcuts for shape tools
   // Rectangle: R
-  Shortcut({ key: "r" }, () => {
+  Shortcut({ key: "r", ctrl: false, shift: false, alt: false, meta: false }, () => {
     handleToolClick("Rectangle");
   });
 
@@ -70,7 +69,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Circle: C
-  Shortcut({ key: "c" }, () => {
+  Shortcut({ key: "c", ctrl: false, shift: false, alt: false, meta: false }, () => {
     handleToolClick("Circle");
   });
 
@@ -80,7 +79,7 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
   });
 
   // Image: Ctrl+Shift+I
-  Shortcut({ ctrl: true, shift: true, key: "k" }, () => {
+  Shortcut({ ctrl: true, shift: true, key: "i" }, () => {
     handleToolClick("Image");
   });
 
@@ -131,7 +130,13 @@ const ShapeTool = ({ activeTool, setActiveTool, openDropdown, setOpenDropdown, s
         )}
       </div>
       {/* {activeTool === "Image" && <Image activeTool={activeTool} />}                 */}
-      <Image activeTool={activeTool} />
+      <Image 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool}
+        setDrawnRectangles={setDrawnRectangles} 
+        position={position} 
+        scale={scale} 
+      />
     </>
   );
 };

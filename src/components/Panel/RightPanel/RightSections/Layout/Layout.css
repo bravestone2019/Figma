@@ -1,0 +1,48 @@
+.reset-size-btn {
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  position: relative;
+  margin-left: -4px;
+  margin-top: -2px;
+  width: 15px;
+  height: 10px;
+  z-index: 10;
+}
+
+.reset-size-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.reset-size-btn .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background: #222;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  position: absolute;
+  transform: translatex(-50%);
+  bottom: -30px;
+  left: -25px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  z-index: 10;
+}
+
+/* Show tooltip on hover */
+.reset-size-btn:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.reset-size-btn.selected {
+  background-color: rgba(24, 159, 255, 0.15); 
+}

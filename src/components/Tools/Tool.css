@@ -22,14 +22,13 @@
   color: #fff;
   padding: 8px 16px; 
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 12px;
   position: absolute;
   left: 45%;
   bottom: 140%; /* Show above the icon */
   transform: translateX(-50%);
   white-space: nowrap;
   pointer-events: none;
-  /* transition: opacity 0.2s; */
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
   z-index: 1001;
 }
@@ -113,6 +112,7 @@
   width: 18px;
   height: 18px;
   display: block; 
+  -webkit-user-drag: none;
 }
 
 .icon-down {
@@ -121,6 +121,7 @@
   height: 10px;
   display: inline-block;
   vertical-align: middle;
+  -webkit-user-drag: none;
 }
 
 .icon-group-tight {
@@ -128,6 +129,7 @@
   gap: 1px; /* Add space between icons in a group */
   align-items: center;
   margin-right: 8px;
+  -webkit-user-drag: none;
 }
 
 .tooltip.hide-tooltip {

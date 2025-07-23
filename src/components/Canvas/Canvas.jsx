@@ -1,255 +1,256 @@
-import { useEffect, useRef, useState } from 'react';
-import './Canvas.css';
-import { handleZoom, handlePinchZoom } from '../../utils/zoom';
-import { handleHorizontalPan, handleVerticalPan } from '../../utils/panning';
+import { useEffect, useRef, useState } from "react";
+import "./Canvas.css";
+// import { handleZoom, handlePinchZoom } from "../../utils/zoom";
+// import { handleHorizontalPan, handleVerticalPan } from "../../utils/panning";
+import CanvasDrawing from "./CanvasDrawing";
+import TextInputOverlay from "./TextInputOverlay";
+import useCanvasEventHandlers from "./eventHandlers/useCanvasEventHandlers";
+import isPointInShape from "./isPointInShape";
+import useKeyboardShortcuts from "./useKeyboardShortcuts";
+import { handleDeleteShapeKey } from "./deleteShapeHandler";
+import { v4 as uuidv4 } from 'uuid';
 
-const Canvas = ({ activeTool, setActiveTool, position, setPosition, scale, setScale, drawnRectangles, setDrawnRectangles }) => {
+const Canvas = ({
+  activeTool,
+  setActiveTool,
+  position,
+  setPosition,
+  scale,
+  setScale,
+  drawnRectangles,
+  setDrawnRectangles,
+  selectedShapes,
+  setSelectedShapes,
+  backgroundColor,
+  backgroundOpacity,
+}) => {
   const canvasRef = useRef(null);
+  const previewRef = useRef(null);
+  const canvasDrawingRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [drawingRectangle, setDrawingRectangle] = useState(null); // New state for dynamic rectangle drawing
+  const [drawingRectangle, setDrawingRectangle] = useState(null);
+  const [drawingLine, setDrawingLine] = useState(null);
+  const [drawingCircle, setDrawingCircle] = useState(null);
+  const [drawingTriangle, setDrawingTriangle] = useState(null);
+  const [drawingImage, setDrawingImage] = useState(null);
+  const [textInput, setTextInput] = useState(null);
+  const [textBox, setTextBox] = useState(null);
+  const [movingShape, setMovingShape] = useState(null);
+  const [hoveredShape, setHoveredShape] = useState(null);
+  const [selectionBox, setSelectionBox] = useState(null);
+  const [scalingHandle, setScalingHandle] = useState(null);
+  const clipboardRef = useRef([]);
+
+  // Copy selected shapes to clipboard
+  const handleCopy = () => {
+    if (!selectedShapes || selectedShapes.length === 0) return;
+    const copiedShapes = drawnRectangles.filter(shape => selectedShapes.includes(shape.id));
+    clipboardRef.current = copiedShapes.map(shape => ({ ...shape }));
+  };
+
+  // Paste shapes from clipboard with offset and new IDs
+  const handlePaste = () => {
+    if (!clipboardRef.current || clipboardRef.current.length === 0) return;
+    const OFFSET = 20;
+    const newShapes = clipboardRef.current.map(shape => {
+      const newShape = { ...shape, id: uuidv4() };
+      // Offset position for each shape type
+      if (newShape.type === 'rectangle' || newShape.type === 'image' || newShape.type === 'text') {
+        newShape.x += OFFSET;
+        newShape.y += OFFSET;
+      } else if (newShape.type === 'circle') {
+        newShape.x += OFFSET;
+        newShape.y += OFFSET;
+      } else if (newShape.type === 'line') {
+        newShape.x1 += OFFSET;
+        newShape.y1 += OFFSET;
+        newShape.x2 += OFFSET;
+        newShape.y2 += OFFSET;
+      } else if (newShape.type === 'triangle') {
+        newShape.x1 += OFFSET;
+        newShape.y1 += OFFSET;
+        newShape.x2 += OFFSET;
+        newShape.y2 += OFFSET;
+        newShape.x3 += OFFSET;
+        newShape.y3 += OFFSET;
+      }
+      return newShape;
+    });
+    setDrawnRectangles(prev => [...prev, ...newShapes]);
+    setSelectedShapes(newShapes.map(s => s.id));
+  };
 
   // Grid configuration
   const GRID_SIZE = 5; // Size of each grid cell in pixels
-  const GRID_COLOR = '#e0e0e0'; // Light gray color for grid lines
+  const GRID_COLOR = "#e0e0e0"; // Light gray color for grid lines
   const MIN_SCALE_FOR_GRID = 2; // Minimum scale to show grid lines
+
+  // Use the custom hook for keyboard shortcuts
+  useKeyboardShortcuts(setActiveTool, textInput, handleCopy, handlePaste);
+
+  // Use the custom hook for event handlers
+  const {
+    handleWheel,
+    handleTouchStart,
+    handleTouchMove,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleMouseLeave,
+    handleContextMenu,
+  } = useCanvasEventHandlers({
+    canvasRef,
+    previewRef,
+    activeTool,
+    setActiveTool,
+    position,
+    setPosition,
+    scale,
+    setScale,
+    drawnRectangles,
+    setDrawnRectangles,
+    drawingRectangle,
+    setDrawingRectangle,
+    drawingLine,
+    setDrawingLine,
+    drawingCircle,
+    setDrawingCircle,
+    drawingTriangle,
+    setDrawingTriangle,
+    drawingImage,
+    setDrawingImage,
+    textInput,
+    setTextInput,
+    textBox,
+    setTextBox,
+    isDragging,
+    setIsDragging,
+    dragStart,
+    setDragStart,
+    movingShape,
+    setMovingShape,
+    hoveredShape,
+    setHoveredShape,
+    selectionBox,
+    setSelectionBox,
+    selectedShapes,
+    setSelectedShapes,
+    isPointInShape,
+    scalingHandle,
+    setScalingHandle,
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    // const ctx = canvas.getContext("2d");
 
     // Set canvas size to window size
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      drawCanvasContent();
     };
 
     // Initial resize
     resizeCanvas();
 
     // Handle window resize
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
 
-    // Prevent browser zoom
+    // Prevent browser zoom only when not in text input
     const preventBrowserZoom = (e) => {
-      if (e.ctrlKey) {
+      // Allow all keyboard events when in text input mode
+      if (textInput) return;
+
+      // Only prevent browser zoom when not in text input
+      if (e.ctrlKey && !e.target.closest(".text-input-container")) {
         e.preventDefault();
       }
     };
 
     // Add event listener for wheel with passive: false to allow preventDefault
-    window.addEventListener('wheel', preventBrowserZoom, { passive: false });
-    window.addEventListener('keydown', preventBrowserZoom);
+    window.addEventListener("wheel", preventBrowserZoom, { passive: false });
+    window.addEventListener("keydown", preventBrowserZoom);
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('wheel', preventBrowserZoom);
-      window.removeEventListener('keydown', preventBrowserZoom);
+      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("wheel", preventBrowserZoom);
+      window.removeEventListener("keydown", preventBrowserZoom);
     };
-  }, []);
+  }, [textInput ]);
 
-  // Draw grid lines and shapes
-  const drawCanvasContent = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-
-    ctx.clearRect(0, 0, width, height);
-
-    // Draw grid
-    if (scale >= MIN_SCALE_FOR_GRID) {
-      ctx.strokeStyle = GRID_COLOR;
-      ctx.lineWidth = 0.5;
-
-      const offsetX = position.x % (GRID_SIZE * scale);
-      const offsetY = position.y % (GRID_SIZE * scale);
-
-      for (let x = offsetX; x < width; x += GRID_SIZE * scale) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-
-      for (let y = offsetY; y < height; y += GRID_SIZE * scale) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-    }
-
-    // Draw existing rectangles
-    drawnRectangles.forEach(rect => {
-      ctx.fillStyle = rect.backgroundColor;
-      ctx.strokeStyle = rect.borderColor;
-      ctx.lineWidth = rect.borderWidth;
-      ctx.globalAlpha = rect.opacity;
-      ctx.fillRect(
-        (rect.x + position.x) * scale, 
-        (rect.y + position.y) * scale, 
-        rect.width * scale, 
-        rect.height * scale
-      );
-      ctx.strokeRect(
-        (rect.x + position.x) * scale, 
-        (rect.y + position.y) * scale, 
-        rect.width * scale, 
-        rect.height * scale
-      );
-    });
-
-    // Draw the rectangle being currently drawn (dynamic preview)
-    if (drawingRectangle) {
-      const startX = drawingRectangle.startX;
-      const startY = drawingRectangle.startY;
-      const currentX = drawingRectangle.currentX;
-      const currentY = drawingRectangle.currentY;
-
-      const rectX = Math.min(startX, currentX);
-      const rectY = Math.min(startY, currentY);
-      const rectWidth = Math.abs(currentX - startX);
-      const rectHeight = Math.abs(currentY - startY);
-
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-      ctx.strokeStyle = '#ff0000';
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 1;
-
-      ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
-      ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
-    }
-  };
-
-  // Re-draw canvas content when position, scale, or drawnRectangles changes
   useEffect(() => {
-    drawCanvasContent();
-  }, [position, scale, drawnRectangles, drawingRectangle]); // Add drawingRectangle to dependencies
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  // Handle mouse wheel for zooming and panning
-  const handleWheel = (e) => {
-    e.preventDefault();
+    const handler = (e) => handleWheel(e);
+    canvas.addEventListener("wheel", handler, { passive: false });
 
-    if (e.shiftKey) {
-      const horizontalPan = handleHorizontalPan(e, position);
-      if (horizontalPan) {
-        setPosition(horizontalPan);
-        return;
+    return () => {
+      canvas.removeEventListener("wheel", handler, { passive: false });
+    };
+  }, [handleWheel]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      const isInput = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
+      if (!isInput) {
+        handleDeleteShapeKey(e, drawnRectangles, selectedShapes, setDrawnRectangles, setSelectedShapes);
       }
-    }
-
-    if (e.ctrlKey) {
-      const verticalPan = handleVerticalPan(e, position);
-      if (verticalPan) {
-        setPosition(verticalPan);
-        return;
-      }
-    }
-
-    const result = handleZoom(e, position, scale);
-    if (result) {
-      setPosition(result.position);
-      setScale(result.scale);
-    }
-  };
-
-  // Handle touch events for pinch zoom
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (e.touches.length === 2) {
-      const result = handlePinchZoom(e, position, scale);
-      if (result) {
-        setPosition(result.position);
-        setScale(result.scale);
-      }
-    }
-  };
-
-  // Handle mouse down for panning or starting rectangle draw
-  const handleMouseDown = (e) => {
-    if (activeTool === 'Hand') {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-    } else if (activeTool === 'Rectangle') {
-      setDrawingRectangle({
-        startX: e.clientX,
-        startY: e.clientY,
-        currentX: e.clientX,
-        currentY: e.clientY,
-      });
-    }
-  };
-
-  // Handle mouse move for panning or drawing rectangle
-  const handleMouseMove = (e) => {
-    if (isDragging && activeTool === 'Hand') {
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
-      setPosition({ x: newX, y: newY });
-    } else if (drawingRectangle && activeTool === 'Rectangle') {
-      setDrawingRectangle(prev => ({
-        ...prev,
-        currentX: e.clientX,
-        currentY: e.clientY,
-      }));
-    }
-  };
-
-  // Handle mouse up to stop panning or finalize rectangle drawing
-  const handleMouseUp = (e) => {
-    setIsDragging(false);
-    if (drawingRectangle && activeTool === 'Rectangle') {
-      const startX = drawingRectangle.startX;
-      const startY = drawingRectangle.startY;
-      const endX = e.clientX;
-      const endY = e.clientY;
-
-      const rectX = Math.min(startX, endX);
-      const rectY = Math.min(startY, endY);
-      const rectWidth = Math.abs(endX - startX);
-      const rectHeight = Math.abs(endY - startY);
-
-      // Add the new rectangle to the list of drawn rectangles
-      setDrawnRectangles(prev => [...prev, {
-        x: (rectX - position.x) / scale, // Adjust for pan and scale
-        y: (rectY - position.y) / scale, // Adjust for pan and scale
-        width: rectWidth / scale, // Adjust for scale
-        height: rectHeight / scale, // Adjust for scale
-        backgroundColor: 'rgba(255, 0, 0, 0.1)',
-        borderColor: '#ff0000',
-        borderWidth: 1,
-        opacity: 1,
-      }]);
-      setDrawingRectangle(null); // Reset drawing state
-    }
-  };
-
-  // Handle mouse leave to stop panning or drawing
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-    setDrawingRectangle(null); // Also reset drawing if mouse leaves canvas
-  };
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [drawnRectangles, selectedShapes]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`canvas ${activeTool === 'Hand' ? 'hand-tool' : ''}`}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-    />
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <canvas
+        ref={canvasRef}
+        className={`canvas ${activeTool === "Hand" ? "hand-tool" : ""}`}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onContextMenu={handleContextMenu}
+      />
+      <CanvasDrawing
+        ref={canvasDrawingRef}
+        canvasRef={canvasRef}
+        previewRef={previewRef}
+        position={position}
+        scale={scale}
+        drawnRectangles={drawnRectangles}
+        drawingRectangle={drawingRectangle}
+        drawingLine={drawingLine}
+        drawingCircle={drawingCircle}
+        drawingTriangle={drawingTriangle}
+        drawingImage={drawingImage}
+        textBox={textBox}
+        hoveredShape={hoveredShape}
+        activeTool={activeTool}
+        selectionBox={selectionBox}
+        selectedShapes={selectedShapes}
+        textInput={textInput}
+        backgroundColor={backgroundColor}
+        backgroundOpacity={backgroundOpacity}
+      />
+      <TextInputOverlay
+        textInput={textInput}
+        setTextInput={setTextInput}
+        setDrawnRectangles={setDrawnRectangles}
+        setSelectedShapes={setSelectedShapes} // Pass this prop
+        scale={scale}
+        position={position}
+        redrawAllShapes={canvasDrawingRef}
+      />
+    </div>
   );
 };
 
-export default Canvas; 
+
+export default Canvas;

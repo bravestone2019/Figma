@@ -1,0 +1,306 @@
+// redraw.js
+// Redraws all shapes on the canvas when textInput or drawnRectangles changes
+
+import { getBoundingRect } from './boundShape';
+import { drawScaleHandles, drawCornerScaleHandles, drawLineHandles, drawCircleHandle, drawTriangleHandles } from './scaleHandles';
+import { 
+  drawRectangle, 
+  drawLine, 
+  drawCircle, 
+  drawTriangle, 
+  drawImage, 
+  drawText 
+} from './shapeRenderers';
+import { drawPreviewShapes } from './previewRenderer';
+import { drawSelectionBox } from './boxSelection';
+
+// Add a utility to convert hex to rgba
+function hexToRgba(color, opacity) {
+  if (!color) return `rgba(217,217,217,${opacity / 100})`;
+  if (color.startsWith('rgba')) {
+    // Replace the alpha value with the new opacity
+    return color.replace(/rgba\((\d+),(\d+),(\d+),([\d.]+)\)/, (match, r, g, b) => {
+      return `rgba(${r},${g},${b},${opacity / 100})`;
+    });
+  }
+  if (color.startsWith('rgb')) {
+    // Convert rgb to rgba
+    return color.replace(/rgb\((\d+),(\d+),(\d+)\)/, (match, r, g, b) => {
+      return `rgba(${r},${g},${b},${opacity / 100})`;
+    });
+  }
+  // Otherwise, treat as hex
+  let r = 217, g = 217, b = 217;
+  if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
+    if (color.length === 7) {
+      r = parseInt(color.slice(1, 3), 16);
+      g = parseInt(color.slice(3, 5), 16);
+      b = parseInt(color.slice(5, 7), 16);
+    } else if (color.length === 4) {
+      r = parseInt(color[1] + color[1], 16);
+      g = parseInt(color[2] + color[2], 16);
+      b = parseInt(color[3] + color[3], 16);
+    }
+  }
+  return `rgba(${r},${g},${b},${opacity / 100})`;
+}
+
+export function redraw({
+  canvasRef,
+  position,
+  scale,
+  drawnRectangles,
+  activeTool,
+  hoveredShape,
+  textInput,
+  selectedShapes = [],
+  drawingRectangle,
+  drawingLine,
+  drawingCircle,
+  drawingTriangle,
+  drawingImage,
+  textBox,
+  selectionBox,
+  backgroundColor = '#FFFFFF',
+  backgroundOpacity = 100,
+}) {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  
+  // Save the current canvas state
+  ctx.save();
+  
+  // Clear and setup transform
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = hexToRgba(backgroundColor, backgroundOpacity);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.translate(position.x, position.y);
+  ctx.scale(scale, scale);
+
+  // Grid configuration
+  const GRID_SIZE = 5; // Size of each grid cell in pixels
+  const GRID_COLOR = "#e0e0e0"; // Light gray color for grid lines
+  const MIN_SCALE_FOR_GRID = 2; // Minimum scale to show grid lines
+
+  // Utility function to draw the grid
+  function drawGrid(ctx, canvas, position, scale) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for grid
+    ctx.strokeStyle = GRID_COLOR;
+    ctx.lineWidth = 0.5;
+    const width = canvas.width;
+    const height = canvas.height;
+    // Offset so grid moves with pan
+    const offsetX = (position.x % (GRID_SIZE * scale));
+    const offsetY = (position.y % (GRID_SIZE * scale));
+    for (let x = offsetX; x < width; x += GRID_SIZE * scale) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = offsetY; y < height; y += GRID_SIZE * scale) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Draw grid lines (before drawing shapes) in screen (pixel) units
+  if (scale >= MIN_SCALE_FOR_GRID) {
+    drawGrid(ctx, canvas, position, scale);
+  }
+
+  // Draw all shapes using the new shape renderer modules
+  drawnRectangles.forEach((shape, i) => {
+    // Skip the current text input shape to prevent double drawing
+    if (textInput && 
+        shape.type === "text" && 
+        shape.x === textInput.x && 
+        shape.y === textInput.y) {
+      return;
+    }
+
+    const renderOptions = {
+      isHovered: activeTool === "Move" && i === hoveredShape,
+      isLocked: shape.locked,
+      scale,
+      activeTool,
+      canvas,
+      x: shape.x,
+      y: shape.y,
+      width: shape.width,
+      height: shape.height,
+      rotation: shape.rotation || 0
+    };
+
+    // Use the appropriate shape renderer based on shape type
+    switch (shape.type) {
+      case "rectangle":
+        drawRectangle(ctx, shape, renderOptions);
+        break;
+      case "line":
+        drawLine(ctx, shape, {
+          ...renderOptions,
+          x1: shape.x1,
+          y1: shape.y1,
+          x2: shape.x2,
+          y2: shape.y2
+        });
+        break;
+      case "circle":
+        drawCircle(ctx, shape, renderOptions);
+        break;
+      case "triangle":
+        drawTriangle(ctx, shape, renderOptions);
+        break;
+      case "image":
+        drawImage(ctx, shape, renderOptions);
+        break;
+      case "text":
+        drawText(ctx, shape, renderOptions);
+        break;
+      default:
+        console.warn(`Unknown shape type: ${shape.type}`);
+    }
+  });
+
+  // Draw bounding boxes for selected shapes (draw on top of all shapes)
+  if (selectedShapes && selectedShapes.length > 0) {
+    selectedShapes.forEach((id) => {
+      const shape = drawnRectangles.find(s => s.id === id);
+      if (!shape) return;
+      if (shape.type === 'line') {
+        drawRotatedLineHandles(ctx, shape, scale);
+      } else if (shape.type === 'circle') {
+        drawCircleHandle(ctx, shape, scale);
+      } else if (shape.type === 'triangle') {
+        drawTriangleHandles(ctx, shape, scale);
+      } else {
+        const bounds = getBoundingRect(shape);
+        // Draw rotated bounding box
+        const cx = bounds.x + bounds.width / 2;
+        const cy = bounds.y + bounds.height / 2;
+        const angle = (shape.rotation || 0);
+        function rotatePoint(x, y, cx, cy, angle) {
+          const rad = (angle * Math.PI) / 180;
+          const dx = x - cx;
+          const dy = y - cy;
+          return {
+            x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+            y: cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+          };
+        }
+        const corners = [
+          rotatePoint(bounds.x, bounds.y, cx, cy, angle),
+          rotatePoint(bounds.x + bounds.width, bounds.y, cx, cy, angle),
+          rotatePoint(bounds.x + bounds.width, bounds.y + bounds.height, cx, cy, angle),
+          rotatePoint(bounds.x, bounds.y + bounds.height, cx, cy, angle)
+        ];
+        ctx.save();
+        ctx.setLineDash([6, 3]);
+        ctx.strokeStyle = '#2196f3';
+        ctx.lineWidth = 2 / scale;
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.moveTo(corners[0].x, corners[0].y);
+        for (let i = 1; i < 4; i++) ctx.lineTo(corners[i].x, corners[i].y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+        drawRotatedCornerHandles(ctx, corners, scale);
+      }
+    });
+  }
+
+  // Draw aspect ratio preservation indicator if scaling handle is active with preserveAspectRatio
+  if (window.scalingHandle && window.scalingHandle.preserveAspectRatio) {
+    const shape = drawnRectangles.find(s => s.id === window.scalingHandle.shapeId);
+    if (shape && (shape.type === 'rectangle' || shape.type === 'text' || shape.type === 'image')) {
+      ctx.save();
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = '#2196f3';
+      ctx.lineWidth = 2 / scale;
+      ctx.globalAlpha = 0.8;
+      
+      // Draw diagonal line from top-left to bottom-right
+      ctx.beginPath();
+      ctx.moveTo(shape.x, shape.y);
+      ctx.lineTo(shape.x + shape.width, shape.y + shape.height);
+      ctx.stroke();
+      
+      // Draw diagonal line from top-right to bottom-left
+      ctx.beginPath();
+      ctx.moveTo(shape.x + shape.width, shape.y);
+      ctx.lineTo(shape.x, shape.y + shape.height);
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+  }
+
+  // Draw selection box using the dedicated module
+  drawSelectionBox(ctx, selectionBox, scale);
+
+  // Draw preview shapes on top of all committed shapes
+  if (!textInput) {
+    const previews = {
+      drawingRectangle,
+      drawingLine,
+      drawingCircle,
+      drawingTriangle,
+      drawingImage,
+      textBox
+    };
+    drawPreviewShapes(ctx, previews, scale);
+  }
+
+  // Restore the canvas state
+  ctx.restore();
+}
+
+function drawRotatedCornerHandles(ctx, corners, scale) {
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#2196f3";
+  const size = 8 / scale;
+  corners.forEach(corner => {
+    ctx.beginPath();
+    ctx.rect(corner.x - size / 2, corner.y - size / 2, size, size);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawRotatedLineHandles(ctx, shape, scale) {
+  const { x1, y1, x2, y2, rotation = 0 } = shape;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const rad = (rotation * Math.PI) / 180;
+  function rotatePoint(x, y) {
+    const dx = x - cx;
+    const dy = y - cy;
+    return {
+      x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+      y: cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+    };
+  }
+  const p1 = rotatePoint(x1, y1);
+  const p2 = rotatePoint(x2, y2);
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#2196f3";
+  const size = 8 / scale;
+  [p1, p2].forEach(pt => {
+    ctx.beginPath();
+    ctx.rect(pt.x - size / 2, pt.y - size / 2, size, size);
+    ctx.fill();
+    ctx.stroke();
+  });
+  ctx.restore();
+} 

@@ -1,0 +1,426 @@
+/*  Main Left Panel */
+.left-panel {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  
+  flex-direction: column; 
+  background: #fff;
+  color: #222;
+  display: flex;
+}  
+
+/* Toggle Button */
+.left-toggle-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  position: relative;
+  top: -18px;
+}
+
+/*  LOGO ICON */
+.logo-area {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;     
+  height: 45px;
+  top: 13px;
+  right: 70px;
+  margin: 16px 14px 0 auto;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.logo-area:hover{
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.logo-icon {
+  width: 42px;
+  height: 40px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.logo-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background: #222;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  position: absolute;
+  /* top: 20px; */
+  transform: translateX(86%);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  z-index: 10;
+}
+
+.logo-area:hover .logo-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.6s;
+} 
+
+.left-panel-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  padding: 18px; 
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.left-panel-header {
+  flex-shrink: 0;
+  background: white;
+  padding: 0 2px;
+}
+
+.left-section-header {
+  font-size: 11px;
+  font-weight: bold;
+  cursor: default;
+  padding: 15px 0 14px 0;
+  margin-left: -10px;
+  margin-top: -15px; 
+}
+
+.left-section-header span {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  margin-right: 40px; 
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.left-section-title {
+  font-size: 11px;
+  font-weight: bold;
+  cursor: default;
+  padding: 15px 0 14px 0;
+  position: relative;
+} 
+
+/* Bottom line like in Figma */
+.left-section-title.scrolled::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -20px;
+  right: -20px;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+.left-section-title.collapsed.scrolled::after {
+  content: none;
+}
+
+.left-section-title .arrow-icon {
+  width: 10px;
+  height: 10px;
+  margin-left: -15px;
+  margin-top: -2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none; 
+}
+
+.left-section-title:hover .arrow-icon {
+  opacity: 1;
+}
+
+.layers-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.left-header-divider {
+  position: relative;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+
+/* Toggle Icon when Left Panel is not Collapsed  */
+.toggle-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 16px 14px 0 auto;
+  padding: 6px 8px;
+  border-radius: 8px; 
+  transition: background-color 0.2s ease;
+} 
+
+.toggle-wrapper:hover{
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  position: absolute;
+  padding: 8px 10px;
+  transition: background 0.2s;
+  user-select: none;
+  -webkit-user-drag: none;
+  z-index: 2;
+}
+
+.left-toggle {
+  visibility: hidden;
+  opacity: 0;
+  background: #222;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  position: absolute;
+  top: 115%;
+  right: -350%;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  z-index: 10;
+}
+
+.toggle-wrapper:hover .left-toggle {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.6s;
+} 
+
+/* Scroll only inside this */
+.assets-scroll {
+  flex-grow: 1;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto; /* Reactivate vertical scrolling */
+  padding: 0;
+  margin-top: 8px;
+  
+  /* scroll-behavior: smooth; */
+  
+  min-height: 0;
+  transition: max-height 0.3s ease-out;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.assets-scroll:hover {
+  overflow-y: auto; 
+}
+
+.assets-scroll.hidden {
+  max-height: 0; /* Collapse state */
+  padding-top: 0; /* Remove top padding when collapsed */
+  padding-bottom: 0; /* Remove bottom padding when collapsed */
+  margin-top: 0; /* Adjust margin if needed */
+  overflow-y: hidden !important;
+}
+
+.assets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #fff;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.assets-list li {
+  font-size: 13px;
+  padding: 7px 0;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.assets-list li:not(.selected):hover {
+  background: #e3e6ea;
+}
+.assets-list .selected {
+  background: #1976d2 !important;
+  color: #fff !important;
+}
+.layer-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  color: #888;
+}
+.assets-list li > span {
+  padding-left: 0;
+}
+
+/* Custom small-height scrollbar thumb for .assets-scroll */
+.assets-scroll::-webkit-scrollbar {
+  width: 7px;
+  background: transparent;
+}
+
+/* Make the scrollbar thumb for .assets-scroll even smaller in height */
+.assets-scroll::-webkit-scrollbar-thumb {
+  background: rgba(162, 89, 247, 0.5);
+  border-radius: 6px;
+  min-height: 8px;
+  max-height: 16px;
+  border: 6px solid transparent;
+  background-clip: padding-box;
+}
+
+.assets-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(162, 89, 247, 0.8);
+}
+
+.assets-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(162, 89, 247, 0.5) transparent;
+}
+
+.assets-list > li {
+  margin-left: 4px;
+}
+
+.assets-list > li > span {
+  padding-left: 4px;
+}
+
+.pages-section {
+  background: #fff;
+  padding: 16px 0 10px 0;
+  margin-bottom: 8px;
+}
+.pages-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  padding: 0 0 6px 0;
+}
+.pages-title {
+  color: #222;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  flex: 1 1 auto;
+  text-align: left !important;
+  margin-right: 0;
+  padding-left: 0;
+}
+.pages-add-btn {
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 22px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background 0.15s;
+  margin-left: auto !important;
+}
+.pages-add-btn:hover {
+  background: #e3e6ea;
+}
+.pages-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+}
+.page-item {
+  background: #e3e6ea;
+  color: #222;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  margin-bottom: 2px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.pages-list .active {
+  background: #1976d2;
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px #1976d2;
+}
+
+.leftpanel-divider {
+  border: none;
+  border-top: 1px solid #e3e6ea;
+  margin: 8px 0 12px 0;
+}
+
+.collected-diamond {
+  color: #a259f7;
+  margin-right: 4px;
+  font-size: 15px;
+  vertical-align: middle;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Ensure .layer-list always shows the full list with no blank space or shrinking */
+.layer-list {
+  min-height: 0 !important;
+  height: auto !important;
+  flex: none !important;
+  display: block !important;
+  /* Remove any previous scroll or flex properties */
+}
+
+/* Also ensure the scroll container does not force extra height */
+.assets-scroll {
+  min-height: 0 !important;
+  height: auto !important;
+  flex: none !important;
+  display: block !important;
+}
+
+/* Keep improved scrollbar styling (already present) */
+
+.layer-list-container,
+.layer-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(162, 89, 247, 0.5) transparent;
+  overflow-y: overlay; /* Chrome/Edge only, fallback to auto if not supported */
+}
+
+/* Remove any permanent scrollbar from .layer-list */
+.layer-list {
+  overflow-y: visible !important;
+  /* Remove any scrollbar styling or scroll properties */
+  scrollbar-width: none !important;
+}
+
+.layer-list::-webkit-scrollbar {
+  display: none !important;
+}
