@@ -1,7 +1,7 @@
 import "./Panel.css";
 import { useState, useEffect, useRef } from "react";
 import Shortcut from "../Shortcut";
-import Minimize from "../../assets/LeftPanel/toggle.png"
+import Minimize from "../../assets/LeftPanel/Toggle.png"
 import LeftPanel from "./LeftPanel/LeftPanel";
 import RightPanel from "./RightPanel/RightPanel";
 
