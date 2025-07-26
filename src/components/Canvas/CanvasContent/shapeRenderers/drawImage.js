@@ -72,12 +72,12 @@ export function drawImage(ctx, shape, options = {}) {
   // Check if image is already loaded
   const cachedImage = imageCache.get(shape.src);
   if (cachedImage instanceof Image) {
-    // 'Contain' fit: scale image to fit inside shape, preserve aspect ratio, center it
+    // 'Cover' fit: scale image to fill the shape, preserve aspect ratio, crop as needed
     const imgW = cachedImage.naturalWidth;
     const imgH = cachedImage.naturalHeight;
     const boxW = shape.width;
     const boxH = shape.height;
-    const scale = Math.min(boxW / imgW, boxH / imgH);
+    const scale = Math.max(boxW / imgW, boxH / imgH);
     const drawW = imgW * scale;
     const drawH = imgH * scale;
     const drawX = shape.x + (boxW - drawW) / 2;
@@ -87,7 +87,7 @@ export function drawImage(ctx, shape, options = {}) {
     drawImagePlaceholder(ctx, shape, scale);
     if (!cachedImage && !loadingImages.has(shape.src)) {
       loadImage(shape.src).then(() => {
-        if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
+        if (canvas && typeof canvas.redrawCallback === 'function' && !canvas.redrawScheduled) {
           canvas.redrawScheduled = true;
           setTimeout(() => {
             canvas.redrawCallback();
@@ -95,7 +95,7 @@ export function drawImage(ctx, shape, options = {}) {
           }, 16);
         }
       }).catch(() => {
-        if (canvas && canvas.redrawCallback && !canvas.redrawScheduled) {
+        if (canvas && typeof canvas.redrawCallback === 'function' && !canvas.redrawScheduled) {
           canvas.redrawScheduled = true;
           setTimeout(() => {
             canvas.redrawCallback();
