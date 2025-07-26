@@ -1,4 +1,4 @@
-import "./upload.css"
+import "./Upload.css"
 import { useRef, useState } from "react";
 import Files from "./Files/Files";
 import Shortcut from  "../../Shortcut";
