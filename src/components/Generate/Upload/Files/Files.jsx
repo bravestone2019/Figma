@@ -1,4 +1,4 @@
-import "./files.css";
+import "./Files.css";
 import { Rnd } from "react-rnd";
 import { useState, useEffect } from "react";
 import Image from "../../../../assets/Generate/file.png";
